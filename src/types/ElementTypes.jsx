@@ -1,0 +1,2 @@
+export const DRAW_RECTANGLE = "DRAW_RECTANGLE";
+export const DRAW_CIRCLE = "DRAW_CIRCLE";
