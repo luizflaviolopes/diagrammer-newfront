@@ -9,10 +9,21 @@ import Line from "../components/Line.jsx";
 const Board = props => {
   const moving = (conId, where, x, y) => {
     let connectorRef = props.elements.connectors.find(con => con.id == conId);
-    console.log(where);
     connectorRef[where].x = x;
     connectorRef[where].y = y;
     connectorRef[where].update();
+  };
+
+  const drawConnectors = () => {
+    return props.elements.connectors.map(con => (
+      <Line from={con.from} to={con.to} />
+    ));
+  };
+
+  const drawElements = () => {
+    return props.elements.draws.map(item => (
+      <DrawWraper {...item} moving={moving} />
+    ));
   };
 
   return (
@@ -22,12 +33,8 @@ const Board = props => {
         <g
           transform={`translate(${props.boardView.viewX},${props.boardView.viewY})`}
         >
-          {props.elements.connectors.map(con => (
-            <Line from={con.from} to={con.to} />
-          ))}
-          {props.elements.draws.map(item => (
-            <DrawWraper {...item} moving={moving} />
-          ))}
+          {drawConnectors()}
+          {drawElements()}
         </g>
       </svg>
     </div>

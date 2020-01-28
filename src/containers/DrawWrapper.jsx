@@ -3,6 +3,8 @@ import ReactDOM from "react-dom";
 
 import elementTypeResolver from "../helpers/elementTypeResolver";
 import { event, drag, select } from "d3";
+import elementCenterCalculator from "../helpers/elementCenterCalculator";
+import { connect } from "react-redux";
 
 export class DrawWrapper extends Component {
   constructor(props) {
@@ -10,7 +12,12 @@ export class DrawWrapper extends Component {
   }
 
   componentDidMount() {
-    let _this = this;
+    this.BindDrag(this);
+  }
+
+  BindDrag = _this => {
+    let centerCalc = elementCenterCalculator(_this.props.type);
+
     const handleDrag = drag()
       .subject(function() {
         const me = select(this);
@@ -21,34 +28,31 @@ export class DrawWrapper extends Component {
         me.attr("transform", `translate(${event.x}, ${event.y})`);
         me.attr("x", event.x);
         me.attr("y", event.y);
-
-        let center = _this.calcCenter(event.x, event.y);
-        for (let i = 0; i < _this.props.connectors.length; i++) {
-          _this.props.moving(
-            _this.props.connectors[i].id,
-            _this.props.connectors[i].type,
-            center.x,
-            center.y
-          );
-        }
+        let center = centerCalc(
+          event.x,
+          event.y,
+          _this.props.width,
+          _this.props.heigth
+        );
+        _this.moveConnectors(center);
       })
       .on("end", function() {
         console.log("dropped");
       });
 
-    const handleDrop = drag().on("end", function() {
-      console.log("dropped");
-    });
     const node = ReactDOM.findDOMNode(this);
     handleDrag(select(node));
-  }
+  };
 
-  calcCenter = (x, y) => {
-    if (this.props.radius) return { x: x, y: y };
-    return {
-      x: x + this.props.width / 2,
-      y: y + this.props.heigth / 2
-    };
+  moveConnectors = center => {
+    for (let i = 0; i < this.props.connectors.length; i++) {
+      this.props.moving(
+        this.props.connectors[i].id,
+        this.props.connectors[i].type,
+        center.x,
+        center.y
+      );
+    }
   };
 
   render() {
@@ -70,4 +74,8 @@ export class DrawWrapper extends Component {
   }
 }
 
-export default DrawWrapper;
+const mapDispatchToProps = {};
+
+const mapStateToProps = state => ({});
+
+export default connect(mapStateToProps, mapDispatchToProps)(DrawWrapper);
