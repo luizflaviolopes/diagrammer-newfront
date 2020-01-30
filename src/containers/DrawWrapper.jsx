@@ -1,10 +1,12 @@
 import React, { Component, useState } from "react";
 import ReactDOM from "react-dom";
-
-import elementTypeResolver from "../helpers/elementTypeResolver";
-import { event, drag, select } from "d3";
-import elementCenterCalculator from "../helpers/elementCenterCalculator";
 import { connect } from "react-redux";
+
+import * as drawActions from "../actions/drawing";
+import elementTypeResolver from "../helpers/elementTypeResolver";
+import elementCenterCalculator from "../helpers/elementCenterCalculator";
+
+import { event, drag, select } from "d3";
 
 export class DrawWrapper extends Component {
   constructor(props) {
@@ -25,34 +27,27 @@ export class DrawWrapper extends Component {
       })
       .on("drag", function() {
         const me = select(this);
-        me.attr("transform", `translate(${event.x}, ${event.y})`);
-        me.attr("x", event.x);
-        me.attr("y", event.y);
+        // me.attr("transform", `translate(${event.x}, ${event.y})`);
+        // me.attr("x", event.x);
+        // me.attr("y", event.y);
         let center = centerCalc(
           event.x,
           event.y,
           _this.props.width,
           _this.props.heigth
         );
-        _this.moveConnectors(center);
-      })
-      .on("end", function() {
-        console.log("dropped");
+        _this.props.dragging({
+          id: _this.props.id,
+          position: { x: event.x, y: event.y },
+          center: center
+        });
       });
+    // .on("end", function() {
+    //   console.log("dropped");
+    // });
 
     const node = ReactDOM.findDOMNode(this);
     handleDrag(select(node));
-  };
-
-  moveConnectors = center => {
-    for (let i = 0; i < this.props.connectors.length; i++) {
-      this.props.moving(
-        this.props.connectors[i].id,
-        this.props.connectors[i].type,
-        center.x,
-        center.y
-      );
-    }
   };
 
   render() {
@@ -74,8 +69,8 @@ export class DrawWrapper extends Component {
   }
 }
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = {
+  dragging: drawActions.dragging
+};
 
-const mapStateToProps = state => ({});
-
-export default connect(mapStateToProps, mapDispatchToProps)(DrawWrapper);
+export default connect(null, mapDispatchToProps)(DrawWrapper);

@@ -1,4 +1,5 @@
 import React from "react";
+import { connect } from "react-redux";
 
 const Grid = props => {
   return (
@@ -36,6 +37,7 @@ const Grid = props => {
         width="2000"
         height="2000"
         fill="url(#grid)"
+        onDoubleClick={props.onDoubleClick}
       />
     </React.Fragment>
   );
