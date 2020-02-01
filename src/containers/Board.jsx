@@ -10,10 +10,11 @@ import Line from "../components/Line.jsx";
 const Board = props => {
   const drawConnectors = () => {
     return Object.keys(props.elements.connectors).map(id => {
-      const connector = { id: id, ...props.elements.connectors[id] };
+      const connector = { ...props.elements.connectors[id] };
       const conectedElements = Object.keys(connector);
       return (
         <Line
+          key={id}
           from={connector[conectedElements[0]]}
           to={connector[conectedElements[1]]}
         />
@@ -25,7 +26,7 @@ const Board = props => {
     return Object.keys(props.elements.draws).map(itemId => {
       const item = { id: itemId, ...props.elements.draws[itemId] };
 
-      return <DrawWraper {...item} />;
+      return <DrawWraper key={itemId} {...item} />;
     });
   };
 

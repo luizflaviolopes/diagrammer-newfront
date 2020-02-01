@@ -1,13 +1,17 @@
 export const elementDragging = (state, actionPayload) => {
   const elementId = actionPayload.id;
   const element = state.draws[elementId];
-  element.x = actionPayload.position.x;
 
+  element.x = actionPayload.position.x;
   element.y = actionPayload.position.y;
 
-  for (let i = 0; i < element.connectors; i++) {
-    const connId = element.connectors[i];
-    state.connectors[connId][elementId] = actionPayload.center;
+  for (let i = 0; i < element.connectors.length; i++) {
+    const connRef = element.connectors[i];
+    const conn = state.connectors[connRef.id];
+    conn[elementId] = {
+      x: actionPayload.position.x + connRef.centerVariant.x,
+      y: actionPayload.position.y + connRef.centerVariant.y
+    };
   }
 
   return state;
@@ -16,7 +20,7 @@ export const elementDragging = (state, actionPayload) => {
 export const elementAdd = (state, actionPayload) => {
   let newElement = {
     type: actionPayload.type,
-    text: "teste++",
+    text: "",
     x: actionPayload.position.x,
     y: actionPayload.position.y,
     heigth: 100,
