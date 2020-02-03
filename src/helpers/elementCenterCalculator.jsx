@@ -1,4 +1,4 @@
-import * as types from "../types/ElementTypes";
+import * as types from "../types/drawTypes";
 
 const elementCenterCalculator = type => {
   return (x, y, w, h) => {

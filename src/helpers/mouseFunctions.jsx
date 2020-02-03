@@ -1,21 +1,23 @@
 import ReactDOM from "react-dom";
 import { event, drag, select } from "d3";
 
-const subjectFunctionDefault = _this => {
-  const me = select(_this);
-  return { x: me.attr("x"), y: me.attr("y") };
-};
+// const subjectFunctionDefault = _this => {
+//   const me = select(_this);
+//   return { x: me.attr("x"), y: me.attr("y") };
+// };
 
 export const bindDrag = (
   element,
-  subjectFunction = subjectFunctionDefault,
+  onStart = () => {},
   dragFunction = () => {},
   dropFunction = () => {}
 ) => {
   const handleDrag = drag()
     .subject(function() {
-      //console.log(this);
-      return subjectFunction(this);
+      return { x: 0, y: 0 };
+    })
+    .on("start", function() {
+      onStart(event);
     })
     .on("drag", function() {
       dragFunction(event);

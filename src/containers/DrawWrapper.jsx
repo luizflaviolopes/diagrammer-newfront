@@ -25,40 +25,33 @@ export class DrawWrapper extends Component {
   }
 
   componentDidMount() {
-    bindDrag(this, undefined, this.onDrag, evt => {
-      console.log(evt);
-    });
+    bindDrag(this, this.onMouseDown, this.onDrag, this.onDrop);
   }
 
-  onDrag = evt => {
-    console.log(evt.x, evt.y);
-    let center = this.centerCalc(
-      evt.x,
-      evt.y,
-      this.props.width,
-      this.props.heigth
-    );
-
-    this.props.dragging({
-      id: this.props.id,
-      position: { x: evt.x, y: evt.y }
-      //movement: { x: evt.x - evt.subject.x, y: evt.y - evt.subject.y }
-    });
-  };
-
-  onDragOver = () => {
-    if (
-      this.props.transients.connectorDrawing &&
-      this.props.transient.elementDragStartId != this.props.id
-    ) {
-      this.setState({ highlightConnector: true });
+  onMouseDown = evt => {
+    if (!this.props.selected) {
+      this.props.mouseDown({
+        id: this.props.id,
+        shiftPressed: evt.sourceEvent.shiftKey
+      });
     }
   };
 
+  onDrag = evt => {
+    this.props.dragging({
+      id: this.props.id,
+      position: { x: evt.x, y: evt.y }
+    });
+  };
+
+  onDrop = evt => {
+    this.props.drop({});
+  };
+
   onDragOver = () => {
     if (
-      this.props.transients.connectorDrawing &&
-      this.props.transients.elementDragStartId != this.props.id
+      this.props.sessionState.connectorDrawing &&
+      this.props.sessionState.elementDragStartId != this.props.id
     ) {
       this.setState({ highlightConnector: true });
     }
@@ -69,6 +62,12 @@ export class DrawWrapper extends Component {
       this.setState({ highlightConnector: false });
     }
   };
+
+  // onClick = evt => {
+  //   if (!this.props.selected)
+  //     if (evt.shiftKey) this.props.addSelect({ id: this.props.id });
+  //     else this.props.select({ id: this.props.id });
+  // };
 
   render() {
     const Element = elementTypeResolver(this.props.type);
@@ -94,6 +93,7 @@ export class DrawWrapper extends Component {
         onMouseLeave={() => this.setState({ showConnectors: false })}
         onMouseOver={this.onDragOver}
         onMouseOut={this.onDragOut}
+        // onClick={this.onClick}
       >
         <Element
           text={this.props.text}
@@ -101,6 +101,7 @@ export class DrawWrapper extends Component {
           width={this.props.width}
           radius={this.props.radius}
           highlightConnection={this.state.highlightConnector}
+          selected={this.props.selected}
         />
         {connectionPoints}
       </g>
@@ -109,11 +110,15 @@ export class DrawWrapper extends Component {
 }
 
 const mapDispatchToProps = {
-  dragging: drawActions.dragging
+  mouseDown: drawActions.mouseDown,
+  dragging: drawActions.dragging,
+  drop: drawActions.drop,
+  select: drawActions.selectDraw,
+  addSelect: drawActions.addSelectDraw
 };
 
 const mapStateToProps = state => ({
-  transients: state.elements.transients
+  sessionState: state.elements.sessionState
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DrawWrapper);

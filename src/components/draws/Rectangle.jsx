@@ -1,11 +1,29 @@
 import React from "react";
 
 const Rectangle = props => {
-  let fillColor = "white";
+  let overlayVariations = {
+    opacity: 1,
+    visibility: "hidden"
+  };
 
   if (props.highlightConnection) {
-    fillColor = "steelblue";
+    overlayVariations = {
+      fill: "steelblue",
+      opacity: "0.2",
+      visibility: "visible"
+    };
+  } else if (props.selected) {
+    overlayVariations = {
+      fill: "none",
+      opacity: "1",
+      visibility: "visible",
+      stroke: "white",
+      strokeWidth: "3",
+      strokeDasharray: 6
+    };
   }
+
+  let overlayObj = <Overlay {...props} variations={overlayVariations} />;
 
   return (
     <React.Fragment>
@@ -16,9 +34,7 @@ const Rectangle = props => {
         width={props.width}
         stroke="black"
         strokeWidth="2"
-        fill={fillColor}
-        name="rect"
-        id="0"
+        fill={props.fillColor || "white"}
       ></rect>
       <text
         x="0"
@@ -29,7 +45,20 @@ const Rectangle = props => {
       >
         {props.text}
       </text>
+      {overlayObj}
     </React.Fragment>
+  );
+};
+
+const Overlay = props => {
+  return (
+    <rect
+      x="0"
+      y="0"
+      height={props.heigth}
+      width={props.width}
+      {...props.variations}
+    ></rect>
   );
 };
 

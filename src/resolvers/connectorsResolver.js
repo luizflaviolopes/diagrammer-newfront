@@ -5,11 +5,11 @@ export const connectorDrawing = (state, actionPayload) => {
 };
 
 export const connectorDrawingStart = (state, actionPayload) => {
-  state.transients.connectorDrawing = true;
-  state.transients.elementDragStartId = actionPayload.id;
+  state.sessionState.connectorDrawing = true;
+  state.sessionState.elementDragStartId = actionPayload.id;
 
   const conId = state.counters.connectors;
-  const drawRef = state.draws[state.transients.elementDragStartId];
+  const drawRef = state.draws[state.sessionState.elementDragStartId];
 
   drawRef.connectors = [
     ...drawRef.connectors,
@@ -46,11 +46,10 @@ export const connectorDrawingEnd = (state, actionPayload) => {
     state.connectors[connCounter] = actualConector;
   }
 
-  state.transients.connectorDrawing = false;
-  state.transients.elementDragStartId = null;
+  state.sessionState.connectorDrawing = false;
+  state.sessionState.elementDragStartId = null;
 
   state.counters.connectors = state.counters.connectors + 1;
-  console.log(actionPayload);
 
   return state;
 };

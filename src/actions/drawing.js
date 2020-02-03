@@ -1,15 +1,48 @@
 import * as types from "../types/actionTypes";
 
+export const mouseDown = data => {
+  return {
+    type: types.BOARD_MOUSEDOWN_DRAW,
+    payload: data
+  };
+};
 export const dragging = data => {
   return {
-    type: types.BOARD_ELEMENT_DRAGGING,
+    type: types.BOARD_DRAGGING_ELEMENTS,
+    payload: data
+  };
+};
+export const drop = data => {
+  return {
+    type: types.BOARD_DROP_ELEMENTS,
     payload: data
   };
 };
 
-export const addElement = data => {
+export const addDraw = data => {
   return {
-    type: types.BOARD_ELEMENT_ADD,
+    type: types.BOARD_DRAW_ADD,
+    payload: data
+  };
+};
+
+export const selectDraw = data => {
+  return {
+    type: types.BOARD_SELECT_DRAW,
+    payload: data
+  };
+};
+
+export const addSelectDraw = data => {
+  return {
+    type: types.BOARD_SELECT_ADD_DRAW,
+    payload: data
+  };
+};
+
+export const clearSelection = data => {
+  return {
+    type: types.BOARD_SELECTION_CLEAR,
     payload: data
   };
 };

@@ -1,7 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
 import Grid from "../components/Grid.jsx";
-import * as elementTypes from "../types/ElementTypes";
 import * as drawActions from "../actions/drawing";
 
 import DrawWraper from "./DrawWrapper.jsx";
@@ -22,19 +21,23 @@ const Board = props => {
     });
   };
 
-  const drawElements = () => {
+  const drawDraws = () => {
     return Object.keys(props.elements.draws).map(itemId => {
-      const item = { id: itemId, ...props.elements.draws[itemId] };
+      const item = { ...props.elements.draws[itemId] };
 
       return <DrawWraper key={itemId} {...item} />;
     });
   };
 
-  const addElement = evt => {
-    props.addElement({
+  const addDraw = evt => {
+    props.addDraw({
       type: props.selectedElement,
       position: { x: evt.pageX, y: evt.pageY }
     });
+  };
+
+  const clearSelection = () => {
+    props.clearSelection();
   };
 
   return (
@@ -43,13 +46,14 @@ const Board = props => {
         <Grid
           offsetX={props.boardView.viewX}
           offsetY={props.boardView.viewY}
-          onDoubleClick={addElement}
+          onDoubleClick={addDraw}
+          onClick={clearSelection}
         />
         <g
           transform={`translate(${props.boardView.viewX},${props.boardView.viewY})`}
         >
           {drawConnectors()}
-          {drawElements()}
+          {drawDraws()}
         </g>
       </svg>
     </div>
@@ -57,7 +61,8 @@ const Board = props => {
 };
 
 const mapDispatchToProps = {
-  addElement: drawActions.addElement
+  addDraw: drawActions.addDraw,
+  clearSelection: drawActions.clearSelection
 };
 
 const mapStateToProps = state => ({

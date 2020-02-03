@@ -38,6 +38,7 @@ const Grid = props => {
         height="2000"
         fill="url(#grid)"
         onDoubleClick={props.onDoubleClick}
+        onClick={props.onClick}
       />
     </React.Fragment>
   );

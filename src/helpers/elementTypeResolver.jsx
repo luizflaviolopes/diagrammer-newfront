@@ -1,4 +1,4 @@
-import * as types from "../types/ElementTypes";
+import * as types from "../types/drawTypes";
 import Rectangle from "../components/draws/Rectangle";
 import Circle from "../components/draws/Circle";
 
