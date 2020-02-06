@@ -6,13 +6,19 @@ const Circle = props => {
     visibility: "hidden"
   };
 
-  if (props.highlightConnection) {
+  if (props.highlightConnection)
     overlayVariations = {
       fill: "steelblue",
       opacity: "0.2",
       visibility: "visible"
     };
-  } else if (props.selected) {
+  else if (props.highlightDrawDragging)
+    overlayVariations = {
+      fill: "red",
+      opacity: "0.2",
+      visibility: "visible"
+    };
+  else if (props.selected) {
     overlayVariations = {
       fill: "none",
       opacity: "1",
@@ -28,6 +34,9 @@ const Circle = props => {
   return (
     <React.Fragment>
       <circle
+        style={{ pointerEvents: props.pointerEvents }}
+        id={props.id}
+        draw="true"
         cx="0"
         cy="0"
         r={props.radius}

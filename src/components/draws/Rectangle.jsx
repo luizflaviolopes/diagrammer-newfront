@@ -12,7 +12,13 @@ const Rectangle = props => {
       opacity: "0.2",
       visibility: "visible"
     };
-  } else if (props.selected) {
+  } else if (props.highlightDrawDragging)
+    overlayVariations = {
+      fill: "red",
+      opacity: "0.2",
+      visibility: "visible"
+    };
+  else if (props.selected) {
     overlayVariations = {
       fill: "none",
       opacity: "1",
@@ -28,6 +34,8 @@ const Rectangle = props => {
   return (
     <React.Fragment>
       <rect
+        style={{ pointerEvents: props.pointerEvents }}
+        id={props.id}
         x="0"
         y="0"
         height={props.heigth}
@@ -35,6 +43,7 @@ const Rectangle = props => {
         stroke="black"
         strokeWidth="2"
         fill={props.fillColor || "white"}
+        draw="true"
       ></rect>
       <text
         x="0"

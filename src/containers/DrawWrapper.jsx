@@ -14,7 +14,12 @@ import elementsConnectorPointsCalculator from "../helpers/elementsConnectorPoint
 export class DrawWrapper extends Component {
   constructor(props) {
     super(props);
-    this.state = { showConnectors: false, highlightConnector: false };
+    this.state = {
+      showConnectors: false,
+      highlightConnector: false,
+      highlightDrawDragging: false,
+      pointerEvents: "all"
+    };
     this.connectionPoints = elementsConnectorPointsCalculator(
       props.type,
       props.width,
@@ -29,12 +34,11 @@ export class DrawWrapper extends Component {
   }
 
   onMouseDown = evt => {
-    if (!this.props.selected) {
-      this.props.mouseDown({
-        id: this.props.id,
-        shiftPressed: evt.sourceEvent.shiftKey
-      });
-    }
+    this.props.mouseDown({
+      id: this.props.id,
+      shiftPressed: evt.sourceEvent.shiftKey
+    });
+    this.setState({ pointerEvents: "none", zindex: 9999 });
   };
 
   onDrag = evt => {
@@ -46,32 +50,37 @@ export class DrawWrapper extends Component {
 
   onDrop = evt => {
     this.props.drop({});
+    this.setState({ pointerEvents: "all", zindex: "unset" });
   };
 
   onDragOver = () => {
     if (
       this.props.sessionState.connectorDrawing &&
-      this.props.sessionState.elementDragStartId != this.props.id
+      this.props.sessionState.elementDragStart.id != this.props.id
     ) {
       this.setState({ highlightConnector: true });
+    } else if (this.props.sessionState.draggingElement) {
+      this.setState({ highlightDrawDragging: true });
     }
   };
 
   onDragOut = () => {
+    console.log("out");
     if (this.state.highlightConnector) {
-      this.setState({ highlightConnector: false });
+      this.setState({
+        highlightConnector: false
+      });
+    }
+    if (this.state.highlightDrawDragging) {
+      this.setState({ highlightDrawDragging: false });
     }
   };
-
-  // onClick = evt => {
-  //   if (!this.props.selected)
-  //     if (evt.shiftKey) this.props.addSelect({ id: this.props.id });
-  //     else this.props.select({ id: this.props.id });
-  // };
 
   render() {
     const Element = elementTypeResolver(this.props.type);
     let connectionPoints = null;
+    let childrens = null;
+
     if (this.state.showConnectors) {
       connectionPoints = this.connectionPoints.map(point => (
         <ConnectionPoints
@@ -84,6 +93,12 @@ export class DrawWrapper extends Component {
       ));
     }
 
+    if (this.props.children) {
+      childrens = this.props.children.map(element => (
+        <DrawWrapper key={element.id} {...element} />
+      ));
+    }
+
     return (
       <g
         x={this.props.x}
@@ -93,7 +108,6 @@ export class DrawWrapper extends Component {
         onMouseLeave={() => this.setState({ showConnectors: false })}
         onMouseOver={this.onDragOver}
         onMouseOut={this.onDragOut}
-        // onClick={this.onClick}
       >
         <Element
           text={this.props.text}
@@ -101,15 +115,20 @@ export class DrawWrapper extends Component {
           width={this.props.width}
           radius={this.props.radius}
           highlightConnection={this.state.highlightConnector}
+          highlightDrawDragging={this.state.highlightDrawDragging}
           selected={this.props.selected}
+          id={this.props.id}
+          pointerEvents={this.state.pointerEvents}
         />
         {connectionPoints}
+        {childrens}
       </g>
     );
   }
 }
 
 const mapDispatchToProps = {
+  clearHighlightDrawDragging: drawActions.clearHighlightDrawDragging,
   mouseDown: drawActions.mouseDown,
   dragging: drawActions.dragging,
   drop: drawActions.drop,

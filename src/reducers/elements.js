@@ -38,6 +38,11 @@ export default (state = setState(), action = {}) => {
       return drawResolver.drawMouseDown({ ...state }, action.payload);
     case actionTypes.BOARD_DRAGGING_ELEMENTS:
       return drawResolver.drawDragging({ ...state }, action.payload);
+    case actionTypes.BOARD_CLEAR_HIGHLIGHT_DRAW_DRAGGING:
+      return drawResolver.clearHighLightDrawDragging(
+        { ...state },
+        action.payload
+      );
     case actionTypes.BOARD_DROP_ELEMENTS:
       return drawResolver.drawdrop({ ...state }, action.payload);
     case actionTypes.BOARD_DRAW_ADD:

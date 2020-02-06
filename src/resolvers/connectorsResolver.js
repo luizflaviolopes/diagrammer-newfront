@@ -6,15 +6,18 @@ export const connectorDrawing = (state, actionPayload) => {
 
 export const connectorDrawingStart = (state, actionPayload) => {
   state.sessionState.connectorDrawing = true;
-  state.sessionState.elementDragStartId = actionPayload.id;
+  state.sessionState.elementDragStart = {
+    id: actionPayload.id,
+    variant: actionPayload.variant
+  };
 
   const conId = state.counters.connectors;
-  const drawRef = state.draws[state.sessionState.elementDragStartId];
+  const drawRef = state.draws[actionPayload.id];
 
-  drawRef.connectors = [
-    ...drawRef.connectors,
-    { id: conId, centerVariant: actionPayload.variant }
-  ];
+  // drawRef.connectors = [
+  //   ...drawRef.connectors,
+  //   { id: conId, centerVariant: actionPayload.variant }
+  // ];
 
   let position = {
     x: actionPayload.variant.x + drawRef.x,
@@ -31,25 +34,38 @@ export const connectorDrawingStart = (state, actionPayload) => {
 
 export const connectorDrawingEnd = (state, actionPayload) => {
   if (actionPayload) {
-    const draw = state.draws[actionPayload.id];
+    const drawB = state.draws[actionPayload.id];
     const connCounter = state.counters.connectors;
 
-    let actualConector = { ...state.connectors[connCounter] };
-    draw.connectors = [
-      ...draw.connectors,
+    const drawA = state.draws[state.sessionState.elementDragStart.id];
+    drawA.connectors = [
+      ...drawA.connectors,
+      {
+        id: connCounter,
+        centerVariant: state.sessionState.elementDragStart.variant
+      }
+    ];
+
+    drawB.connectors = [
+      ...drawB.connectors,
       { id: connCounter, centerVariant: actionPayload.variants }
     ];
 
+    let actualConector = { ...state.connectors[connCounter] };
     actualConector[actionPayload.id] = actualConector.b;
     delete actualConector.b;
 
     state.connectors[connCounter] = actualConector;
+
+    state.counters.connectors = state.counters.connectors + 1;
+  } else {
+    let connectors = { ...state.connectors };
+    delete connectors[state.counters.connectors];
+    state.connectors = connectors;
   }
 
   state.sessionState.connectorDrawing = false;
-  state.sessionState.elementDragStartId = null;
-
-  state.counters.connectors = state.counters.connectors + 1;
+  state.sessionState.elementDragStart = null;
 
   return state;
 };

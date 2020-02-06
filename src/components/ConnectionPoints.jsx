@@ -19,11 +19,11 @@ class ConnectionPoints extends React.Component {
       variant: { x: this.props.x, y: this.props.y }
     });
 
-    let rectPos = _this.getBoundingClientRect();
-    return {
-      x: rectPos.left + (rectPos.right - rectPos.left) / 2,
-      y: rectPos.top + (rectPos.bottom - rectPos.top) / 2
-    };
+    // let rectPos = _this.getBoundingClientRect();
+    // return {
+    //   x: rectPos.left + (rectPos.right - rectPos.left) / 2,
+    //   y: rectPos.top + (rectPos.bottom - rectPos.top) / 2
+    // };
   };
 
   onDrag = evt => {

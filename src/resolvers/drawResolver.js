@@ -2,17 +2,21 @@ export const drawMouseDown = (state, actionPayload) => {
   const drawId = actionPayload.id;
   const selectedDraw = state.draws[drawId];
 
-  selectedDraw.selected = true;
-  selectedDraw.lastPosition = { x: selectedDraw.x, y: selectedDraw.y };
-  if (!actionPayload.shiftPressed) {
-    clearSelecteds(state.sessionState);
-    state.sessionState.elementsSelected = [selectedDraw];
-  } else {
-    state.sessionState.elementsSelected = [
-      ...state.sessionState.elementsSelected,
-      selectedDraw
-    ];
+  if (!selectedDraw.selected) {
+    selectedDraw.selected = true;
+    selectedDraw.lastPosition = { x: selectedDraw.x, y: selectedDraw.y };
+    if (!actionPayload.shiftPressed) {
+      clearSelecteds(state.sessionState);
+      state.sessionState.elementsSelected = [selectedDraw];
+    } else {
+      state.sessionState.elementsSelected = [
+        ...state.sessionState.elementsSelected,
+        selectedDraw
+      ];
+    }
   }
+
+  state.sessionState.draggingElement = true;
 
   return state;
 };
@@ -33,12 +37,25 @@ export const drawDragging = (state, actionPayload) => {
     dragSelecteds(state, actionPayload.position);
   }
 
+  if (actionPayload.draw) {
+    state.draws[actionPayload.draw].highlightDrawDragging = true;
+    state.sessionState.highlightDrawDragging = actionPayload.draw;
+  }
+
+  return state;
+};
+
+export const clearHighLightDrawDragging = (state, actionPayload) => {
+  state.draws[actionPayload.id].highlightDrawDragging = false;
+  state.sessionState.highlightDrawDragging = undefined;
+
   return state;
 };
 
 export const drawdrop = (state, actionPayload) => {
   let selecteds = state.sessionState.elementsSelected;
 
+  //iteration to update "last position" of all itens
   for (let i = 0; i < selecteds.length; i++) {
     let el = selecteds[i];
     el.lastPosition = {
@@ -46,6 +63,8 @@ export const drawdrop = (state, actionPayload) => {
       y: el.y
     };
   }
+
+  state.sessionState.draggingElement = false;
 
   return state;
 };
