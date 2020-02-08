@@ -39,13 +39,6 @@ export const selectDraw = data => {
   };
 };
 
-export const addSelectDraw = data => {
-  return {
-    type: types.BOARD_SELECT_ADD_DRAW,
-    payload: data
-  };
-};
-
 export const clearSelection = data => {
   return {
     type: types.BOARD_SELECTION_CLEAR,

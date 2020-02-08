@@ -6,14 +6,11 @@ export const drawMouseDown = (state, actionPayload) => {
     selectedDraw.selected = true;
     selectedDraw.lastPosition = { x: selectedDraw.x, y: selectedDraw.y };
     if (!actionPayload.shiftPressed) {
-      clearSelecteds(state.sessionState);
-      state.sessionState.elementsSelected = [selectedDraw];
-    } else {
-      state.sessionState.elementsSelected = [
-        ...state.sessionState.elementsSelected,
-        selectedDraw
-      ];
+      clearSelecteds(state);
     }
+
+    newSelectedDraw(state, selectedDraw);
+    newSelectionZOrdering(state);
   }
 
   state.sessionState.draggingElement = true;
@@ -29,6 +26,7 @@ export const drawDragging = (state, actionPayload) => {
     if (!selectedDraw.lastPosition)
       selectedDraw.lastPosition = { x: selectedDraw.x, y: selectedDraw.y };
 
+    console.log("teste");
     selectedDraw.x = selectedDraw.lastPosition.x + actionPayload.position.x;
     selectedDraw.y = selectedDraw.lastPosition.y + actionPayload.position.y;
 
@@ -65,7 +63,7 @@ export const drawdrop = (state, actionPayload) => {
   }
 
   state.sessionState.draggingElement = false;
-
+  zOrderingToOrigin(state);
   return state;
 };
 
@@ -89,7 +87,7 @@ export const drawAdd = (state, actionPayload) => {
 };
 
 export const drawSelect = (state, actionPayload) => {
-  clearSelecteds(state.sessionState.elementsSelected);
+  clearSelecteds(state.elementsSelected);
 
   let selected = getSelectedDraw(state.draws, actionPayload.id);
 
@@ -103,19 +101,8 @@ export const drawSelect = (state, actionPayload) => {
   return state;
 };
 
-export const drawAddSelection = (state, actionPayload) => {
-  let selected = getSelectedDraw(state.draws, actionPayload.id);
-
-  state.sessionState.elementsSelected = addToSelection(
-    state.sessionState.elementsSelected,
-    selected
-  );
-
-  return state;
-};
-
 export const selectionClear = (state, actionPayload) => {
-  clearSelecteds(state.sessionState);
+  clearSelecteds(state);
   return state;
 };
 
@@ -123,21 +110,33 @@ const getSelectedDraw = (list, elementId) => {
   return list[elementId];
 };
 
-const clearSelecteds = sessionState => {
-  let list = sessionState.elementsSelected;
+const clearSelecteds = state => {
+  let list = state.sessionState.elementsSelected;
   for (let i = 0; i < list.length; i++) {
     list[i].selected = false;
   }
-  sessionState.elementsSelected = [];
+  state.sessionState.elementsSelected = [];
+  state.boardDrawSelected = [];
 };
 
-const addToSelection = (selectionList, elementToAdd) => {
-  elementToAdd.selected = true;
-  elementToAdd.lastPosition = {
-    x: elementToAdd.x,
-    y: elementToAdd.y
-  };
-  return [...selectionList, elementToAdd];
+const newSelectedDraw = (state, element) => {
+  state.sessionState.elementsSelected = [
+    ...state.sessionState.elementsSelected,
+    element
+  ];
+  state.boardDrawSelected = [...state.boardDrawSelected, element.id];
+};
+
+const newSelectionZOrdering = state => {
+  let nonSelected = state.boardDrawShowOrder.filter(e => {
+    return state.boardDrawSelected.indexOf(e) === -1;
+  });
+
+  state.boardDrawShowOrder = [...nonSelected, ...state.boardDrawSelected];
+};
+
+const zOrderingToOrigin = state => {
+  state.boardDrawShowOrder = [...state.boardDrawZOrder];
 };
 
 const dragSelecteds = (state, newPos) => {

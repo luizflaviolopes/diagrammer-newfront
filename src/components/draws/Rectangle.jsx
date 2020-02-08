@@ -67,6 +67,7 @@ const Overlay = props => {
       height={props.heigth}
       width={props.width}
       {...props.variations}
+      style={{ pointerEvents: "none" }}
     ></rect>
   );
 };

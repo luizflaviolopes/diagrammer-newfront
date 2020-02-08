@@ -22,10 +22,10 @@ const Board = props => {
   };
 
   const drawDraws = () => {
-    return Object.keys(props.elements.draws).map(itemId => {
-      const item = { ...props.elements.draws[itemId] };
+    return props.elements.boardDrawShowOrder.map(itemId => {
+      const item = props.elements.draws[itemId];
 
-      return <DrawWraper key={itemId} {...item} />;
+      return <DrawWraper key={item.id} {...item} />;
     });
   };
 

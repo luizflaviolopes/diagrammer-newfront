@@ -27,6 +27,10 @@ const setState = () => ({
     }
   },
   connectors: {},
+  boardDrawZOrder: [1, 2],
+  boardDrawSelected: [],
+  boardDrawShowOrder: [1, 2],
+
   sessionState: {
     elementsSelected: []
   }
@@ -49,8 +53,6 @@ export default (state = setState(), action = {}) => {
       return drawResolver.drawAdd({ ...state }, action.payload);
     case actionTypes.BOARD_SELECT_DRAW:
       return drawResolver.drawSelect({ ...state }, action.payload);
-    case actionTypes.BOARD_SELECT_ADD_DRAW:
-      return drawResolver.drawAddSelection({ ...state }, action.payload);
     case actionTypes.BOARD_SELECTION_CLEAR:
       return drawResolver.selectionClear({ ...state }, action.payload);
     case actionTypes.BOARD_CONNECTOR_DRAWING:
