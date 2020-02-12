@@ -14,7 +14,9 @@ const setState = () => ({
       heigth: 100,
       width: 100,
       id: 1,
-      connectors: []
+      connectors: [],
+      parent: undefined,
+      childrens: []
     },
     2: {
       type: elementTypes.DRAW_CIRCLE,
@@ -23,7 +25,9 @@ const setState = () => ({
       y: 100,
       radius: 50,
       id: 2,
-      connectors: []
+      connectors: [],
+      parent: undefined,
+      childrens: []
     }
   },
   connectors: {},

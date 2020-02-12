@@ -10,9 +10,8 @@ export const drawMouseDown = (state, actionPayload) => {
     }
 
     newSelectedDraw(state, selectedDraw);
-    newSelectionZOrdering(state);
   }
-
+  newSelectionZOrdering(state);
   state.sessionState.draggingElement = true;
 
   return state;
@@ -26,7 +25,6 @@ export const drawDragging = (state, actionPayload) => {
     if (!selectedDraw.lastPosition)
       selectedDraw.lastPosition = { x: selectedDraw.x, y: selectedDraw.y };
 
-    console.log("teste");
     selectedDraw.x = selectedDraw.lastPosition.x + actionPayload.position.x;
     selectedDraw.y = selectedDraw.lastPosition.y + actionPayload.position.y;
 
@@ -62,6 +60,20 @@ export const drawdrop = (state, actionPayload) => {
     };
   }
 
+  for (let i = 0; i < selecteds.length; i++) {
+    let draw = selecteds[i];
+    // ver se já está no mesmo pai
+    console.log(draw.parent, actionPayload.id);
+    if (draw.parent !== actionPayload.id) {
+      console.log("entrous");
+      //remover do pai atual
+      detachDraw(state, draw);
+
+      //adicionar no novo pai
+      attachDraw(state, draw.id, actionPayload.id);
+    }
+  }
+
   state.sessionState.draggingElement = false;
   zOrderingToOrigin(state);
   return state;
@@ -78,10 +90,14 @@ export const drawAdd = (state, actionPayload) => {
     heigth: 100,
     width: 100,
     id: newID,
-    connectors: []
+    connectors: [],
+    parent: undefined,
+    childrens: []
   };
 
   state.draws[newID] = newDraw;
+  state.boardDrawZOrder.push(newID);
+  state.boardDrawShowOrder.push(newID);
 
   return state;
 };
@@ -160,4 +176,26 @@ const updateConnectors = (draw, connectorsList, newPos) => {
       y: draw.y + connRef.centerVariant.y
     };
   }
+};
+
+const detachDraw = (state, drawToDetach) => {
+  if (drawToDetach.parent) {
+    let parent = state.draws[drawToDetach.parent];
+    let drawsUnremoved = parent.childrens.filter(e => {
+      return e !== drawToDetach.id;
+    });
+    parent.childrens = drawsUnremoved;
+  } else {
+    let drawsUnremoved = state.boardDrawZOrder.filter(e => {
+      return e !== drawToDetach.id;
+    });
+
+    state.boardDrawZOrder = drawsUnremoved;
+  }
+};
+
+const attachDraw = (state, drawIdToAttach, target) => {
+  if (target) {
+    state.draws[+target].childrens.push(drawIdToAttach);
+  } else state.boardDrawZOrder.push(drawIdToAttach);
 };

@@ -50,7 +50,15 @@ const Circle = props => {
 };
 
 const Overlay = props => {
-  return <circle cx="0" cy="0" r={props.radius} {...props.variations} />;
+  return (
+    <circle
+      cx="0"
+      cy="0"
+      r={props.radius}
+      style={{ pointerEvents: "none" }}
+      {...props.variations}
+    />
+  );
 };
 
 export default Circle;
