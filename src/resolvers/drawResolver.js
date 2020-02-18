@@ -49,6 +49,7 @@ export const clearHighLightDrawDragging = (state, actionPayload) => {
 };
 
 export const drawdrop = (state, actionPayload) => {
+  console.log("dropped");
   let selecteds = state.sessionState.elementsSelected;
 
   //iteration to update "last position" of all itens
@@ -61,19 +62,19 @@ export const drawdrop = (state, actionPayload) => {
   }
 
   for (let i = 0; i < selecteds.length; i++) {
-    let draw = selecteds[i];
+    let draw = { ...selecteds[i] };
     // ver se já está no mesmo pai
-    console.log(draw.parent, actionPayload.id);
     if (draw.parent !== actionPayload.id) {
-      console.log("entrous");
       //remover do pai atual
       detachDraw(state, draw);
 
       //adicionar no novo pai
       attachDraw(state, draw.id, actionPayload.id);
+
+      state.draws[draw.id] = draw;
     }
   }
-
+  state.draws = { ...state.draws };
   state.sessionState.draggingElement = false;
   zOrderingToOrigin(state);
   return state;
@@ -180,22 +181,32 @@ const updateConnectors = (draw, connectorsList, newPos) => {
 
 const detachDraw = (state, drawToDetach) => {
   if (drawToDetach.parent) {
-    let parent = state.draws[drawToDetach.parent];
+    let parent = { ...state.draws[drawToDetach.parent] };
     let drawsUnremoved = parent.childrens.filter(e => {
       return e !== drawToDetach.id;
     });
     parent.childrens = drawsUnremoved;
+    state.draws[drawToDetach.parent] = parent;
   } else {
     let drawsUnremoved = state.boardDrawZOrder.filter(e => {
       return e !== drawToDetach.id;
     });
 
+    resetDrawPosition(drawToDetach);
+
     state.boardDrawZOrder = drawsUnremoved;
   }
 };
 
+const resetDrawPosition = draw => {
+  draw.x = 0;
+  draw.y = 0;
+};
+
 const attachDraw = (state, drawIdToAttach, target) => {
   if (target) {
-    state.draws[+target].childrens.push(drawIdToAttach);
+    let parent = { ...state.draws[+target] };
+    parent.childrens.push(drawIdToAttach);
+    state.draws[+target] = parent;
   } else state.boardDrawZOrder.push(drawIdToAttach);
 };

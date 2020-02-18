@@ -4,10 +4,10 @@ const elementsConnectorPointsCalculator = (type, w, h, r) => {
   switch (type) {
     case types.DRAW_CIRCLE:
       return [
-        { x: 0, y: r, ref: "a" },
-        { x: 0, y: -r, ref: "b" },
-        { x: r, y: 0, ref: "c" },
-        { x: -r, y: 0, ref: "d" }
+        { x: r, y: 0, ref: "a" },
+        { x: r * 2, y: r, ref: "b" },
+        { x: r, y: r * 2, ref: "c" },
+        { x: 0, y: r, ref: "d" }
       ];
     case types.DRAW_RECTANGLE:
       return [

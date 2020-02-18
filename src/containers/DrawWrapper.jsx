@@ -12,7 +12,7 @@ import { bindDrag } from "../helpers/mouseFunctions";
 import elementsConnectorPointsCalculator from "../helpers/elementsConnectorPointsCalculator";
 import Teste from "./Teste";
 
-export class DrawWrapper extends Component {
+class DrawWrapper extends Component {
   constructor(props) {
     super(props);
     console.log(props);
@@ -34,34 +34,45 @@ export class DrawWrapper extends Component {
     this.centerCalc = elementCenterCalculator(props.type);
   }
 
-  componentDidMount() {
-    bindDrag(this, this.onMouseDown, this.onDrag, this.onDrop);
-  }
+  // componentDidMount() {
+  //   // this.drag = bindDrag(this, this.onMouseDown, this.onDrag, this.onDrop);
+  // }
 
-  onMouseDown = evt => {
-    this.props.mouseDown({
-      id: this.props.id,
-      shiftPressed: evt.sourceEvent.shiftKey
-    });
-    this.setState({ pointerEvents: "none" });
-  };
+  // onMouseDown = evt => {
+  //   this.props.mouseDown({
+  //     id: this.props.id,
+  //     shiftPressed: evt.sourceEvent.shiftKey
+  //   });
+  //   this.setState({ pointerEvents: "none" });
+  // };
 
-  onDrag = evt => {
-    this.props.dragging({
-      id: this.props.id,
-      position: { x: evt.x, y: evt.y }
-    });
-  };
+  // onDrag = evt => {
+  //   this.props.dragging({
+  //     id: this.props.id,
+  //     position: { x: evt.x, y: evt.y }
+  //   });
+  // };
 
-  onDrop = evt => {
-    if (
-      evt.sourceEvent.toElement &&
-      evt.sourceEvent.toElement.getAttribute("draw") == "true"
-    )
-      this.props.drop({ id: evt.sourceEvent.toElement.id });
-    else this.props.drop({});
-    this.setState({ pointerEvents: "bounding-box" });
-  };
+  // componentWillUnmount() {
+  //   this.drag
+  //     .on("start", null)
+  //     .on("drag", null)
+  //     .on("end", null);
+  // }
+
+  // componentWillUpdate(a, b) {
+  //   console.log(a, b, a == b);
+  // }
+  // onDrop = evt => {
+  //   console.log("droped");
+  //   if (
+  //     evt.sourceEvent.toElement &&
+  //     evt.sourceEvent.toElement.getAttribute("draw") == "true"
+  //   )
+  //     this.props.drop({ id: evt.sourceEvent.toElement.id });
+  //   else this.props.drop({});
+  //   this.setState({ pointerEvents: "bounding-box" });
+  // };
 
   onDragOver = () => {
     if (
@@ -112,6 +123,13 @@ export class DrawWrapper extends Component {
       });
     }
 
+    const calcPointerEvents = () => {
+      if (this.props.sessionState.draggingElement && this.props.selected)
+        return "none";
+      else return "bounding-box";
+    };
+    const pointerEvents = calcPointerEvents();
+
     return (
       <g
         x={this.props.x}
@@ -133,7 +151,7 @@ export class DrawWrapper extends Component {
           highlightDrawDragging={this.state.highlightDrawDragging}
           selected={this.props.selected}
           id={this.props.id}
-          pointerEvents={this.state.pointerEvents}
+          pointerEvents={pointerEvents}
         />
         {connectionPoints}
         {childrens}

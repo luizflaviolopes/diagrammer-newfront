@@ -34,11 +34,11 @@ const Circle = props => {
   return (
     <React.Fragment>
       <circle
-        style={{ pointerEvents: props.pointerEvents }}
+        //style={{ pointerEvents: props.pointerEvents }}
         id={props.id}
         draw="true"
-        cx="0"
-        cy="0"
+        cx={props.radius}
+        cy={props.radius}
         r={props.radius}
         stroke="black"
         strokeWidth="2"
@@ -52,8 +52,8 @@ const Circle = props => {
 const Overlay = props => {
   return (
     <circle
-      cx="0"
-      cy="0"
+      cx={props.radius}
+      cy={props.radius}
       r={props.radius}
       style={{ pointerEvents: "none" }}
       {...props.variations}

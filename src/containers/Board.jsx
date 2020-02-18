@@ -1,12 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
+import ReactDOM from "react-dom";
 import { connect } from "react-redux";
 import Grid from "../components/Grid.jsx";
 import * as drawActions from "../actions/drawing";
+
+import draggingAPI from "../helpers/draggingDrawAPI.jsx";
 
 import DrawWraper from "./DrawWrapper.jsx";
 import Line from "../components/Line.jsx";
 
 const Board = props => {
+  useEffect(() => {
+    draggingAPI.startDrag();
+    return draggingAPI.endDrag;
+  }, []);
+
   const drawConnectors = () => {
     return Object.keys(props.elements.connectors).map(id => {
       const connector = { ...props.elements.connectors[id] };
@@ -22,9 +30,9 @@ const Board = props => {
   };
 
   const drawDraws = () => {
-    return props.elements.boardDrawShowOrder.map(itemId => {
+    return props.showSequence.map(itemId => {
       const item = props.elements.draws[itemId];
-
+      console.log("rendering", itemId);
       return <DrawWraper key={item.id} {...item} />;
     });
   };
@@ -67,6 +75,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = state => ({
   boardView: state.boardView,
+  showSequence: state.elements.boardDrawShowOrder,
   elements: state.elements,
   selectedElement: state.toolboxElements.elementSelected
 });

@@ -28,4 +28,5 @@ export const bindDrag = (
 
   const node = ReactDOM.findDOMNode(element);
   handleDrag(select(node));
+  return handleDrag;
 };
