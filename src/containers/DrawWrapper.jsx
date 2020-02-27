@@ -7,15 +7,13 @@ import elementTypeResolver from "../helpers/elementTypeResolver";
 import elementCenterCalculator from "../helpers/elementCenterCalculator";
 import ConnectionPoints from "../components/ConnectionPoints";
 
-import { event, drag, select } from "d3";
-import { bindDrag } from "../helpers/mouseFunctions";
 import elementsConnectorPointsCalculator from "../helpers/elementsConnectorPointsCalculator";
-import Teste from "./Teste";
+import Connector from "./Connector";
 
 class DrawWrapper extends Component {
   constructor(props) {
     super(props);
-    console.log(props);
+    console.log("construindo", props.id);
     this.state = {
       showConnectors: false,
       highlightConnector: false,
@@ -34,47 +32,11 @@ class DrawWrapper extends Component {
     this.centerCalc = elementCenterCalculator(props.type);
   }
 
-  // componentDidMount() {
-  //   // this.drag = bindDrag(this, this.onMouseDown, this.onDrag, this.onDrop);
-  // }
+  componentDidUpdate = () => {
+    console.log("update", this.props.id);
+  };
 
-  // onMouseDown = evt => {
-  //   this.props.mouseDown({
-  //     id: this.props.id,
-  //     shiftPressed: evt.sourceEvent.shiftKey
-  //   });
-  //   this.setState({ pointerEvents: "none" });
-  // };
-
-  // onDrag = evt => {
-  //   this.props.dragging({
-  //     id: this.props.id,
-  //     position: { x: evt.x, y: evt.y }
-  //   });
-  // };
-
-  // componentWillUnmount() {
-  //   this.drag
-  //     .on("start", null)
-  //     .on("drag", null)
-  //     .on("end", null);
-  // }
-
-  // componentWillUpdate(a, b) {
-  //   console.log(a, b, a == b);
-  // }
-  // onDrop = evt => {
-  //   console.log("droped");
-  //   if (
-  //     evt.sourceEvent.toElement &&
-  //     evt.sourceEvent.toElement.getAttribute("draw") == "true"
-  //   )
-  //     this.props.drop({ id: evt.sourceEvent.toElement.id });
-  //   else this.props.drop({});
-  //   this.setState({ pointerEvents: "bounding-box" });
-  // };
-
-  onDragOver = () => {
+  onDragOver = evt => {
     if (
       this.props.sessionState.connectorDrawing &&
       this.props.sessionState.elementDragStart.id != this.props.id
@@ -88,7 +50,7 @@ class DrawWrapper extends Component {
     }
   };
 
-  onDragOut = () => {
+  onDragOut = evt => {
     if (this.state.highlightConnector) {
       this.setState({
         highlightConnector: false
@@ -97,6 +59,15 @@ class DrawWrapper extends Component {
     if (this.state.highlightDrawDragging) {
       this.setState({ highlightDrawDragging: false });
     }
+  };
+
+  renderConnectors = () => {
+    if (this.props.connectors) {
+      return this.props.connectors.map(conn => {
+        console.log("rendering connector ", conn);
+        return <Connector key={conn.id} id={conn.id} />;
+      });
+    } else return null;
   };
 
   render() {
@@ -117,9 +88,9 @@ class DrawWrapper extends Component {
 
     if (this.props.childrens) {
       childrens = this.props.childrens.map(element => {
-        const draw = this.props.allDraws[element];
-
-        return <DrawWrapperConnected key={draw.id} {...draw} />;
+        // const draw = this.props.allDraws[element];
+        console.log("renderizando filho");
+        return <DrawWrapperConnected key={element} id={element} />;
       });
     }
 
@@ -131,31 +102,35 @@ class DrawWrapper extends Component {
     const pointerEvents = calcPointerEvents();
 
     return (
-      <g
-        x={this.props.x}
-        y={this.props.y}
-        transform={`translate(${this.props.x}, ${this.props.y})`}
-        onMouseEnter={() => {
-          this.setState({ showConnectors: true });
-        }}
-        onMouseLeave={() => this.setState({ showConnectors: false })}
-        onMouseOver={this.onDragOver}
-        onMouseOut={this.onDragOut}
-      >
-        <Element
-          text={this.props.text}
-          heigth={this.props.heigth}
-          width={this.props.width}
-          radius={this.props.radius}
-          highlightConnection={this.state.highlightConnector}
-          highlightDrawDragging={this.state.highlightDrawDragging}
-          selected={this.props.selected}
-          id={this.props.id}
-          pointerEvents={pointerEvents}
-        />
-        {connectionPoints}
-        {childrens}
-      </g>
+      <React.Fragment>
+        <g
+          transform={`translate(${this.props.x}, ${this.props.y})`}
+          onMouseOver={this.onDragOver}
+          onMouseOut={this.onDragOut}
+        >
+          <g
+            onMouseEnter={evt => {
+              this.setState({ showConnectors: true });
+            }}
+            onMouseLeave={() => this.setState({ showConnectors: false })}
+          >
+            <Element
+              text={this.props.text}
+              heigth={this.props.heigth}
+              width={this.props.width}
+              radius={this.props.radius}
+              highlightConnection={this.state.highlightConnector}
+              highlightDrawDragging={this.state.highlightDrawDragging}
+              selected={this.props.selected}
+              id={this.props.id}
+              pointerEvents={pointerEvents}
+            />
+            {connectionPoints}
+          </g>
+          <g>{childrens}</g>
+        </g>
+        {this.renderConnectors()}
+      </React.Fragment>
     );
   }
 }
@@ -168,9 +143,9 @@ const mapDispatchToProps = {
   select: drawActions.selectDraw
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state, ownProps) => ({
   sessionState: state.elements.sessionState,
-  allDraws: state.elements.draws
+  ...state.elements.draws[ownProps.id]
 });
 
 const DrawWrapperConnected = connect(

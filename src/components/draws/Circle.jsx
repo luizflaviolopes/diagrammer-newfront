@@ -34,7 +34,7 @@ const Circle = props => {
   return (
     <React.Fragment>
       <circle
-        //style={{ pointerEvents: props.pointerEvents }}
+        style={{ pointerEvents: props.pointerEvents }}
         id={props.id}
         draw="true"
         cx={props.radius}

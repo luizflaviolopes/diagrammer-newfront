@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import Grid from "../components/Grid.jsx";
 import * as drawActions from "../actions/drawing";
 
-import draggingAPI from "../helpers/draggingDrawAPI.jsx";
+import draggingAPI from "../helpers/draggingAPI/draggingAPI";
 
 import DrawWraper from "./DrawWrapper.jsx";
 import Line from "../components/Line.jsx";
@@ -16,8 +16,8 @@ const Board = props => {
   }, []);
 
   const drawConnectors = () => {
-    return Object.keys(props.elements.connectors).map(id => {
-      const connector = { ...props.elements.connectors[id] };
+    return Object.keys(props.connectors).map(id => {
+      const connector = { ...props.connectors[id] };
       const conectedElements = Object.keys(connector);
       return (
         <Line
@@ -29,11 +29,10 @@ const Board = props => {
     });
   };
 
-  const drawDraws = () => {
-    return props.showSequence.map(itemId => {
-      const item = props.elements.draws[itemId];
+  const drawDraws = list => {
+    return list.map(itemId => {
       console.log("rendering", itemId);
-      return <DrawWraper key={item.id} {...item} />;
+      return <DrawWraper key={itemId} id={itemId} />;
     });
   };
 
@@ -60,8 +59,9 @@ const Board = props => {
         <g
           transform={`translate(${props.boardView.viewX},${props.boardView.viewY})`}
         >
-          {drawConnectors()}
-          {drawDraws()}
+          {drawDraws(props.showSequence)}
+          {/* {drawConnectors()} */}
+          {drawDraws(props.selectedDraws)}
         </g>
       </svg>
     </div>
@@ -76,7 +76,8 @@ const mapDispatchToProps = {
 const mapStateToProps = state => ({
   boardView: state.boardView,
   showSequence: state.elements.boardDrawShowOrder,
-  elements: state.elements,
+  connectors: state.elements.connectors,
+  selectedDraws: state.elements.sessionState.elementsSelected,
   selectedElement: state.toolboxElements.elementSelected
 });
 

@@ -1,6 +1,10 @@
 export const connectorDrawing = (state, actionPayload) => {
-  state.connectors[state.counters.connectors].b = { ...actionPayload };
+  console.log("connectorDragging", state.connectors, state.counters.connectors);
+  state.connectors[state.counters.connectors].endPoints.b = {
+    ...actionPayload
+  };
 
+  state.connectors = { ...state.connectors };
   return state;
 };
 
@@ -25,8 +29,10 @@ export const connectorDrawingStart = (state, actionPayload) => {
   };
 
   state.connectors[conId] = {
-    [actionPayload.id]: position,
-    b: position
+    endPoints: {
+      [actionPayload.id]: position,
+      b: position
+    }
   };
 
   return state;
@@ -51,11 +57,11 @@ export const connectorDrawingEnd = (state, actionPayload) => {
       { id: connCounter, centerVariant: actionPayload.variants }
     ];
 
-    let actualConector = { ...state.connectors[connCounter] };
+    let actualConector = { ...state.connectors[connCounter].endPoints };
     actualConector[actionPayload.id] = actualConector.b;
     delete actualConector.b;
 
-    state.connectors[connCounter] = actualConector;
+    state.connectors[connCounter].endPoints = actualConector;
 
     state.counters.connectors = state.counters.connectors + 1;
   } else {

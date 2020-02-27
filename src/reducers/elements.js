@@ -13,7 +13,7 @@ const setState = () => ({
       y: 500,
       heigth: 100,
       width: 100,
-      id: 1,
+      id: "1",
       connectors: [],
       parent: undefined,
       childrens: []
@@ -24,16 +24,16 @@ const setState = () => ({
       x: 300,
       y: 100,
       radius: 50,
-      id: 2,
+      id: "2",
       connectors: [],
       parent: undefined,
       childrens: []
     }
   },
   connectors: {},
-  boardDrawZOrder: [1, 2],
+  boardDrawZOrder: ["1", "2"],
   boardDrawSelected: [],
-  boardDrawShowOrder: [1, 2],
+  boardDrawShowOrder: ["1", "2"],
 
   sessionState: {
     elementsSelected: []
@@ -46,17 +46,17 @@ export default (state = setState(), action = {}) => {
       return drawResolver.drawMouseDown({ ...state }, action.payload);
     case actionTypes.BOARD_DRAGGING_ELEMENTS:
       return drawResolver.drawDragging({ ...state }, action.payload);
-    case actionTypes.BOARD_CLEAR_HIGHLIGHT_DRAW_DRAGGING:
-      return drawResolver.clearHighLightDrawDragging(
-        { ...state },
-        action.payload
-      );
+    // case actionTypes.BOARD_CLEAR_HIGHLIGHT_DRAW_DRAGGING:
+    //   return drawResolver.clearHighLightDrawDragging(
+    //     { ...state },
+    //     action.payload
+    //   );
     case actionTypes.BOARD_DROP_ELEMENTS:
       return drawResolver.drawdrop({ ...state }, action.payload);
     case actionTypes.BOARD_DRAW_ADD:
       return drawResolver.drawAdd({ ...state }, action.payload);
-    case actionTypes.BOARD_SELECT_DRAW:
-      return drawResolver.drawSelect({ ...state }, action.payload);
+    // case actionTypes.BOARD_SELECT_DRAW:
+    //   return drawResolver.drawSelect({ ...state }, action.payload);
     case actionTypes.BOARD_SELECTION_CLEAR:
       return drawResolver.selectionClear({ ...state }, action.payload);
     case actionTypes.BOARD_CONNECTOR_DRAWING:

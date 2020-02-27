@@ -1,17 +1,14 @@
 export const drawMouseDown = (state, actionPayload) => {
   const drawId = actionPayload.id;
   const selectedDraw = state.draws[drawId];
-
   if (!selectedDraw.selected) {
-    selectedDraw.selected = true;
-    selectedDraw.lastPosition = { x: selectedDraw.x, y: selectedDraw.y };
     if (!actionPayload.shiftPressed) {
       clearSelecteds(state);
     }
 
-    newSelectedDraw(state, selectedDraw);
+    newSelectedDraw(state, selectedDraw, actionPayload.clientRectPosition);
   }
-  newSelectionZOrdering(state);
+  // updateBoardOrdering(state);
   state.sessionState.draggingElement = true;
 
   return state;
@@ -22,11 +19,8 @@ export const drawDragging = (state, actionPayload) => {
   const selectedDraw = state.draws[drawId];
 
   if (!selectedDraw.selected) {
-    if (!selectedDraw.lastPosition)
-      selectedDraw.lastPosition = { x: selectedDraw.x, y: selectedDraw.y };
-
-    selectedDraw.x = selectedDraw.lastPosition.x + actionPayload.position.x;
-    selectedDraw.y = selectedDraw.lastPosition.y + actionPayload.position.y;
+    clearSelecteds(state);
+    newSelectedDraw(state, selectedDraw);
 
     updateConnectors(selectedDraw, state.connectors);
   } else {
@@ -41,42 +35,42 @@ export const drawDragging = (state, actionPayload) => {
   return state;
 };
 
-export const clearHighLightDrawDragging = (state, actionPayload) => {
-  state.draws[actionPayload.id].highlightDrawDragging = false;
-  state.sessionState.highlightDrawDragging = undefined;
-
-  return state;
-};
-
 export const drawdrop = (state, actionPayload) => {
-  console.log("dropped");
   let selecteds = state.sessionState.elementsSelected;
 
-  //iteration to update "last position" of all itens
+  //iteration in all droped draws
   for (let i = 0; i < selecteds.length; i++) {
-    let el = selecteds[i];
-    el.lastPosition = {
-      x: el.x,
-      y: el.y
+    let draw = state.draws[selecteds[i]];
+
+    //update position
+    draw.lastPosition = {
+      x: draw.x,
+      y: draw.y
     };
-  }
 
-  for (let i = 0; i < selecteds.length; i++) {
-    let draw = { ...selecteds[i] };
     // ver se já está no mesmo pai
-    if (draw.parent !== actionPayload.id) {
+    if (
+      (draw.parent && draw.parent.id !== actionPayload.id) ||
+      (draw.parent && !actionPayload.id) ||
+      (!draw.parent && actionPayload.id)
+    ) {
       //remover do pai atual
-      detachDraw(state, draw);
+      // detachDrawPermanent(state, draw);
 
-      //adicionar no novo pai
-      attachDraw(state, draw.id, actionPayload.id);
+      // //adicionar no novo pai
+      // attachDraw(state, draw.id, actionPayload.id);
+
+      reAttachDraw(state, draw, actionPayload);
 
       state.draws[draw.id] = draw;
     }
+    // else reverseDetachProvisory(state, draw);
   }
-  state.draws = { ...state.draws };
-  state.sessionState.draggingElement = false;
-  zOrderingToOrigin(state);
+
+  let newSession = { ...state.sessionState };
+  newSession.draggingElement = false;
+
+  state.sessionState = newSession;
   return state;
 };
 
@@ -97,105 +91,166 @@ export const drawAdd = (state, actionPayload) => {
   };
 
   state.draws[newID] = newDraw;
-  state.boardDrawZOrder.push(newID);
-  state.boardDrawShowOrder.push(newID);
+  state.boardDrawZOrder = [...state.boardDrawZOrder, newID];
+  state.boardDrawShowOrder = [...state.boardDrawShowOrder, newID];
 
   return state;
 };
 
-export const drawSelect = (state, actionPayload) => {
-  clearSelecteds(state.elementsSelected);
+// export const drawSelect = (state, actionPayload) => {
+//   clearSelecteds(state.elementsSelected);
 
-  let selected = getSelectedDraw(state.draws, actionPayload.id);
+//   let selected = getSelectedDraw(state.draws, actionPayload.id);
 
-  selected.selected = true;
-  selected.lastPosition = {
-    x: selected.x,
-    y: selected.y
-  };
-  state.sessionState.elementsSelected = [selected];
+//   selected.selected = true;
+//   selected.lastPosition = {
+//     x: selected.x,
+//     y: selected.y
+//   };
+//   state.sessionState.elementsSelected = [selected.id];
 
-  return state;
-};
+//   return state;
+// };
 
 export const selectionClear = (state, actionPayload) => {
   clearSelecteds(state);
   return state;
 };
 
-const getSelectedDraw = (list, elementId) => {
-  return list[elementId];
-};
+// const getSelectedDraw = (list, elementId) => {
+//   return list[elementId];
+// };
 
 const clearSelecteds = state => {
   let list = state.sessionState.elementsSelected;
   for (let i = 0; i < list.length; i++) {
-    list[i].selected = false;
+    state.draws[list[i]].selected = false;
+    reverseDetachProvisory(state, state.draws[list[i]]);
   }
   state.sessionState.elementsSelected = [];
-  state.boardDrawSelected = [];
-};
 
-const newSelectedDraw = (state, element) => {
-  state.sessionState.elementsSelected = [
-    ...state.sessionState.elementsSelected,
-    element
-  ];
-  state.boardDrawSelected = [...state.boardDrawSelected, element.id];
-};
-
-const newSelectionZOrdering = state => {
-  let nonSelected = state.boardDrawShowOrder.filter(e => {
-    return state.boardDrawSelected.indexOf(e) === -1;
-  });
-
-  state.boardDrawShowOrder = [...nonSelected, ...state.boardDrawSelected];
-};
-
-const zOrderingToOrigin = state => {
   state.boardDrawShowOrder = [...state.boardDrawZOrder];
 };
 
+const newSelectedDraw = (state, drawSelected, windowPosition) => {
+  drawSelected.selected = true;
+  drawSelected.lastPosition = { x: drawSelected.x, y: drawSelected.y };
+
+  state.sessionState.elementsSelected = [
+    ...state.sessionState.elementsSelected,
+    drawSelected.id
+  ];
+
+  detachDrawProvisory(state, drawSelected, windowPosition);
+};
+
+// const updateBoardOrdering = state => {
+// let nonSelected = getNonSelectedDraws(state);
+// state.boardDrawShowOrder = [...nonSelected];
+// };
+
+// const zOrderingToOrigin = state => {
+//   state.boardDrawShowOrder = [...state.boardDrawZOrder];
+// };
+
+// const getNonSelectedDraws = state => {
+//   return state.boardDrawShowOrder.filter(e => {
+//     return state.sessionState.elementsSelected.indexOf(e) === -1;
+//   });
+// };
+
 const dragSelecteds = (state, newPos) => {
-  for (let i = 0; i < state.sessionState.elementsSelected.length; i++) {
-    const draw = state.sessionState.elementsSelected[i];
+  let selecteds = state.sessionState.elementsSelected;
+  for (let i = 0; i < selecteds.length; i++) {
+    const draw = state.draws[selecteds[i]];
 
     draw.x = draw.lastPosition.x + newPos.x;
     draw.y = draw.lastPosition.y + newPos.y;
 
     updateConnectors(draw, state.connectors);
   }
+  state.connectors = { ...state.connectors };
   return state;
 };
 
-const updateConnectors = (draw, connectorsList, newPos) => {
+const updateConnectors = (draw, connectorsList) => {
   for (let i = 0; i < draw.connectors.length; i++) {
     const connRef = draw.connectors[i];
     const conn = connectorsList[connRef.id];
-    conn[draw.id] = {
+
+    let newPositions = conn.endPoints;
+    newPositions[draw.id] = {
       x: draw.x + connRef.centerVariant.x,
       y: draw.y + connRef.centerVariant.y
     };
+
+    conn.endPoints = newPositions;
   }
 };
 
-const detachDraw = (state, drawToDetach) => {
+const detachDrawProvisory = (state, drawToDetach, windowPosition) => {
   if (drawToDetach.parent) {
-    let parent = { ...state.draws[drawToDetach.parent] };
-    let drawsUnremoved = parent.childrens.filter(e => {
-      return e !== drawToDetach.id;
-    });
+    let parent = state.draws[drawToDetach.parent.id];
+    let drawsUnremoved = removeFromArray(parent.childrens, drawToDetach.id);
     parent.childrens = drawsUnremoved;
-    state.draws[drawToDetach.parent] = parent;
+
+    repositionForDetach(drawToDetach, windowPosition);
   } else {
-    let drawsUnremoved = state.boardDrawZOrder.filter(e => {
-      return e !== drawToDetach.id;
-    });
+    let drawsUnremoved = removeFromArray(
+      state.boardDrawShowOrder,
+      drawToDetach.id
+    );
+    // resetDrawPosition(drawToDetach);
 
-    resetDrawPosition(drawToDetach);
-
-    state.boardDrawZOrder = drawsUnremoved;
+    state.boardDrawShowOrder = drawsUnremoved;
   }
+};
+
+const repositionForDetach = (drawDetached, windowPosition) => {
+  drawDetached.x = windowPosition.x;
+  drawDetached.y = windowPosition.y;
+
+  drawDetached.lastPosition.x = drawDetached.x;
+  drawDetached.lastPosition.y = drawDetached.y;
+};
+
+const reverseDetachProvisory = (state, drawToReverse) => {
+  if (drawToReverse.parent) {
+    let parent = state.draws[drawToReverse.parent.id];
+    let newChildrens = [...parent.childrens, drawToReverse.id];
+    parent.childrens = newChildrens;
+
+    repositionForAttach(drawToReverse);
+  }
+};
+
+const repositionForAttach = drawAttached => {
+  drawAttached.x = drawAttached.x - drawAttached.parent.x;
+  drawAttached.y = drawAttached.y - drawAttached.parent.y;
+};
+
+const reAttachDraw = (state, drawToReAttach, drawTargetObj) => {
+  console.log("reattaching");
+  if (drawToReAttach.parent) {
+    drawToReAttach.parent = undefined;
+  } else
+    state.boardDrawZOrder = removeFromArray(
+      state.boardDrawZOrder,
+      drawToReAttach.id
+    );
+
+  if (drawTargetObj.id) {
+    drawToReAttach.parent = drawTargetObj;
+  } else {
+    state.boardDrawZOrder.push(drawToReAttach.id);
+  }
+};
+
+const removeFromArray = (array, valueToRemove) => {
+  let index = array.indexOf(valueToRemove);
+  let newArray = [...array];
+  newArray.splice(index, 1);
+  return newArray;
 };
 
 const resetDrawPosition = draw => {
@@ -205,8 +260,11 @@ const resetDrawPosition = draw => {
 
 const attachDraw = (state, drawIdToAttach, target) => {
   if (target) {
-    let parent = { ...state.draws[+target] };
-    parent.childrens.push(drawIdToAttach);
-    state.draws[+target] = parent;
-  } else state.boardDrawZOrder.push(drawIdToAttach);
+    let parent = state.draws[+target];
+    let newChildrens = [...parent.childrens, drawIdToAttach];
+    parent.childrens = newChildrens;
+    console.log("adicionando filho");
+  } else {
+    state.boardDrawZOrder.push(drawIdToAttach);
+  }
 };

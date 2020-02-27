@@ -1,16 +1,10 @@
 import React from "react";
-import { bindDrag } from "../helpers/mouseFunctions";
-import { event, drag, select } from "d3";
 import * as drawActions from "../actions/drawing";
 import { connect } from "react-redux";
 
 class ConnectionPoints extends React.Component {
   constructor(props) {
     super(props);
-  }
-
-  componentDidMount() {
-    bindDrag(this, this.onDragStart, this.onDrag, this.onDragEnd);
   }
 
   onDragStart = _this => {
