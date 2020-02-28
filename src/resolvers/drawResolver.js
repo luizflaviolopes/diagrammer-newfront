@@ -19,18 +19,19 @@ export const drawDragging = (state, actionPayload) => {
   const selectedDraw = state.draws[drawId];
 
   if (!selectedDraw.selected) {
-    clearSelecteds(state);
-    newSelectedDraw(state, selectedDraw);
+    throw { message: "error" };
+    // clearSelecteds(state);
+    // newSelectedDraw(state, selectedDraw);
 
-    updateConnectors(selectedDraw, state.connectors);
+    // updateConnectors(selectedDraw, state.connectors);
   } else {
     dragSelecteds(state, actionPayload.position);
   }
 
-  if (actionPayload.draw) {
-    state.draws[actionPayload.draw].highlightDrawDragging = true;
-    state.sessionState.highlightDrawDragging = actionPayload.draw;
-  }
+  // if (actionPayload.draw) {
+  //   state.draws[actionPayload.draw].highlightDrawDragging = true;
+  //   state.sessionState.highlightDrawDragging = actionPayload.draw;
+  // }
 
   return state;
 };
@@ -49,21 +50,15 @@ export const drawdrop = (state, actionPayload) => {
     };
 
     // ver se já está no mesmo pai
-    if (
-      (draw.parent && draw.parent.id !== actionPayload.id) ||
-      (draw.parent && !actionPayload.id) ||
-      (!draw.parent && actionPayload.id)
-    ) {
-      //remover do pai atual
-      // detachDrawPermanent(state, draw);
+    // if (
+    //   (draw.parent && draw.parent.id !== actionPayload.id) ||
+    //   (draw.parent && !actionPayload.id) ||
+    //   (!draw.parent && actionPayload.id)
+    // ) {
+    reAttachDraw(state, draw, actionPayload);
 
-      // //adicionar no novo pai
-      // attachDraw(state, draw.id, actionPayload.id);
-
-      reAttachDraw(state, draw, actionPayload);
-
-      state.draws[draw.id] = draw;
-    }
+    state.draws[draw.id] = draw;
+    // }
     // else reverseDetachProvisory(state, draw);
   }
 
@@ -87,7 +82,11 @@ export const drawAdd = (state, actionPayload) => {
     id: newID,
     connectors: [],
     parent: undefined,
-    childrens: []
+    childrens: [],
+    absolutePosition: {
+      x: actionPayload.position.x,
+      y: actionPayload.position.y
+    }
   };
 
   state.draws[newID] = newDraw;
@@ -167,6 +166,8 @@ const dragSelecteds = (state, newPos) => {
     draw.x = draw.lastPosition.x + newPos.x;
     draw.y = draw.lastPosition.y + newPos.y;
 
+    draw.absolutePosition = { x: draw.x, y: draw.y };
+
     updateConnectors(draw, state.connectors);
   }
   state.connectors = { ...state.connectors };
@@ -178,10 +179,10 @@ const updateConnectors = (draw, connectorsList) => {
     const connRef = draw.connectors[i];
     const conn = connectorsList[connRef.id];
 
-    let newPositions = conn.endPoints;
+    let newPositions = { ...conn.endPoints };
     newPositions[draw.id] = {
-      x: draw.x + connRef.centerVariant.x,
-      y: draw.y + connRef.centerVariant.y
+      x: draw.absolutePosition.x + connRef.centerVariant.x,
+      y: draw.absolutePosition.y + connRef.centerVariant.y
     };
 
     conn.endPoints = newPositions;

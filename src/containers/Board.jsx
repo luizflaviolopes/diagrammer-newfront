@@ -8,6 +8,7 @@ import draggingAPI from "../helpers/draggingAPI/draggingAPI";
 
 import DrawWraper from "./DrawWrapper.jsx";
 import Line from "../components/Line.jsx";
+import Connector from "./Connector.jsx";
 
 const Board = props => {
   useEffect(() => {
@@ -15,18 +16,16 @@ const Board = props => {
     return draggingAPI.endDrag;
   }, []);
 
-  const drawConnectors = () => {
-    return Object.keys(props.connectors).map(id => {
-      const connector = { ...props.connectors[id] };
-      const conectedElements = Object.keys(connector);
+  const drawProvisoryConnector = () => {
+    if (props.drawingConnector)
       return (
-        <Line
-          key={id}
-          from={connector[conectedElements[0]]}
-          to={connector[conectedElements[1]]}
+        <Connector
+          key={props.drawingConnector}
+          id={props.drawingConnector}
+          prov
         />
       );
-    });
+    else return null;
   };
 
   const drawDraws = list => {
@@ -60,8 +59,8 @@ const Board = props => {
           transform={`translate(${props.boardView.viewX},${props.boardView.viewY})`}
         >
           {drawDraws(props.showSequence)}
-          {/* {drawConnectors()} */}
           {drawDraws(props.selectedDraws)}
+          {drawProvisoryConnector()}
         </g>
       </svg>
     </div>
@@ -76,9 +75,9 @@ const mapDispatchToProps = {
 const mapStateToProps = state => ({
   boardView: state.boardView,
   showSequence: state.elements.boardDrawShowOrder,
-  connectors: state.elements.connectors,
   selectedDraws: state.elements.sessionState.elementsSelected,
-  selectedElement: state.toolboxElements.elementSelected
+  selectedElement: state.toolboxElements.elementSelected,
+  drawingConnector: state.elements.sessionState.drawingConnector
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Board);

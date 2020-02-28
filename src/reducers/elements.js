@@ -9,14 +9,15 @@ const setState = () => ({
     1: {
       type: elementTypes.DRAW_RECTANGLE,
       text: "",
-      x: 100,
+      x: 200,
       y: 500,
       heigth: 100,
       width: 100,
       id: "1",
       connectors: [],
       parent: undefined,
-      childrens: []
+      childrens: [],
+      absolutePosition: { x: 200, y: 500 }
     },
     2: {
       type: elementTypes.DRAW_CIRCLE,
@@ -27,7 +28,8 @@ const setState = () => ({
       id: "2",
       connectors: [],
       parent: undefined,
-      childrens: []
+      childrens: [],
+      absolutePosition: { x: 300, y: 100 }
     }
   },
   connectors: {},

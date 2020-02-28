@@ -64,8 +64,14 @@ class DrawWrapper extends Component {
   renderConnectors = () => {
     if (this.props.connectors) {
       return this.props.connectors.map(conn => {
-        console.log("rendering connector ", conn);
-        return <Connector key={conn.id} id={conn.id} />;
+        //ajustanto posição de referencia
+        return (
+          <Connector
+            key={conn.id}
+            id={conn.id}
+            posRef={{ ...conn.centerVariant, id: this.props.id }}
+          />
+        );
       });
     } else return null;
   };
@@ -114,6 +120,7 @@ class DrawWrapper extends Component {
             }}
             onMouseLeave={() => this.setState({ showConnectors: false })}
           >
+            {this.renderConnectors()}
             <Element
               text={this.props.text}
               heigth={this.props.heigth}
@@ -129,7 +136,6 @@ class DrawWrapper extends Component {
           </g>
           <g>{childrens}</g>
         </g>
-        {this.renderConnectors()}
       </React.Fragment>
     );
   }
