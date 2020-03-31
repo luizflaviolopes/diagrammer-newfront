@@ -1,6 +1,9 @@
 import React from "react";
 
 const Circle = props => {
+  const radius =
+    props.width > props.heigth ? props.width / 2 : props.heigth / 2;
+
   let overlayVariations = {
     opacity: 1,
     visibility: "hidden"
@@ -21,7 +24,7 @@ const Circle = props => {
   else if (props.selected) {
     overlayVariations = {
       fill: "none",
-      opacity: "1",
+      opacity: "0.7",
       visibility: "visible",
       stroke: "white",
       strokeWidth: "3",
@@ -29,7 +32,9 @@ const Circle = props => {
     };
   }
 
-  let overlayObj = <Overlay {...props} variations={overlayVariations} />;
+  let overlayObj = (
+    <Overlay {...props} variations={overlayVariations} radius={radius} />
+  );
 
   return (
     <React.Fragment>
@@ -37,12 +42,13 @@ const Circle = props => {
         style={{ pointerEvents: props.pointerEvents }}
         id={props.id}
         draw="true"
-        cx={props.radius}
-        cy={props.radius}
-        r={props.radius}
+        cx={radius}
+        cy={radius}
+        r={radius}
         stroke="black"
         strokeWidth="2"
         fill={props.fillColor || "white"}
+        opacity={props.selected ? "0.7" : "1"}
       />
       {overlayObj}
     </React.Fragment>

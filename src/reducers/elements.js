@@ -4,41 +4,49 @@ import * as drawResolver from "../resolvers/drawResolver";
 import * as connectorResolvers from "../resolvers/connectorsResolver";
 
 const setState = () => ({
-  counters: { draws: 3, connectors: 1 },
+  counters: {
+    draws: 3,
+    connectors: 2
+  },
   draws: {
-    1: {
-      type: elementTypes.DRAW_RECTANGLE,
+    "1": {
+      type: "DRAW_RECTANGLE",
       text: "",
       x: 200,
       y: 500,
       heigth: 100,
       width: 100,
       id: "1",
-      connectors: [],
-      parent: undefined,
-      childrens: [],
-      absolutePosition: { x: 200, y: 500 }
+      connectors: {},
+      childrens: []
     },
-    2: {
-      type: elementTypes.DRAW_CIRCLE,
+    "2": {
+      type: "DRAW_CIRCLE",
       text: "",
-      x: 300,
-      y: 100,
-      radius: 50,
+      x: 804,
+      y: 76,
+      heigth: 325,
+      width: 293,
       id: "2",
-      connectors: [],
-      parent: undefined,
+      connectors: {},
       childrens: [],
-      absolutePosition: { x: 300, y: 100 }
+      selected: false,
+      lastPosition: {
+        x: 804,
+        y: 76
+      }
     }
   },
   connectors: {},
-  boardDrawZOrder: ["1", "2"],
+  boardDrawZOrder: [1, 2],
   boardDrawSelected: [],
-  boardDrawShowOrder: ["1", "2"],
-
+  boardDrawShowOrder: [1, 2],
   sessionState: {
-    elementsSelected: []
+    elementsSelected: [],
+    connectorSelected: [],
+    draggingElement: false,
+    connectorDrawing: false,
+    elementDragStart: null
   }
 });
 
@@ -48,17 +56,10 @@ export default (state = setState(), action = {}) => {
       return drawResolver.drawMouseDown({ ...state }, action.payload);
     case actionTypes.BOARD_DRAGGING_ELEMENTS:
       return drawResolver.drawDragging({ ...state }, action.payload);
-    // case actionTypes.BOARD_CLEAR_HIGHLIGHT_DRAW_DRAGGING:
-    //   return drawResolver.clearHighLightDrawDragging(
-    //     { ...state },
-    //     action.payload
-    //   );
     case actionTypes.BOARD_DROP_ELEMENTS:
       return drawResolver.drawdrop({ ...state }, action.payload);
     case actionTypes.BOARD_DRAW_ADD:
       return drawResolver.drawAdd({ ...state }, action.payload);
-    // case actionTypes.BOARD_SELECT_DRAW:
-    //   return drawResolver.drawSelect({ ...state }, action.payload);
     case actionTypes.BOARD_SELECTION_CLEAR:
       return drawResolver.selectionClear({ ...state }, action.payload);
     case actionTypes.BOARD_CONNECTOR_DRAWING:
@@ -73,7 +74,15 @@ export default (state = setState(), action = {}) => {
         { ...state },
         action.payload
       );
-
+    case actionTypes.BOARD_SELECT_CONNECTOR:
+      return connectorResolvers.selectConector({ ...state }, action.payload);
+    case actionTypes.BOARD_DELETE_PRESSED:
+      return connectorResolvers.selectConector({ ...state }, action.payload);
+    case "teste":
+      const newstate = { ...state };
+      newstate.draws["1"].heigth = 500;
+      return newstate;
+      break;
     default:
       return state;
   }

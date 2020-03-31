@@ -1,5 +1,11 @@
 import React, { Component, useState } from "react";
 import { connect } from "react-redux";
+import { selectConnector } from "../actions/connectorsActions";
+
+import {
+  polylinePointsTransformation,
+  intermediatePointsCalculator
+} from "../helpers/connectorPointsCalculator";
 
 class Connector extends Component {
   constructor(props) {
@@ -7,40 +13,51 @@ class Connector extends Component {
   }
 
   render() {
-    let from = this.props.endPoints[Object.keys(this.props.endPoints)[0]];
-    let to = this.props.endPoints[Object.keys(this.props.endPoints)[1]];
-    console.log(from, to);
+    let from = this.props.endPoints[0];
+    let to = this.props.endPoints[1];
+    console.log("connector", from, to, this.props.intermediatePoints);
 
-    if (this.props.posRef) {
-      console.log("corrigindo connector");
-      const originalPosition = this.props.endPoints[this.props.posRef.id];
-      const posVariation = {
-        x: originalPosition.x - this.props.posRef.x,
-        y: originalPosition.y - this.props.posRef.y
-      };
+    const points = this.props.drawing
+      ? [from, to]
+      : intermediatePointsCalculator(from, to, 10);
 
-      from = { x: from.x - posVariation.x, y: from.y - posVariation.y };
-      to = { x: to.x - posVariation.x, y: to.y - posVariation.y };
+    let midPoints = [];
+
+    if (this.props.selected) {
+      for (let i = 1; i < points.length - 1; i++) {
+        midPoints.push(points[i]);
+      }
     }
 
     return (
-      <line
-        style={{ pointerEvents: this.props.prov ? "none" : "all" }}
-        x1={from.x}
-        y1={from.y}
-        x2={to.x}
-        y2={to.y}
-        stroke="black"
-        strokeWidth="3"
-      />
+      <g>
+        <polyline
+          style={{
+            pointerEvents: this.props.drawing ? "none" : "stroke",
+            fill: "none"
+          }}
+          points={polylinePointsTransformation(points)}
+          stroke="black"
+          strokeWidth="3"
+          markerEnd="url(#triangle)"
+          onClick={evt => {
+            this.props.select({ id: this.props.id });
+          }}
+        />
+        {midPoints.map(p => {
+          return <circle cx={p.x} cy={p.y} r="7" fill="green" />;
+        })}
+      </g>
     );
   }
 }
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = {
+  select: selectConnector
+};
 
 const mapStateToProps = (state, ownProps) => ({
-  endPoints: state.elements.connectors[ownProps.id].endPoints
+  ...state.elements.connectors[ownProps.id]
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Connector);

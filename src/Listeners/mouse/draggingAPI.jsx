@@ -2,7 +2,7 @@ import { onDrawDragStart, IsDraw } from "./draggingDraw";
 import { IsConnector, onDrawConnectorStart } from "./draggingConnector";
 
 const onMouseDownFunction = evt => {
-  if (IsDraw(evt.target)) {
+  if (evt.button == 0 && IsDraw(evt.target)) {
     onDrawDragStart(evt);
   } else if (IsConnector(evt.target)) {
     onDrawConnectorStart(evt);

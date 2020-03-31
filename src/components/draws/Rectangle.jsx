@@ -44,6 +44,7 @@ const Rectangle = props => {
         strokeWidth="2"
         fill={props.fillColor || "white"}
         draw="true"
+        opacity={props.selected ? "0.7" : "1"}
       ></rect>
       <text
         x="0"

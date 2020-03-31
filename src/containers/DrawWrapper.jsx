@@ -1,14 +1,11 @@
 import React, { Component, useState } from "react";
-import ReactDOM from "react-dom";
 import { connect } from "react-redux";
 
 import * as drawActions from "../actions/drawing";
 import elementTypeResolver from "../helpers/elementTypeResolver";
-import elementCenterCalculator from "../helpers/elementCenterCalculator";
 import ConnectionPoints from "../components/ConnectionPoints";
 
 import elementsConnectorPointsCalculator from "../helpers/elementsConnectorPointsCalculator";
-import Connector from "./Connector";
 
 class DrawWrapper extends Component {
   constructor(props) {
@@ -21,25 +18,18 @@ class DrawWrapper extends Component {
       pointerEvents:
         props.sessionState.draggingElement && props.selected
           ? "none"
-          : "bounding-box"
+          : "painted"
     };
-    this.connectionPoints = elementsConnectorPointsCalculator(
-      props.type,
-      props.width,
-      props.heigth,
-      props.radius
-    );
-    this.centerCalc = elementCenterCalculator(props.type);
+
+    // this.centerCalc = elementCenterCalculator(props.type);
   }
 
-  componentDidUpdate = () => {
-    console.log("update", this.props.id);
-  };
+  componentDidUpdate = () => {};
 
   onDragOver = evt => {
     if (
       this.props.sessionState.connectorDrawing &&
-      this.props.sessionState.elementDragStart.id != this.props.id
+      this.props.sessionState.connectorStartElement.id != this.props.id
     ) {
       this.setState({ highlightConnector: true });
     } else if (
@@ -61,33 +51,25 @@ class DrawWrapper extends Component {
     }
   };
 
-  renderConnectors = () => {
-    if (this.props.connectors) {
-      return this.props.connectors.map(conn => {
-        //ajustanto posição de referencia
-        return (
-          <Connector
-            key={conn.id}
-            id={conn.id}
-            posRef={{ ...conn.centerVariant, id: this.props.id }}
-          />
-        );
-      });
-    } else return null;
-  };
-
   render() {
+    console.log("update", this.props.id);
     const Element = elementTypeResolver(this.props.type);
     let connectionPoints = null;
     let childrens = null;
 
     if (this.state.showConnectors) {
-      connectionPoints = this.connectionPoints.map(point => (
+      let points = elementsConnectorPointsCalculator(
+        this.props.type,
+        this.props.width,
+        this.props.heigth,
+        this.props.radius
+      );
+
+      connectionPoints = points.map(point => (
         <ConnectionPoints
-          x={point.x}
-          y={point.y}
           elementId={this.props.id}
-          key={point.ref}
+          key={point.pointRef}
+          {...point}
         />
       ));
     }
@@ -103,24 +85,19 @@ class DrawWrapper extends Component {
     const calcPointerEvents = () => {
       if (this.props.sessionState.draggingElement && this.props.selected)
         return "none";
-      else return "bounding-box";
+      else return "painted";
     };
     const pointerEvents = calcPointerEvents();
 
     return (
-      <React.Fragment>
-        <g
-          transform={`translate(${this.props.x}, ${this.props.y})`}
-          onMouseOver={this.onDragOver}
-          onMouseOut={this.onDragOut}
-        >
+      <g transform={`translate(${this.props.x}, ${this.props.y})`}>
+        <g onMouseOver={this.onDragOver} onMouseOut={this.onDragOut}>
           <g
             onMouseEnter={evt => {
               this.setState({ showConnectors: true });
             }}
             onMouseLeave={() => this.setState({ showConnectors: false })}
           >
-            {this.renderConnectors()}
             <Element
               text={this.props.text}
               heigth={this.props.heigth}
@@ -134,9 +111,9 @@ class DrawWrapper extends Component {
             />
             {connectionPoints}
           </g>
-          <g>{childrens}</g>
         </g>
-      </React.Fragment>
+        {childrens}
+      </g>
     );
   }
 }

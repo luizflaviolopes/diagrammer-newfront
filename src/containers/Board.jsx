@@ -4,28 +4,27 @@ import { connect } from "react-redux";
 import Grid from "../components/Grid.jsx";
 import * as drawActions from "../actions/drawing";
 
-import draggingAPI from "../helpers/draggingAPI/draggingAPI";
+import draggingAPI from "../Listeners/mouse/draggingAPI";
+import keyboardAPI from "../Listeners/keyboard/keyboardAPI";
 
 import DrawWraper from "./DrawWrapper.jsx";
-import Line from "../components/Line.jsx";
 import Connector from "./Connector.jsx";
+import Marker from "../components/Markers.jsx";
 
 const Board = props => {
   useEffect(() => {
     draggingAPI.startDrag();
-    return draggingAPI.endDrag;
+    keyboardAPI.start();
+    return () => {
+      draggingAPI.endDrag();
+      keyboardAPI.stop();
+    };
   }, []);
 
-  const drawProvisoryConnector = () => {
-    if (props.drawingConnector)
-      return (
-        <Connector
-          key={props.drawingConnector}
-          id={props.drawingConnector}
-          prov
-        />
-      );
-    else return null;
+  const drawconnectors = () => {
+    return Object.keys(props.connectors).map(conn => {
+      return <Connector key={conn} id={conn} />;
+    });
   };
 
   const drawDraws = list => {
@@ -45,10 +44,11 @@ const Board = props => {
   const clearSelection = () => {
     props.clearSelection();
   };
-
+  console.log("renderBoard");
   return (
     <div style={{ height: "100%" }}>
       <svg id="svg" width="100%" height="100%">
+        <Marker />
         <Grid
           offsetX={props.boardView.viewX}
           offsetY={props.boardView.viewY}
@@ -59,8 +59,8 @@ const Board = props => {
           transform={`translate(${props.boardView.viewX},${props.boardView.viewY})`}
         >
           {drawDraws(props.showSequence)}
+          {drawconnectors()}
           {drawDraws(props.selectedDraws)}
-          {drawProvisoryConnector()}
         </g>
       </svg>
     </div>
@@ -77,7 +77,7 @@ const mapStateToProps = state => ({
   showSequence: state.elements.boardDrawShowOrder,
   selectedDraws: state.elements.sessionState.elementsSelected,
   selectedElement: state.toolboxElements.elementSelected,
-  drawingConnector: state.elements.sessionState.drawingConnector
+  connectors: state.elements.connectors
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Board);
