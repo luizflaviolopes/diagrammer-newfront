@@ -90,8 +90,12 @@ class DrawWrapper extends Component {
     const pointerEvents = calcPointerEvents();
 
     return (
-      <g transform={`translate(${this.props.x}, ${this.props.y})`}>
-        <g onMouseOver={this.onDragOver} onMouseOut={this.onDragOut}>
+      <React.Fragment>
+        <g
+          onMouseOver={this.onDragOver}
+          onMouseOut={this.onDragOut}
+          transform={`translate(${this.props.x}, ${this.props.y})`}
+        >
           <g
             onMouseEnter={evt => {
               this.setState({ showConnectors: true });
@@ -113,7 +117,7 @@ class DrawWrapper extends Component {
           </g>
         </g>
         {childrens}
-      </g>
+      </React.Fragment>
     );
   }
 }

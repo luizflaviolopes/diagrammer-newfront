@@ -1,7 +1,7 @@
 import elementsConnectorPointsCalculator from "../helpers/elementsConnectorPointsCalculator";
 import { clearConnectorSelection } from "./connectorsResolver";
 
-export const drawMouseDown = (state, actionPayload) => {
+export const selectDraw = (state, actionPayload) => {
   const drawId = actionPayload.id;
   const selectedDraw = state.draws[drawId];
 

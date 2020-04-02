@@ -32,18 +32,17 @@ export const onDrawDragging = evt => {
 
 export const onDrawDrop = evt => {
   console.log(evt);
-  if (window.dragging) {
-    if (IsDraw(evt.toElement) && window.dragging.objectId != evt.toElement.id) {
-      let evtMeasures = evt.toElement.getBoundingClientRect();
-      store.dispatch(
-        drop({
-          id: evt.toElement.id,
-          x: evtMeasures.x,
-          y: evtMeasures.y
-        })
-      );
-    } else store.dispatch(drop({}));
 
-    window.dragging = undefined;
-  }
+  if (IsDraw(evt.toElement)) {
+    let evtMeasures = evt.toElement.getBoundingClientRect();
+    store.dispatch(
+      drop({
+        id: evt.toElement.id,
+        x: evtMeasures.x,
+        y: evtMeasures.y
+      })
+    );
+  } else store.dispatch(drop({}));
+
+  window.dragging = undefined;
 };

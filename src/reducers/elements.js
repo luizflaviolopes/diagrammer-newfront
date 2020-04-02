@@ -52,8 +52,8 @@ const setState = () => ({
 
 export default (state = setState(), action = {}) => {
   switch (action.type) {
-    case actionTypes.BOARD_MOUSEDOWN_DRAW:
-      return drawResolver.drawMouseDown({ ...state }, action.payload);
+    case actionTypes.BOARD_SELECT_DRAW:
+      return drawResolver.selectDraw({ ...state }, action.payload);
     case actionTypes.BOARD_DRAGGING_ELEMENTS:
       return drawResolver.drawDragging({ ...state }, action.payload);
     case actionTypes.BOARD_DROP_ELEMENTS:

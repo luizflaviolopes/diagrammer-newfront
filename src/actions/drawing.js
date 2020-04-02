@@ -2,7 +2,7 @@ import * as types from "../types/actionTypes";
 
 export const mouseDown = data => {
   return {
-    type: types.BOARD_MOUSEDOWN_DRAW,
+    type: types.BOARD_SELECT_DRAW,
     payload: data
   };
 };
