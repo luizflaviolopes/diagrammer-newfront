@@ -5,42 +5,14 @@ import * as connectorResolvers from "../resolvers/connectorsResolver";
 
 const setState = () => ({
   counters: {
-    draws: 3,
-    connectors: 2
+    draws: 1,
+    connectors: 1
   },
-  draws: {
-    "1": {
-      type: "DRAW_RECTANGLE",
-      text: "",
-      x: 200,
-      y: 500,
-      heigth: 100,
-      width: 100,
-      id: "1",
-      connectors: {},
-      childrens: []
-    },
-    "2": {
-      type: "DRAW_CIRCLE",
-      text: "",
-      x: 804,
-      y: 76,
-      heigth: 325,
-      width: 293,
-      id: "2",
-      connectors: {},
-      childrens: [],
-      selected: false,
-      lastPosition: {
-        x: 804,
-        y: 76
-      }
-    }
-  },
+  draws: {},
   connectors: {},
-  boardDrawZOrder: [1, 2],
+  boardDrawZOrder: [],
   boardDrawSelected: [],
-  boardDrawShowOrder: [1, 2],
+  boardDrawShowOrder: [],
   sessionState: {
     elementsSelected: [],
     connectorSelected: [],
