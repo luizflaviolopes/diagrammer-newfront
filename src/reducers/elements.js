@@ -6,7 +6,7 @@ import * as connectorResolvers from "../resolvers/connectorsResolver";
 const setState = () => ({
   counters: {
     draws: 1,
-    connectors: 1
+    connectors: 1,
   },
   draws: {},
   connectors: {},
@@ -18,8 +18,8 @@ const setState = () => ({
     connectorSelected: [],
     draggingElement: false,
     connectorDrawing: false,
-    elementDragStart: null
-  }
+    elementDragStart: null,
+  },
 });
 
 export default (state = setState(), action = {}) => {
@@ -50,11 +50,6 @@ export default (state = setState(), action = {}) => {
       return connectorResolvers.selectConector({ ...state }, action.payload);
     case actionTypes.BOARD_DELETE_PRESSED:
       return connectorResolvers.selectConector({ ...state }, action.payload);
-    case "teste":
-      const newstate = { ...state };
-      newstate.draws["1"].heigth = 500;
-      return newstate;
-      break;
     default:
       return state;
   }

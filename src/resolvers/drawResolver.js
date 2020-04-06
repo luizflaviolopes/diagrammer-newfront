@@ -5,8 +5,6 @@ export const selectDraw = (state, actionPayload) => {
   const drawId = actionPayload.id;
   const selectedDraw = state.draws[drawId];
 
-  clearConnectorSelection(state);
-
   if (!selectedDraw.selected) {
     if (!actionPayload.shiftPressed) {
       clearSelecteds(state);
@@ -35,33 +33,86 @@ export const drawDragging = (state, actionPayload) => {
 export const drawdrop = (state, actionPayload) => {
   let selecteds = state.sessionState.elementsSelected;
 
-  //iteration in all droped draws
-  for (let i = 0; i < selecteds.length; i++) {
-    let draw = state.draws[selecteds[i]];
+  if (actionPayload.id) {
+    const parent = state.draws[actionPayload.id];
+    const padding = 10;
+    const firstElement = state.draws[selecteds[0]];
+    let minX = firstElement.x;
+    let minY = firstElement.y;
+    let maxRight = firstElement.x + firstElement.width;
+    let maxBottom = firstElement.y + firstElement.heigth;
 
-    updateDrawLastPosition(state, draw);
+    for (let z = 1; z < selecteds.length; z++) {
+      let elementSelected = state.draws[selecteds[z]];
+      if (elementSelected.x < minX) minX = elementSelected.x;
+      if (elementSelected.y < minY) minY = elementSelected.y;
+      if (elementSelected.x + elementSelected.width > maxRight)
+        maxRight = elementSelected.x + elementSelected.width;
+      if (elementSelected.y + elementSelected.heigth > maxBottom)
+        maxBottom = elementSelected.y + elementSelected.heigth;
+    }
 
-    if (actionPayload.id) {
+    const newAbsolutePosition = updateParentSize(
+      state,
+      parent,
+      {
+        x: actionPayload.x,
+        y: actionPayload.y,
+      },
+      { minX, minY, maxRight, maxBottom, padding }
+    );
+
+    resizeGrandParents(state, parent, padding);
+
+    //é possível aumentar a performance, separando o calculo para x e y.
+    if (newAbsolutePosition.varX < 0 || newAbsolutePosition.varY < 0) {
+      for (let c = 0; c < parent.childrens.length; c++) {
+        updateChildrensPositionOnParentResize(
+          state.draws[parent.childrens[c]],
+          {
+            x: newAbsolutePosition.varX,
+            y: newAbsolutePosition.varY,
+          }
+        );
+      }
+    }
+
+    for (let a = 0; a < selecteds.length; a++) {
+      let droppedDraw = state.draws[selecteds[a]];
+
       // board to parent
-      if (!draw.parent) {
-        addDrawToParent(state, draw, actionPayload.id);
-        removeDrawFromBoard(state, draw.id);
-      }
-      // parent1 to parent2
-      else if (actionPayload.id !== draw.parent) {
-        removeDrawFromParent(state, draw);
-        addDrawToParent(state, draw, actionPayload.id);
-      }
-
-      updateParentSize(state, draw);
-    } else {
-      //parent to board
-      if (draw.parent) {
-        removeDrawFromParent(state, draw);
-        addDrawToBoard(state, draw.id);
+      if (!droppedDraw.parent) {
+        addDrawToParent(state, droppedDraw, actionPayload.id);
+        removeDrawFromBoard(state, droppedDraw.id);
+        updateDroppedChildrenPosition(
+          droppedDraw,
+          newAbsolutePosition,
+          padding
+        );
       }
     }
   }
+
+  //iteration in all droped draws
+  // for (let i = 0; i < selecteds.length; i++) {
+  //   let draw = state.draws[selecteds[i]];
+
+  //   // updateDrawLastPosition(state, draw);
+
+  //   if (actionPayload.id) {
+  //     // parent1 to parent2
+  //     else if (actionPayload.id !== draw.parent) {
+  //       removeDrawFromParent(state, draw);
+  //       addDrawToParent(state, draw, actionPayload.id);
+  //     }
+  //   } else {
+  //     //parent to board
+  //     if (draw.parent) {
+  //       removeDrawFromParent(state, draw);
+  //       addDrawToBoard(state, draw.id);
+  //     }
+  //   }
+  // }
 
   let newSession = { ...state.sessionState };
   newSession.draggingElement = false;
@@ -84,10 +135,6 @@ export const drawAdd = (state, actionPayload) => {
     connectors: [],
     parent: undefined,
     childrens: [],
-    absolutePosition: {
-      x: actionPayload.position.x,
-      y: actionPayload.position.y
-    }
   };
 
   state.draws[newID] = newDraw;
@@ -103,7 +150,7 @@ export const selectionClear = (state, actionPayload) => {
   return state;
 };
 
-const clearSelecteds = state => {
+const clearSelecteds = (state) => {
   let list = state.sessionState.elementsSelected;
   for (let i = 0; i < list.length; i++) {
     state.draws[list[i]].selected = false;
@@ -119,7 +166,7 @@ const newSelectedDraw = (state, drawSelected) => {
 
   state.sessionState.elementsSelected = [
     ...state.sessionState.elementsSelected,
-    drawSelected.id
+    drawSelected.id,
   ];
 
   // ##remover do showorder
@@ -141,22 +188,14 @@ const updateDrawPosition = (state, draw, posVariation) => {
 
   console.log("updated position", draw.id);
 
-  updateChildrensPosition(state, draw, posVariation);
+  //updateChildrensPosition(state, draw, posVariation);
   updateConnectors(draw, state.connectors);
-};
-
-const updateChildrensPosition = (state, draw, posVariation) => {
-  for (let i = 0; i < draw.childrens.length; i++) {
-    const children = state.draws[draw.childrens[i]];
-
-    updateDrawPosition(state, children, posVariation);
-  }
 };
 
 const updateDrawLastPosition = (state, draw) => {
   draw.lastPosition = {
     x: draw.x,
-    y: draw.y
+    y: draw.y,
   };
   updateChildrensLastPosition(state, draw);
 };
@@ -192,7 +231,7 @@ const updateConnectorsFromResize = (draw, connectorsList) => {
       draw.width,
       draw.heigth
     );
-    const point = connectorPoints.find(el => {
+    const point = connectorPoints.find((el) => {
       return el.pointRef == connRef.centerVariant.pointRef;
     });
 
@@ -207,43 +246,124 @@ const updateConnectorsFromResize = (draw, connectorsList) => {
   }
 };
 
-const updateParentSize = (state, droppedDraw) => {
-  const padding = 10;
-  console.log("atualizando tamanho", droppedDraw);
-  const parent = state.draws[droppedDraw.parent];
+const updateParentSize = (state, parent, absolutePosition, measures) => {
+  const padding = measures.padding;
+  console.log("atualizando tamanho");
   let variationX = 0;
   let variationY = 0;
   let variationH = 0;
   let variationW = 0;
 
-  if (droppedDraw.x < parent.x) {
-    variationX = droppedDraw.x - (parent.x + padding);
-    parent.x = parent.x + variationX;
-  }
-  if (droppedDraw.y < parent.y) {
-    variationY = droppedDraw.y - (parent.y + padding);
-    parent.y = parent.y + variationY;
-  }
-  if (droppedDraw.x + droppedDraw.width > parent.x + parent.width) {
-    variationW =
-      droppedDraw.x + droppedDraw.width + padding - (parent.x + parent.width);
-  }
-  if (droppedDraw.y + droppedDraw.heigth > parent.y + parent.heigth) {
-    variationH =
-      droppedDraw.y + droppedDraw.heigth + padding - (parent.y + parent.heigth);
-  }
+  if (measures.minX < absolutePosition.x + padding) {
+    variationX = measures.minX - (absolutePosition.x + padding);
 
-  parent.width = parent.width - variationX + variationW;
-  parent.heigth = parent.heigth - variationY + variationH;
+    parent.x = parent.x + variationX;
+    parent.width = parent.width - variationX;
+  }
+  if (measures.minY < absolutePosition.y + padding) {
+    variationY = measures.minY - (absolutePosition.y + padding);
+
+    parent.y = parent.y + variationY;
+    parent.heigth = parent.heigth - variationY;
+  }
+  if (
+    measures.maxRight >
+    absolutePosition.x + variationX + parent.width - padding
+  ) {
+    variationW =
+      measures.maxRight +
+      padding -
+      (absolutePosition.x + variationX + parent.width);
+    parent.width = parent.width + variationW;
+  }
+  if (
+    measures.maxBottom >
+    absolutePosition.y + variationY + parent.heigth - padding
+  ) {
+    variationH =
+      measures.maxBottom +
+      padding -
+      (absolutePosition.y + variationY + parent.heigth);
+    parent.heigth = parent.heigth + variationH;
+  }
 
   updateConnectorsFromResize(parent, state.connectors);
+
+  return {
+    x: absolutePosition.x + variationX,
+    y: absolutePosition.y + variationY,
+    varX: variationX,
+    varY: variationY,
+    varW: variationW,
+    varH: variationH,
+  };
 };
 
 const addDrawToParent = (state, children, parentId) => {
   children.parent = parentId;
   let parent = state.draws[parentId];
+
   let newChildrens = [...parent.childrens, children.id];
   parent.childrens = newChildrens;
+};
+
+const updateDroppedChildrenPosition = (children, absolutePosition, padding) => {
+  const calcX = children.x - absolutePosition.x;
+  const calcY = children.y - absolutePosition.y;
+
+  children.x = calcX;
+  children.y = calcY;
+};
+
+const updateChildrensPositionOnParentResize = (children, variation) => {
+  children.x = children.x - variation.x;
+  children.y = children.y - variation.y;
+};
+
+const resizeGrandParents = (state, parent, padding) => {
+  if (!parent.parent) return;
+
+  const grandParent = state.draws[parent.parent];
+  let variationX = 0;
+  let variationY = 0;
+  let isUpdated = false;
+
+  if (parent.x < padding) {
+    variationX = parent.x - padding;
+
+    grandParent.x = grandParent.x + variationX;
+    grandParent.width = grandParent.width - variationX;
+    isUpdated = true;
+  }
+  if (parent.y < padding) {
+    variationY = parent.y - padding;
+
+    grandParent.y = grandParent.y + variationY;
+    grandParent.heigth = grandParent.heigth - variationY;
+    isUpdated = true;
+  }
+  if (parent.x + parent.width - variationX > grandParent.width - padding) {
+    grandParent.width = parent.x + parent.width + padding - variationX;
+    isUpdated = true;
+  }
+  if (parent.y + parent.heigth - variationY > grandParent.heigth - padding) {
+    grandParent.heigth = parent.y + parent.heigth + padding - variationY;
+    isUpdated = true;
+  }
+
+  if (variationX < 0 || variationY < 0) {
+    for (let c = 0; c < grandParent.childrens.length; c++) {
+      updateChildrensPositionOnParentResize(
+        state.draws[grandParent.childrens[c]],
+        {
+          x: variationX,
+          y: variationY,
+        }
+      );
+    }
+  }
+
+  if (isUpdated) resizeGrandParents(state, grandParent, padding);
 };
 
 const removeDrawFromParent = (state, drawToRemove) => {

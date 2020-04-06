@@ -18,7 +18,7 @@ class DrawWrapper extends Component {
       pointerEvents:
         props.sessionState.draggingElement && props.selected
           ? "none"
-          : "painted"
+          : "painted",
     };
 
     // this.centerCalc = elementCenterCalculator(props.type);
@@ -26,7 +26,7 @@ class DrawWrapper extends Component {
 
   componentDidUpdate = () => {};
 
-  onDragOver = evt => {
+  onDragOver = (evt) => {
     if (
       this.props.sessionState.connectorDrawing &&
       this.props.sessionState.connectorStartElement.id != this.props.id
@@ -40,10 +40,10 @@ class DrawWrapper extends Component {
     }
   };
 
-  onDragOut = evt => {
+  onDragOut = (evt) => {
     if (this.state.highlightConnector) {
       this.setState({
-        highlightConnector: false
+        highlightConnector: false,
       });
     }
     if (this.state.highlightDrawDragging) {
@@ -65,7 +65,7 @@ class DrawWrapper extends Component {
         this.props.radius
       );
 
-      connectionPoints = points.map(point => (
+      connectionPoints = points.map((point) => (
         <ConnectionPoints
           elementId={this.props.id}
           key={point.pointRef}
@@ -75,8 +75,7 @@ class DrawWrapper extends Component {
     }
 
     if (this.props.childrens) {
-      childrens = this.props.childrens.map(element => {
-        // const draw = this.props.allDraws[element];
+      childrens = this.props.childrens.map((element) => {
         console.log("renderizando filho");
         return <DrawWrapperConnected key={element} id={element} />;
       });
@@ -90,34 +89,32 @@ class DrawWrapper extends Component {
     const pointerEvents = calcPointerEvents();
 
     return (
-      <React.Fragment>
+      <g
+        onMouseOver={this.onDragOver}
+        onMouseOut={this.onDragOut}
+        transform={`translate(${this.props.x}, ${this.props.y})`}
+      >
         <g
-          onMouseOver={this.onDragOver}
-          onMouseOut={this.onDragOut}
-          transform={`translate(${this.props.x}, ${this.props.y})`}
+          onMouseEnter={(evt) => {
+            this.setState({ showConnectors: true });
+          }}
+          onMouseLeave={() => this.setState({ showConnectors: false })}
         >
-          <g
-            onMouseEnter={evt => {
-              this.setState({ showConnectors: true });
-            }}
-            onMouseLeave={() => this.setState({ showConnectors: false })}
-          >
-            <Element
-              text={this.props.text}
-              heigth={this.props.heigth}
-              width={this.props.width}
-              radius={this.props.radius}
-              highlightConnection={this.state.highlightConnector}
-              highlightDrawDragging={this.state.highlightDrawDragging}
-              selected={this.props.selected}
-              id={this.props.id}
-              pointerEvents={pointerEvents}
-            />
-            {connectionPoints}
-          </g>
+          <Element
+            text={this.props.text}
+            heigth={this.props.heigth}
+            width={this.props.width}
+            radius={this.props.radius}
+            highlightConnection={this.state.highlightConnector}
+            highlightDrawDragging={this.state.highlightDrawDragging}
+            selected={this.props.selected}
+            id={this.props.id}
+            pointerEvents={pointerEvents}
+          />
+          {connectionPoints}
         </g>
         {childrens}
-      </React.Fragment>
+      </g>
     );
   }
 }
@@ -127,12 +124,12 @@ const mapDispatchToProps = {
   mouseDown: drawActions.mouseDown,
   dragging: drawActions.dragging,
   drop: drawActions.drop,
-  select: drawActions.selectDraw
+  select: drawActions.selectDraw,
 };
 
 const mapStateToProps = (state, ownProps) => ({
   sessionState: state.elements.sessionState,
-  ...state.elements.draws[ownProps.id]
+  ...state.elements.draws[ownProps.id],
 });
 
 const DrawWrapperConnected = connect(
