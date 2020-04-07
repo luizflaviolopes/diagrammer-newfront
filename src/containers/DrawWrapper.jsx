@@ -74,7 +74,7 @@ class DrawWrapper extends Component {
       ));
     }
 
-    if (this.props.childrens) {
+    if (this.props.childrens ) {
       childrens = this.props.childrens.map((element) => {
         console.log("renderizando filho");
         return <DrawWrapperConnected key={element} id={element} />;

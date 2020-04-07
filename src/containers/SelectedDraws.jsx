@@ -1,12 +1,20 @@
 import React from 'react'
+import { connect } from 'react-redux'
+import DrawWraper from "./DrawWrapper.jsx";
 
 const SelectedDraws = (props) => {
 
-return (
-    <div></div>
-)
-
+return props.elements.map(itemId => {
+    return <DrawWraper key={itemId} id={itemId} />;
+  });
 }
 
-const mapStateToProps
+const mapDispatchToProps = {
+    
+};
 
+const mapStateToProps = state => ({
+    elements: state.elements.sessionState.elementsSelected
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(SelectedDraws);

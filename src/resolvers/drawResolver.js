@@ -82,7 +82,7 @@ export const drawdrop = (state, actionPayload) => {
 
       // board to parent
       if (!droppedDraw.parent) {
-        addDrawToParent(state, droppedDraw, actionPayload.id);
+        addParentInChildren(droppedDraw, actionPayload.id);
         removeDrawFromBoard(state, droppedDraw.id);
         updateDroppedChildrenPosition(
           droppedDraw,
@@ -153,7 +153,10 @@ export const selectionClear = (state, actionPayload) => {
 const clearSelecteds = (state) => {
   let list = state.sessionState.elementsSelected;
   for (let i = 0; i < list.length; i++) {
-    state.draws[list[i]].selected = false;
+    let actualDraw = state.draws[list[i]];
+    actualDraw.selected = false;
+    if(actualDraw.parent)
+      addChildrenInParent(state, actualDraw);
   }
   state.sessionState.elementsSelected = [];
 
@@ -299,13 +302,16 @@ const updateParentSize = (state, parent, absolutePosition, measures) => {
   };
 };
 
-const addDrawToParent = (state, children, parentId) => {
-  children.parent = parentId;
-  let parent = state.draws[parentId];
+const addChildrenInParent = (state, children) => {
+  let parent = state.draws[children.parent];
 
   let newChildrens = [...parent.childrens, children.id];
   parent.childrens = newChildrens;
 };
+
+const addParentInChildren = (children, parentId) => {
+  children.parent = parentId;
+}
 
 const updateDroppedChildrenPosition = (children, absolutePosition, padding) => {
   const calcX = children.x - absolutePosition.x;
