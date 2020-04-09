@@ -7,10 +7,10 @@ export const selectDraw = (state, actionPayload) => {
   const selectedDraw = state.draws[drawId];
 
   if (!actionPayload.shiftPressed) {
-      clearSelecteds(state);
-    }
+    clearSelecteds(state);
+  }
 
-    newSelectedDraw(state, selectedDraw, actionPayload.clientRectPosition);
+  newSelectedDraw(state, selectedDraw, actionPayload.clientRectPosition);
   state.sessionState.draggingElement = true;
 
   return state;
@@ -87,17 +87,15 @@ export const drawdrop = (state, actionPayload) => {
         //   droppedDraw,
         //   newAbsolutePosition
         // );
-      }
-      else{
+      } else {
         addParentInChildren(droppedDraw, actionPayload.id);
       }
     }
-  }
-  else{
+  } else {
     //Remove parent from children when dropping draw on board
     for (let a = 0; a < selecteds.length; a++) {
       let selectedDraw = state.draws[selecteds[a]];
-      if(selectedDraw.parent){
+      if (selectedDraw.parent) {
         selectedDraw.parent = undefined;
         state.boardDrawZOrder = [...state.boardDrawZOrder, selectedDraw.id];
       }
@@ -166,8 +164,7 @@ const clearSelecteds = (state) => {
   for (let i = 0; i < list.length; i++) {
     let actualDraw = state.draws[list[i]];
     actualDraw.selected = false;
-    if(actualDraw.parent)
-      addChildrenInParent(state, actualDraw);
+    if (actualDraw.parent) addChildrenInParent(state, actualDraw);
   }
   state.sessionState.elementsSelected = [];
 
@@ -175,39 +172,42 @@ const clearSelecteds = (state) => {
 };
 
 const newSelectedDraw = (state, drawSelected, clientRectPosition) => {
-  drawSelected.absolutePosition = { x: clientRectPosition.x, y: clientRectPosition.y };
+  drawSelected.absolutePosition = {
+    x: clientRectPosition.x,
+    y: clientRectPosition.y,
+  };
 
   if (!drawSelected.selected) {
-    
-  
-  drawSelected.selected = true;
-  
+    drawSelected.selected = true;
 
-  drawSelected.x = clientRectPosition.x;
-  drawSelected.y = clientRectPosition.y;
+    drawSelected.x = clientRectPosition.x;
+    drawSelected.y = clientRectPosition.y;
 
-  state.sessionState.elementsSelected = [
-    ...state.sessionState.elementsSelected,
-    drawSelected.id,
-  ];
+    state.sessionState.elementsSelected = [
+      ...state.sessionState.elementsSelected,
+      drawSelected.id,
+    ];
 
-  if(drawSelected.parent){
-    detachChildrenFromParentOnSelect(state.draws[drawSelected.parent], drawSelected.id);
-  }
+    if (drawSelected.parent) {
+      detachChildrenFromParentOnSelect(
+        state.draws[drawSelected.parent],
+        drawSelected.id
+      );
+    }
 
-  // ##remover do showorder
-  let drawsUnremoved = removeFromArray(
-    state.boardDrawShowOrder,
-    +drawSelected.id
-  );
+    // ##remover do showorder
+    let drawsUnremoved = removeFromArray(
+      state.boardDrawShowOrder,
+      +drawSelected.id
+    );
 
-  state.boardDrawShowOrder = drawsUnremoved;
+    state.boardDrawShowOrder = drawsUnremoved;
   }
 };
 
 const detachChildrenFromParentOnSelect = (parent, children_id) => {
   parent.childrens = removeFromArray(parent.childrens, children_id);
-}
+};
 
 const updateDrawPosition = (state, draw, posVariation) => {
   const newDraw = { ...draw };
@@ -327,9 +327,9 @@ const updateParentSize = (state, parent, absolutePosition, measures) => {
     varY: variationY,
     varW: variationW,
     varH: variationH,
-  }
+  };
 
-  parent.absolutePosition = {x: newPositions.x, y: newPositions.y};
+  parent.absolutePosition = { x: newPositions.x, y: newPositions.y };
 
   return newPositions;
 };
@@ -347,7 +347,7 @@ const addChildrenInParent = (state, children) => {
 
 const addParentInChildren = (children, parentId) => {
   children.parent = parentId;
-}
+};
 
 // const updateDroppedChildrenPosition = (children, absolutePosition) => {
 //   const calcX = children.x - absolutePosition.x;
