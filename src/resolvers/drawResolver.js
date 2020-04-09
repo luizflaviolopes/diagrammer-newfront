@@ -1,17 +1,16 @@
 import elementsConnectorPointsCalculator from "../helpers/elementsConnectorPointsCalculator";
 import { clearConnectorSelection } from "./connectorsResolver";
+import { drop } from "../actions/drawing";
 
 export const selectDraw = (state, actionPayload) => {
   const drawId = actionPayload.id;
   const selectedDraw = state.draws[drawId];
 
-  if (!selectedDraw.selected) {
-    if (!actionPayload.shiftPressed) {
+  if (!actionPayload.shiftPressed) {
       clearSelecteds(state);
     }
 
     newSelectedDraw(state, selectedDraw, actionPayload.clientRectPosition);
-  }
   state.sessionState.draggingElement = true;
 
   return state;
@@ -84,11 +83,23 @@ export const drawdrop = (state, actionPayload) => {
       if (!droppedDraw.parent) {
         addParentInChildren(droppedDraw, actionPayload.id);
         removeDrawFromBoard(state, droppedDraw.id);
-        updateDroppedChildrenPosition(
-          droppedDraw,
-          newAbsolutePosition,
-          padding
-        );
+        // updateDroppedChildrenPosition(
+        //   droppedDraw,
+        //   newAbsolutePosition
+        // );
+      }
+      else{
+        addParentInChildren(droppedDraw, actionPayload.id);
+      }
+    }
+  }
+  else{
+    //Remove parent from children when dropping draw on board
+    for (let a = 0; a < selecteds.length; a++) {
+      let selectedDraw = state.draws[selecteds[a]];
+      if(selectedDraw.parent){
+        selectedDraw.parent = undefined;
+        state.boardDrawZOrder = [...state.boardDrawZOrder, selectedDraw.id];
       }
     }
   }
@@ -163,14 +174,26 @@ const clearSelecteds = (state) => {
   state.boardDrawShowOrder = [...state.boardDrawZOrder];
 };
 
-const newSelectedDraw = (state, drawSelected) => {
+const newSelectedDraw = (state, drawSelected, clientRectPosition) => {
+  drawSelected.absolutePosition = { x: clientRectPosition.x, y: clientRectPosition.y };
+
+  if (!drawSelected.selected) {
+    
+  
   drawSelected.selected = true;
-  drawSelected.lastPosition = { x: drawSelected.x, y: drawSelected.y };
+  
+
+  drawSelected.x = clientRectPosition.x;
+  drawSelected.y = clientRectPosition.y;
 
   state.sessionState.elementsSelected = [
     ...state.sessionState.elementsSelected,
     drawSelected.id,
   ];
+
+  if(drawSelected.parent){
+    detachChildrenFromParentOnSelect(state.draws[drawSelected.parent], drawSelected.id);
+  }
 
   // ##remover do showorder
   let drawsUnremoved = removeFromArray(
@@ -179,13 +202,18 @@ const newSelectedDraw = (state, drawSelected) => {
   );
 
   state.boardDrawShowOrder = drawsUnremoved;
+  }
 };
+
+const detachChildrenFromParentOnSelect = (parent, children_id) => {
+  parent.childrens = removeFromArray(parent.childrens, children_id);
+}
 
 const updateDrawPosition = (state, draw, posVariation) => {
   const newDraw = { ...draw };
 
-  newDraw.x = draw.lastPosition.x + posVariation.x;
-  newDraw.y = draw.lastPosition.y + posVariation.y;
+  newDraw.x = draw.absolutePosition.x + posVariation.x;
+  newDraw.y = draw.absolutePosition.y + posVariation.y;
 
   state.draws[draw.id] = newDraw;
 
@@ -196,7 +224,7 @@ const updateDrawPosition = (state, draw, posVariation) => {
 };
 
 const updateDrawLastPosition = (state, draw) => {
-  draw.lastPosition = {
+  draw.absolutePosition = {
     x: draw.x,
     y: draw.y,
   };
@@ -292,20 +320,28 @@ const updateParentSize = (state, parent, absolutePosition, measures) => {
 
   updateConnectorsFromResize(parent, state.connectors);
 
-  return {
+  const newPositions = {
     x: absolutePosition.x + variationX,
     y: absolutePosition.y + variationY,
     varX: variationX,
     varY: variationY,
     varW: variationW,
     varH: variationH,
-  };
+  }
+
+  parent.absolutePosition = {x: newPositions.x, y: newPositions.y};
+
+  return newPositions;
 };
 
 const addChildrenInParent = (state, children) => {
   let parent = state.draws[children.parent];
 
   let newChildrens = [...parent.childrens, children.id];
+
+  children.x = children.x - parent.absolutePosition.x;
+  children.y = children.y - parent.absolutePosition.y;
+
   parent.childrens = newChildrens;
 };
 
@@ -313,13 +349,13 @@ const addParentInChildren = (children, parentId) => {
   children.parent = parentId;
 }
 
-const updateDroppedChildrenPosition = (children, absolutePosition, padding) => {
-  const calcX = children.x - absolutePosition.x;
-  const calcY = children.y - absolutePosition.y;
+// const updateDroppedChildrenPosition = (children, absolutePosition) => {
+//   const calcX = children.x - absolutePosition.x;
+//   const calcY = children.y - absolutePosition.y;
 
-  children.x = calcX;
-  children.y = calcY;
-};
+//   children.x = calcX;
+//   children.y = calcY;
+// };
 
 const updateChildrensPositionOnParentResize = (children, variation) => {
   children.x = children.x - variation.x;
