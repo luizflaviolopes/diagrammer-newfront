@@ -215,17 +215,22 @@ const updateDrawPosition = (state, draw, posVariation) => {
   newDraw.x = draw.absolutePosition.x + posVariation.x;
   newDraw.y = draw.absolutePosition.y + posVariation.y;
 
+  let newPositionVariationForConnector = {
+    x: newDraw.x - draw.x,
+    y: newDraw.y - draw.y
+  }
+
   state.draws[draw.id] = newDraw;
 
   console.log("updated position", draw.id);
 
   //updateChildrensPosition(state, draw, posVariation);
-  updateConnectors(draw, state.connectors, posVariation);
+  updateConnectors(draw, state, newPositionVariationForConnector);
 };
 
 const updateDrawLastPosition = (state, draw) => {
   draw.absolutePosition = {
-    x: draw.x,
+    y: draw.x,
     y: draw.y,
   };
   updateChildrensLastPosition(state, draw);
@@ -239,8 +244,10 @@ const updateChildrensLastPosition = (state, draw) => {
   }
 };
 
-const updateConnectors = (draw, connectorsList, onMouseMovePositionVariant) => {
+const updateConnectors = (draw, state, onMouseMovePositionVariant) => {
+  const connectorsList = state.connectors;
   for (let i = 0; i < draw.connectors.length; i++) {
+    console.log('Atualizando conector.');
     const connRef = draw.connectors[i];
     const conn = connectorsList[connRef.id];
 
@@ -250,30 +257,71 @@ const updateConnectors = (draw, connectorsList, onMouseMovePositionVariant) => {
 
     conn.endPoints = newPositions;
   }
+  for (let c = 0; c < draw.childrens.length; c++) {
+    const children = state.draws[draw.childrens[c]];
+    updateConnectors(children, state, onMouseMovePositionVariant);
+  }
 };
 
-const updateConnectorsFromResize = (draw, connectorsList) => {
+const updateConnectorsFromResize = (draw, connectorsList, variants) => {
   for (let i = 0; i < draw.connectors.length; i++) {
     const connRef = draw.connectors[i];
     const conn = connectorsList[connRef.id];
 
-    const connectorPoints = elementsConnectorPointsCalculator(
-      draw.type,
-      draw.width,
-      draw.heigth
-    );
-    const point = connectorPoints.find((el) => {
-      return el.pointRef == connRef.centerVariant.pointRef;
-    });
+    let varY, varX = 0;
 
-    draw.connectors[i].centerVariant = point;
+    switch (connRef.angle){
+      case 0: //se w variar em valor diferente de x || se y variar +/- que variação de H|| se h variar
+        varY = (variants.varH + variants.varY) / 2;
+        varX = variants.varW;
+        conn.endPoints[connRef.endPoint].x += varX;
+        conn.endPoints[connRef.endPoint].y += varY;
+      break;
 
-    let newPositions = [...conn.endPoints];
+      case 90: 
+      varY = variants.varY;
+      varX = (variants.varW + variants.varX) /2;
+      conn.endPoints[connRef.endPoint].x += varX;
+      conn.endPoints[connRef.endPoint].y += varY;
 
-    newPositions[connRef.endPoint].x = draw.x + point.x;
-    newPositions[connRef.endPoint].y = draw.y + point.y;
+      break;
 
-    conn.endPoints = newPositions;
+      case 180: 
+      varY = (variants.varH + variants.varY ) / 2;
+      varX = variants.varX;
+      conn.endPoints[connRef.endPoint].x += varX;
+      conn.endPoints[connRef.endPoint].y += varY;
+
+      break;
+
+      case 270: 
+      varY = variants.varH;
+      varX = (variants.varW + variants.varX) / 2;
+      conn.endPoints[connRef.endPoint].x += varX;
+      conn.endPoints[connRef.endPoint].y += varY;
+
+      break;
+    }
+
+    conn.endPoints = [...conn.endPoints];
+
+    // const connectorPoints = elementsConnectorPointsCalculator(
+    //   draw.type,
+    //   draw.width,
+    //   draw.heigth
+    // );
+    // const point = connectorPoints.find((el) => {
+    //   return el.pointRef == connRef.centerVariant.pointRef;
+    // });
+
+    // draw.connectors[i].centerVariant = point;
+
+    // let newPositions = [...conn.endPoints];
+
+    // newPositions[connRef.endPoint].x = draw.x + point.x;
+    // newPositions[connRef.endPoint].y = draw.y + point.y;
+
+    // conn.endPoints = newPositions;
   }
 };
 
@@ -318,8 +366,6 @@ const updateParentSize = (state, parent, absolutePosition, measures) => {
     parent.heigth = parent.heigth + variationH;
   }
 
-  updateConnectorsFromResize(parent, state.connectors);
-
   const newPositions = {
     x: absolutePosition.x + variationX,
     y: absolutePosition.y + variationY,
@@ -328,6 +374,8 @@ const updateParentSize = (state, parent, absolutePosition, measures) => {
     varW: variationW,
     varH: variationH,
   };
+
+  updateConnectorsFromResize(parent, state.connectors, newPositions);
 
   parent.absolutePosition = { x: newPositions.x, y: newPositions.y };
 
@@ -368,6 +416,8 @@ const resizeGrandParents = (state, parent, padding) => {
   const grandParent = state.draws[parent.parent];
   let variationX = 0;
   let variationY = 0;
+  let variationW = 0;
+  let variationH = 0;
   let isUpdated = false;
 
   if (parent.x < padding) {
@@ -385,11 +435,15 @@ const resizeGrandParents = (state, parent, padding) => {
     isUpdated = true;
   }
   if (parent.x + parent.width - variationX > grandParent.width - padding) {
-    grandParent.width = parent.x + parent.width + padding - variationX;
+    let calcW = parent.x + parent.width + padding - variationX;
+    variationW = calcW - grandParent.width;
+    grandParent.width = calcW;
     isUpdated = true;
   }
   if (parent.y + parent.heigth - variationY > grandParent.heigth - padding) {
-    grandParent.heigth = parent.y + parent.heigth + padding - variationY;
+    let calcH = parent.y + parent.heigth + padding - variationY;
+    variationH = calcH - grandParent.heigth;
+    grandParent.heigth = calcH;
     isUpdated = true;
   }
 
@@ -404,6 +458,15 @@ const resizeGrandParents = (state, parent, padding) => {
       );
     }
   }
+
+  const variations = {
+    varX: variationX,
+    varY: variationY,
+    varW: variationW,
+    varH: variationH,
+  };
+
+  updateConnectorsFromResize(grandParent, state.connectors, variations);
 
   if (isUpdated) resizeGrandParents(state, grandParent, padding);
 };

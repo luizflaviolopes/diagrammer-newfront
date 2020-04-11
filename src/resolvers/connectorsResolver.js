@@ -48,18 +48,23 @@ export const connectorDrawingEnd = (state, actionPayload) => {
     const connObject = state.connectors[connCounter];
 
     const drawA = state.draws[connObject.endPoints[0].id];
-    drawA.connectors = {
+    drawA.connectors = [
       ...drawA.connectors,
-      [connCounter]: {
+      {
         id: connCounter,
-        endPoint: 0
+        endPoint: 0,
+        angle: connObject.endPoints[0].angle
       }
-    };
+    ];
 
-    drawB.connectors[connCounter] = {
-      id: connCounter,
-      endPoint: 1
-    };
+    drawB.connectors = [
+      ...drawB.connectors,
+      {
+        id: connCounter,
+        endPoint: 1,
+        angle: actionPayload.variants.angle
+      }
+    ];
 
     let connEndpoints = [...connObject.endPoints];
     connEndpoints[1].id = +actionPayload.id;
