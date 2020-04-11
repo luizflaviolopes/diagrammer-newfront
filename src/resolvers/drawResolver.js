@@ -1,19 +1,16 @@
 import elementsConnectorPointsCalculator from "../helpers/elementsConnectorPointsCalculator";
 import { clearConnectorSelection } from "./connectorsResolver";
+import { drop } from "../actions/drawing";
 
 export const selectDraw = (state, actionPayload) => {
   const drawId = actionPayload.id;
   const selectedDraw = state.draws[drawId];
 
-  clearConnectorSelection(state);
-
-  if (!selectedDraw.selected) {
-    if (!actionPayload.shiftPressed) {
-      clearSelecteds(state);
-    }
-
-    newSelectedDraw(state, selectedDraw, actionPayload.clientRectPosition);
+  if (!actionPayload.shiftPressed) {
+    clearSelecteds(state);
   }
+
+  newSelectedDraw(state, selectedDraw, actionPayload.clientRectPosition);
   state.sessionState.draggingElement = true;
 
   return state;
@@ -35,33 +32,96 @@ export const drawDragging = (state, actionPayload) => {
 export const drawdrop = (state, actionPayload) => {
   let selecteds = state.sessionState.elementsSelected;
 
-  //iteration in all droped draws
-  for (let i = 0; i < selecteds.length; i++) {
-    let draw = state.draws[selecteds[i]];
+  if (actionPayload.id) {
+    const parent = state.draws[actionPayload.id];
+    const padding = 10;
+    const firstElement = state.draws[selecteds[0]];
+    let minX = firstElement.x;
+    let minY = firstElement.y;
+    let maxRight = firstElement.x + firstElement.width;
+    let maxBottom = firstElement.y + firstElement.heigth;
 
-    updateDrawLastPosition(state, draw);
+    for (let z = 1; z < selecteds.length; z++) {
+      let elementSelected = state.draws[selecteds[z]];
+      if (elementSelected.x < minX) minX = elementSelected.x;
+      if (elementSelected.y < minY) minY = elementSelected.y;
+      if (elementSelected.x + elementSelected.width > maxRight)
+        maxRight = elementSelected.x + elementSelected.width;
+      if (elementSelected.y + elementSelected.heigth > maxBottom)
+        maxBottom = elementSelected.y + elementSelected.heigth;
+    }
 
-    if (actionPayload.id) {
+    const newAbsolutePosition = updateParentSize(
+      state,
+      parent,
+      {
+        x: actionPayload.x,
+        y: actionPayload.y,
+      },
+      { minX, minY, maxRight, maxBottom, padding }
+    );
+
+    resizeGrandParents(state, parent, padding);
+
+    //é possível aumentar a performance, separando o calculo para x e y.
+    if (newAbsolutePosition.varX < 0 || newAbsolutePosition.varY < 0) {
+      for (let c = 0; c < parent.childrens.length; c++) {
+        updateChildrensPositionOnParentResize(
+          state.draws[parent.childrens[c]],
+          {
+            x: newAbsolutePosition.varX,
+            y: newAbsolutePosition.varY,
+          }
+        );
+      }
+    }
+
+    for (let a = 0; a < selecteds.length; a++) {
+      let droppedDraw = state.draws[selecteds[a]];
+
       // board to parent
-      if (!draw.parent) {
-        addDrawToParent(state, draw, actionPayload.id);
-        removeDrawFromBoard(state, draw.id);
+      if (!droppedDraw.parent) {
+        addParentInChildren(droppedDraw, actionPayload.id);
+        removeDrawFromBoard(state, droppedDraw.id);
+        // updateDroppedChildrenPosition(
+        //   droppedDraw,
+        //   newAbsolutePosition
+        // );
+      } else {
+        addParentInChildren(droppedDraw, actionPayload.id);
       }
-      // parent1 to parent2
-      else if (actionPayload.id !== draw.parent) {
-        removeDrawFromParent(state, draw);
-        addDrawToParent(state, draw, actionPayload.id);
-      }
-
-      updateParentSize(state, draw);
-    } else {
-      //parent to board
-      if (draw.parent) {
-        removeDrawFromParent(state, draw);
-        addDrawToBoard(state, draw.id);
+    }
+  } else {
+    //Remove parent from children when dropping draw on board
+    for (let a = 0; a < selecteds.length; a++) {
+      let selectedDraw = state.draws[selecteds[a]];
+      if (selectedDraw.parent) {
+        selectedDraw.parent = undefined;
+        state.boardDrawZOrder = [...state.boardDrawZOrder, selectedDraw.id];
       }
     }
   }
+
+  //iteration in all droped draws
+  // for (let i = 0; i < selecteds.length; i++) {
+  //   let draw = state.draws[selecteds[i]];
+
+  //   // updateDrawLastPosition(state, draw);
+
+  //   if (actionPayload.id) {
+  //     // parent1 to parent2
+  //     else if (actionPayload.id !== draw.parent) {
+  //       removeDrawFromParent(state, draw);
+  //       addDrawToParent(state, draw, actionPayload.id);
+  //     }
+  //   } else {
+  //     //parent to board
+  //     if (draw.parent) {
+  //       removeDrawFromParent(state, draw);
+  //       addDrawToBoard(state, draw.id);
+  //     }
+  //   }
+  // }
 
   let newSession = { ...state.sessionState };
   newSession.draggingElement = false;
@@ -84,10 +144,6 @@ export const drawAdd = (state, actionPayload) => {
     connectors: [],
     parent: undefined,
     childrens: [],
-    absolutePosition: {
-      x: actionPayload.position.x,
-      y: actionPayload.position.y
-    }
   };
 
   state.draws[newID] = newDraw;
@@ -103,60 +159,79 @@ export const selectionClear = (state, actionPayload) => {
   return state;
 };
 
-const clearSelecteds = state => {
+const clearSelecteds = (state) => {
   let list = state.sessionState.elementsSelected;
   for (let i = 0; i < list.length; i++) {
-    state.draws[list[i]].selected = false;
+    let actualDraw = state.draws[list[i]];
+    actualDraw.selected = false;
+    if (actualDraw.parent) addChildrenInParent(state, actualDraw);
   }
   state.sessionState.elementsSelected = [];
 
   state.boardDrawShowOrder = [...state.boardDrawZOrder];
 };
 
-const newSelectedDraw = (state, drawSelected) => {
-  drawSelected.selected = true;
-  drawSelected.lastPosition = { x: drawSelected.x, y: drawSelected.y };
+const newSelectedDraw = (state, drawSelected, clientRectPosition) => {
+  drawSelected.absolutePosition = {
+    x: clientRectPosition.x,
+    y: clientRectPosition.y,
+  };
 
-  state.sessionState.elementsSelected = [
-    ...state.sessionState.elementsSelected,
-    drawSelected.id
-  ];
+  if (!drawSelected.selected) {
+    drawSelected.selected = true;
 
-  // ##remover do showorder
-  let drawsUnremoved = removeFromArray(
-    state.boardDrawShowOrder,
-    +drawSelected.id
-  );
+    drawSelected.x = clientRectPosition.x;
+    drawSelected.y = clientRectPosition.y;
 
-  state.boardDrawShowOrder = drawsUnremoved;
+    state.sessionState.elementsSelected = [
+      ...state.sessionState.elementsSelected,
+      drawSelected.id,
+    ];
+
+    if (drawSelected.parent) {
+      detachChildrenFromParentOnSelect(
+        state.draws[drawSelected.parent],
+        drawSelected.id
+      );
+    }
+
+    // ##remover do showorder
+    let drawsUnremoved = removeFromArray(
+      state.boardDrawShowOrder,
+      +drawSelected.id
+    );
+
+    state.boardDrawShowOrder = drawsUnremoved;
+  }
+};
+
+const detachChildrenFromParentOnSelect = (parent, children_id) => {
+  parent.childrens = removeFromArray(parent.childrens, children_id);
 };
 
 const updateDrawPosition = (state, draw, posVariation) => {
   const newDraw = { ...draw };
 
-  newDraw.x = draw.lastPosition.x + posVariation.x;
-  newDraw.y = draw.lastPosition.y + posVariation.y;
+  newDraw.x = draw.absolutePosition.x + posVariation.x;
+  newDraw.y = draw.absolutePosition.y + posVariation.y;
+
+  let newPositionVariationForConnector = {
+    x: newDraw.x - draw.x,
+    y: newDraw.y - draw.y
+  }
 
   state.draws[draw.id] = newDraw;
 
   console.log("updated position", draw.id);
 
-  updateChildrensPosition(state, draw, posVariation);
-  updateConnectors(draw, state.connectors);
-};
-
-const updateChildrensPosition = (state, draw, posVariation) => {
-  for (let i = 0; i < draw.childrens.length; i++) {
-    const children = state.draws[draw.childrens[i]];
-
-    updateDrawPosition(state, children, posVariation);
-  }
+  //updateChildrensPosition(state, draw, posVariation);
+  updateConnectors(draw, state, newPositionVariationForConnector);
 };
 
 const updateDrawLastPosition = (state, draw) => {
-  draw.lastPosition = {
-    x: draw.x,
-    y: draw.y
+  draw.absolutePosition = {
+    y: draw.x,
+    y: draw.y,
   };
   updateChildrensLastPosition(state, draw);
 };
@@ -169,81 +244,231 @@ const updateChildrensLastPosition = (state, draw) => {
   }
 };
 
-const updateConnectors = (draw, connectorsList) => {
+const updateConnectors = (draw, state, onMouseMovePositionVariant) => {
+  const connectorsList = state.connectors;
   for (let i = 0; i < draw.connectors.length; i++) {
+    console.log('Atualizando conector.');
     const connRef = draw.connectors[i];
     const conn = connectorsList[connRef.id];
 
     let newPositions = [...conn.endPoints];
-    newPositions[connRef.endPoint].x = draw.x + connRef.centerVariant.x;
-    newPositions[connRef.endPoint].y = draw.y + connRef.centerVariant.y;
+    newPositions[connRef.endPoint].x = conn.endPoints[connRef.endPoint].x + onMouseMovePositionVariant.x;
+    newPositions[connRef.endPoint].y = conn.endPoints[connRef.endPoint].y + onMouseMovePositionVariant.y;
 
     conn.endPoints = newPositions;
   }
+  for (let c = 0; c < draw.childrens.length; c++) {
+    const children = state.draws[draw.childrens[c]];
+    updateConnectors(children, state, onMouseMovePositionVariant);
+  }
 };
 
-const updateConnectorsFromResize = (draw, connectorsList) => {
+const updateConnectorsFromResize = (draw, connectorsList, variants) => {
   for (let i = 0; i < draw.connectors.length; i++) {
     const connRef = draw.connectors[i];
     const conn = connectorsList[connRef.id];
 
-    const connectorPoints = elementsConnectorPointsCalculator(
-      draw.type,
-      draw.width,
-      draw.heigth
-    );
-    const point = connectorPoints.find(el => {
-      return el.pointRef == connRef.centerVariant.pointRef;
-    });
+    let varY, varX = 0;
 
-    draw.connectors[i].centerVariant = point;
+    switch (connRef.angle){
+      case 0: //se w variar em valor diferente de x || se y variar +/- que variação de H|| se h variar
+        varY = (variants.varH + variants.varY) / 2;
+        varX = variants.varW;
+        conn.endPoints[connRef.endPoint].x += varX;
+        conn.endPoints[connRef.endPoint].y += varY;
+      break;
 
-    let newPositions = [...conn.endPoints];
+      case 90: 
+      varY = variants.varY;
+      varX = (variants.varW + variants.varX) /2;
+      conn.endPoints[connRef.endPoint].x += varX;
+      conn.endPoints[connRef.endPoint].y += varY;
 
-    newPositions[connRef.endPoint].x = draw.x + point.x;
-    newPositions[connRef.endPoint].y = draw.y + point.y;
+      break;
 
-    conn.endPoints = newPositions;
+      case 180: 
+      varY = (variants.varH + variants.varY ) / 2;
+      varX = variants.varX;
+      conn.endPoints[connRef.endPoint].x += varX;
+      conn.endPoints[connRef.endPoint].y += varY;
+
+      break;
+
+      case 270: 
+      varY = variants.varH;
+      varX = (variants.varW + variants.varX) / 2;
+      conn.endPoints[connRef.endPoint].x += varX;
+      conn.endPoints[connRef.endPoint].y += varY;
+
+      break;
+    }
+
+    conn.endPoints = [...conn.endPoints];
+
+    // const connectorPoints = elementsConnectorPointsCalculator(
+    //   draw.type,
+    //   draw.width,
+    //   draw.heigth
+    // );
+    // const point = connectorPoints.find((el) => {
+    //   return el.pointRef == connRef.centerVariant.pointRef;
+    // });
+
+    // draw.connectors[i].centerVariant = point;
+
+    // let newPositions = [...conn.endPoints];
+
+    // newPositions[connRef.endPoint].x = draw.x + point.x;
+    // newPositions[connRef.endPoint].y = draw.y + point.y;
+
+    // conn.endPoints = newPositions;
   }
 };
 
-const updateParentSize = (state, droppedDraw) => {
-  const padding = 10;
-  console.log("atualizando tamanho", droppedDraw);
-  const parent = state.draws[droppedDraw.parent];
+const updateParentSize = (state, parent, absolutePosition, measures) => {
+  const padding = measures.padding;
+  console.log("atualizando tamanho");
   let variationX = 0;
   let variationY = 0;
   let variationH = 0;
   let variationW = 0;
 
-  if (droppedDraw.x < parent.x) {
-    variationX = droppedDraw.x - (parent.x + padding);
+  if (measures.minX < absolutePosition.x + padding) {
+    variationX = measures.minX - (absolutePosition.x + padding);
+
     parent.x = parent.x + variationX;
+    parent.width = parent.width - variationX;
   }
-  if (droppedDraw.y < parent.y) {
-    variationY = droppedDraw.y - (parent.y + padding);
+  if (measures.minY < absolutePosition.y + padding) {
+    variationY = measures.minY - (absolutePosition.y + padding);
+
     parent.y = parent.y + variationY;
+    parent.heigth = parent.heigth - variationY;
   }
-  if (droppedDraw.x + droppedDraw.width > parent.x + parent.width) {
+  if (
+    measures.maxRight >
+    absolutePosition.x + variationX + parent.width - padding
+  ) {
     variationW =
-      droppedDraw.x + droppedDraw.width + padding - (parent.x + parent.width);
+      measures.maxRight +
+      padding -
+      (absolutePosition.x + variationX + parent.width);
+    parent.width = parent.width + variationW;
   }
-  if (droppedDraw.y + droppedDraw.heigth > parent.y + parent.heigth) {
+  if (
+    measures.maxBottom >
+    absolutePosition.y + variationY + parent.heigth - padding
+  ) {
     variationH =
-      droppedDraw.y + droppedDraw.heigth + padding - (parent.y + parent.heigth);
+      measures.maxBottom +
+      padding -
+      (absolutePosition.y + variationY + parent.heigth);
+    parent.heigth = parent.heigth + variationH;
   }
 
-  parent.width = parent.width - variationX + variationW;
-  parent.heigth = parent.heigth - variationY + variationH;
+  const newPositions = {
+    x: absolutePosition.x + variationX,
+    y: absolutePosition.y + variationY,
+    varX: variationX,
+    varY: variationY,
+    varW: variationW,
+    varH: variationH,
+  };
 
-  updateConnectorsFromResize(parent, state.connectors);
+  updateConnectorsFromResize(parent, state.connectors, newPositions);
+
+  parent.absolutePosition = { x: newPositions.x, y: newPositions.y };
+
+  return newPositions;
 };
 
-const addDrawToParent = (state, children, parentId) => {
-  children.parent = parentId;
-  let parent = state.draws[parentId];
+const addChildrenInParent = (state, children) => {
+  let parent = state.draws[children.parent];
+
   let newChildrens = [...parent.childrens, children.id];
+
+  children.x = children.x - parent.absolutePosition.x;
+  children.y = children.y - parent.absolutePosition.y;
+
   parent.childrens = newChildrens;
+};
+
+const addParentInChildren = (children, parentId) => {
+  children.parent = parentId;
+};
+
+// const updateDroppedChildrenPosition = (children, absolutePosition) => {
+//   const calcX = children.x - absolutePosition.x;
+//   const calcY = children.y - absolutePosition.y;
+
+//   children.x = calcX;
+//   children.y = calcY;
+// };
+
+const updateChildrensPositionOnParentResize = (children, variation) => {
+  children.x = children.x - variation.x;
+  children.y = children.y - variation.y;
+};
+
+const resizeGrandParents = (state, parent, padding) => {
+  if (!parent.parent) return;
+
+  const grandParent = state.draws[parent.parent];
+  let variationX = 0;
+  let variationY = 0;
+  let variationW = 0;
+  let variationH = 0;
+  let isUpdated = false;
+
+  if (parent.x < padding) {
+    variationX = parent.x - padding;
+
+    grandParent.x = grandParent.x + variationX;
+    grandParent.width = grandParent.width - variationX;
+    isUpdated = true;
+  }
+  if (parent.y < padding) {
+    variationY = parent.y - padding;
+
+    grandParent.y = grandParent.y + variationY;
+    grandParent.heigth = grandParent.heigth - variationY;
+    isUpdated = true;
+  }
+  if (parent.x + parent.width - variationX > grandParent.width - padding) {
+    let calcW = parent.x + parent.width + padding - variationX;
+    variationW = calcW - grandParent.width;
+    grandParent.width = calcW;
+    isUpdated = true;
+  }
+  if (parent.y + parent.heigth - variationY > grandParent.heigth - padding) {
+    let calcH = parent.y + parent.heigth + padding - variationY;
+    variationH = calcH - grandParent.heigth;
+    grandParent.heigth = calcH;
+    isUpdated = true;
+  }
+
+  if (variationX < 0 || variationY < 0) {
+    for (let c = 0; c < grandParent.childrens.length; c++) {
+      updateChildrensPositionOnParentResize(
+        state.draws[grandParent.childrens[c]],
+        {
+          x: variationX,
+          y: variationY,
+        }
+      );
+    }
+  }
+
+  const variations = {
+    varX: variationX,
+    varY: variationY,
+    varW: variationW,
+    varH: variationH,
+  };
+
+  updateConnectorsFromResize(grandParent, state.connectors, variations);
+
+  if (isUpdated) resizeGrandParents(state, grandParent, padding);
 };
 
 const removeDrawFromParent = (state, drawToRemove) => {

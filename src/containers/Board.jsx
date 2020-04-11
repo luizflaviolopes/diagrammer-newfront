@@ -10,6 +10,7 @@ import keyboardAPI from "../Listeners/keyboard/keyboardAPI";
 import DrawWraper from "./DrawWrapper.jsx";
 import Connector from "./Connector.jsx";
 import Marker from "../components/Markers.jsx";
+import SelectedDraws from "./SelectedDraws.jsx";
 
 const Board = props => {
   useEffect(() => {
@@ -60,7 +61,7 @@ const Board = props => {
         >
           {drawDraws(props.showSequence)}
           {drawconnectors()}
-          {drawDraws(props.selectedDraws)}
+          <SelectedDraws/>
         </g>
       </svg>
     </div>

@@ -15,12 +15,12 @@ export const onDrawConnectorStart = evt => {
     onMove: onConnectorDragging,
     onDrop: onConnectorDrop
   };
+  let clientRect = evt.target.getBoundingClientRect();
   store.dispatch(
     connectorDrawingStart({
       id: evt.target.getAttribute("element"),
       variant: {
-        x: +evt.target.getAttribute("cx"),
-        y: +evt.target.getAttribute("cy"),
+        absolutePosition: {x: clientRect.x + clientRect.width / 2, y: clientRect.y + clientRect.height / 2},
         pointRef: evt.target.getAttribute("pointRef"),
         angle: +evt.target.getAttribute("angle")
       }
@@ -51,12 +51,12 @@ const onConnectorDrop = evt => {
   if (window.dragging) {
     window.dragging = undefined;
     if (evt.toElement.id === "anchorPoint") {
+      let clientRect = evt.toElement.getBoundingClientRect();
       store.dispatch(
         connectorDrawingEnd({
           id: evt.toElement.getAttribute("element"),
           variants: {
-            x: +evt.toElement.getAttribute("cx"),
-            y: +evt.toElement.getAttribute("cy"),
+            absolutePosition: {x: clientRect.x + clientRect.width / 2, y: clientRect.y + clientRect.height / 2},
             pointRef: evt.toElement.getAttribute("pointRef"),
             angle: +evt.toElement.getAttribute("angle")
           }

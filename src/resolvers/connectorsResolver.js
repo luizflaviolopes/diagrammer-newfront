@@ -3,19 +3,14 @@ import { selectionClear } from "./drawResolver";
 
 export const connectorDrawingStart = (state, actionPayload) => {
   state.sessionState.connectorDrawing = true;
-  state.sessionState.connectorStartElement = {
-    id: actionPayload.id,
-    variant: actionPayload.variant
-  };
 
   const conId = state.counters.connectors;
-  const drawRef = state.draws[actionPayload.id];
   const idFrom = +actionPayload.id;
 
   let from = {
     id: idFrom,
-    x: actionPayload.variant.x + drawRef.x,
-    y: actionPayload.variant.y + drawRef.y,
+    x: actionPayload.variant.absolutePosition.x,
+    y: actionPayload.variant.absolutePosition.y,
     angle: actionPayload.variant.angle
   };
 
@@ -50,35 +45,38 @@ export const connectorDrawingEnd = (state, actionPayload) => {
     const drawB = state.draws[actionPayload.id];
     const connCounter = state.counters.connectors;
 
-    const drawA = state.draws[state.sessionState.connectorStartElement.id];
-    drawA.connectors = {
+    const connObject = state.connectors[connCounter];
+
+    const drawA = state.draws[connObject.endPoints[0].id];
+    drawA.connectors = [
       ...drawA.connectors,
-      [connCounter]: {
+      {
         id: connCounter,
-        centerVariant: state.sessionState.connectorStartElement.variant,
-        endPoint: 0
+        endPoint: 0,
+        angle: connObject.endPoints[0].angle
       }
-    };
+    ];
 
-    drawB.connectors[connCounter] = {
-      id: connCounter,
-      centerVariant: actionPayload.variants,
-      endPoint: 1
-    };
+    drawB.connectors = [
+      ...drawB.connectors,
+      {
+        id: connCounter,
+        endPoint: 1,
+        angle: actionPayload.variants.angle
+      }
+    ];
 
-    let connEndpoints = [...state.connectors[connCounter].endPoints];
+    let connEndpoints = [...connObject.endPoints];
     connEndpoints[1].id = +actionPayload.id;
 
-    state.connectors[connCounter].endPoints = connEndpoints;
-    state.connectors[connCounter].drawing = undefined;
+    connObject.endPoints = connEndpoints;
+    connObject.drawing = undefined;
 
-    state.connectors[
-      connCounter
-    ].intermediatePoints = intermediatePointsCalculator(
-      connEndpoints[0],
-      connEndpoints[1],
-      20
-    );
+    // connObject.intermediatePoints = intermediatePointsCalculator(
+    //   connEndpoints[0],
+    //   connEndpoints[1],
+    //   20
+    // );
 
     state.counters.connectors = state.counters.connectors + 1;
   } else {
