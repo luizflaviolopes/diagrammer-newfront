@@ -220,7 +220,7 @@ const updateDrawPosition = (state, draw, posVariation) => {
   console.log("updated position", draw.id);
 
   //updateChildrensPosition(state, draw, posVariation);
-  updateConnectors(draw, state.connectors);
+  updateConnectors(draw, state.connectors, posVariation);
 };
 
 const updateDrawLastPosition = (state, draw) => {
@@ -239,14 +239,14 @@ const updateChildrensLastPosition = (state, draw) => {
   }
 };
 
-const updateConnectors = (draw, connectorsList) => {
+const updateConnectors = (draw, connectorsList, onMouseMovePositionVariant) => {
   for (let i = 0; i < draw.connectors.length; i++) {
     const connRef = draw.connectors[i];
     const conn = connectorsList[connRef.id];
 
     let newPositions = [...conn.endPoints];
-    newPositions[connRef.endPoint].x = draw.x + connRef.centerVariant.x;
-    newPositions[connRef.endPoint].y = draw.y + connRef.centerVariant.y;
+    newPositions[connRef.endPoint].x = conn.endPoints[connRef.endPoint].x + onMouseMovePositionVariant.x;
+    newPositions[connRef.endPoint].y = conn.endPoints[connRef.endPoint].y + onMouseMovePositionVariant.y;
 
     conn.endPoints = newPositions;
   }

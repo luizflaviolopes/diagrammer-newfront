@@ -28,8 +28,7 @@ class DrawWrapper extends Component {
 
   onDragOver = (evt) => {
     if (
-      this.props.sessionState.connectorDrawing &&
-      this.props.sessionState.connectorStartElement.id != this.props.id
+      this.props.sessionState.connectorDrawing
     ) {
       this.setState({ highlightConnector: true });
     } else if (
