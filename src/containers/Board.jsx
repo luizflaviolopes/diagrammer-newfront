@@ -12,7 +12,7 @@ import Connector from "./Connector.jsx";
 import Marker from "../components/Markers.jsx";
 import SelectedDraws from "./SelectedDraws.jsx";
 
-const Board = props => {
+const Board = (props) => {
   useEffect(() => {
     draggingAPI.startDrag();
     keyboardAPI.start();
@@ -23,22 +23,22 @@ const Board = props => {
   }, []);
 
   const drawconnectors = () => {
-    return Object.keys(props.connectors).map(conn => {
+    return Object.keys(props.connectors).map((conn) => {
       return <Connector key={conn} id={conn} />;
     });
   };
 
-  const drawDraws = list => {
-    return list.map(itemId => {
+  const drawDraws = (list) => {
+    return list.map((itemId) => {
       console.log("rendering", itemId);
       return <DrawWraper key={itemId} id={itemId} />;
     });
   };
 
-  const addDraw = evt => {
+  const addDraw = (evt) => {
     props.addDraw({
       type: props.selectedElement,
-      position: { x: evt.pageX, y: evt.pageY }
+      position: { x: evt.pageX, y: evt.pageY },
     });
   };
 
@@ -61,7 +61,7 @@ const Board = props => {
         >
           {drawDraws(props.showSequence)}
           {drawconnectors()}
-          <SelectedDraws/>
+          <SelectedDraws />
         </g>
       </svg>
     </div>
@@ -70,15 +70,15 @@ const Board = props => {
 
 const mapDispatchToProps = {
   addDraw: drawActions.addDraw,
-  clearSelection: drawActions.clearSelection
+  clearSelection: drawActions.clearSelection,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   boardView: state.boardView,
   showSequence: state.elements.boardDrawShowOrder,
-  selectedDraws: state.elements.sessionState.elementsSelected,
+  selectedDraws: state.elements.sessionState.drawsSelected,
   selectedElement: state.toolboxElements.elementSelected,
-  connectors: state.elements.connectors
+  connectors: state.elements.connectors,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Board);

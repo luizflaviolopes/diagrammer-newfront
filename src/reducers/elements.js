@@ -2,6 +2,7 @@ import * as elementTypes from "../types/drawTypes";
 import * as actionTypes from "../types/actionTypes";
 import * as drawResolver from "../resolvers/drawResolver";
 import * as connectorResolvers from "../resolvers/connectorsResolver";
+import * as keyboardResolver from "../resolvers/keyboardResolver";
 
 const setState = () => ({
   counters: {
@@ -14,8 +15,8 @@ const setState = () => ({
   boardDrawSelected: [],
   boardDrawShowOrder: [],
   sessionState: {
-    elementsSelected: [],
-    connectorSelected: [],
+    drawsSelected: [],
+    connectorsSelected: [],
     draggingElement: false,
     connectorDrawing: false,
     elementDragStart: null,
@@ -49,7 +50,7 @@ export default (state = setState(), action = {}) => {
     case actionTypes.BOARD_SELECT_CONNECTOR:
       return connectorResolvers.selectConector({ ...state }, action.payload);
     case actionTypes.BOARD_DELETE_PRESSED:
-      return connectorResolvers.selectConector({ ...state }, action.payload);
+      return keyboardResolver.deleteSelecteds({ ...state }, action.payload);
     default:
       return state;
   }

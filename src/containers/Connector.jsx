@@ -4,7 +4,7 @@ import { selectConnector } from "../actions/connectorsActions";
 
 import {
   polylinePointsTransformation,
-  intermediatePointsCalculator
+  intermediatePointsCalculator,
 } from "../helpers/connectorPointsCalculator";
 
 class Connector extends Component {
@@ -34,17 +34,18 @@ class Connector extends Component {
         <polyline
           style={{
             pointerEvents: this.props.drawing ? "none" : "stroke",
-            fill: "none"
+            fill: "none",
           }}
           points={polylinePointsTransformation(points)}
           stroke="black"
           strokeWidth="3"
           markerEnd="url(#triangle)"
-          onClick={evt => {
+          onClick={(evt) => {
             this.props.select({ id: this.props.id });
           }}
+          strokeDasharray={this.props.selected ? 2 : "none"}
         />
-        {midPoints.map(p => {
+        {midPoints.map((p) => {
           return <circle cx={p.x} cy={p.y} r="7" fill="green" />;
         })}
       </g>
@@ -53,11 +54,11 @@ class Connector extends Component {
 }
 
 const mapDispatchToProps = {
-  select: selectConnector
+  select: selectConnector,
 };
 
 const mapStateToProps = (state, ownProps) => ({
-  ...state.elements.connectors[ownProps.id]
+  ...state.elements.connectors[ownProps.id],
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Connector);

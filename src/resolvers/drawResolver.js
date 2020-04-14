@@ -1,6 +1,7 @@
 import elementsConnectorPointsCalculator from "../helpers/elementsConnectorPointsCalculator";
 import { clearConnectorSelection } from "./connectorsResolver";
 import { drop } from "../actions/drawing";
+import { removeFromArray } from "../helpers/arrayManipulation";
 
 export const selectDraw = (state, actionPayload) => {
   const drawId = actionPayload.id;
@@ -17,7 +18,7 @@ export const selectDraw = (state, actionPayload) => {
 };
 
 export const drawDragging = (state, actionPayload) => {
-  let selecteds = state.sessionState.elementsSelected;
+  let selecteds = state.sessionState.drawsSelected;
   let newPos = actionPayload.position;
 
   for (let i = 0; i < selecteds.length; i++) {
@@ -30,7 +31,7 @@ export const drawDragging = (state, actionPayload) => {
 };
 
 export const drawdrop = (state, actionPayload) => {
-  let selecteds = state.sessionState.elementsSelected;
+  let selecteds = state.sessionState.drawsSelected;
 
   if (actionPayload.id) {
     const parent = state.draws[actionPayload.id];
@@ -160,13 +161,13 @@ export const selectionClear = (state, actionPayload) => {
 };
 
 const clearSelecteds = (state) => {
-  let list = state.sessionState.elementsSelected;
+  let list = state.sessionState.drawsSelected;
   for (let i = 0; i < list.length; i++) {
     let actualDraw = state.draws[list[i]];
     actualDraw.selected = false;
     if (actualDraw.parent) addChildrenInParent(state, actualDraw);
   }
-  state.sessionState.elementsSelected = [];
+  state.sessionState.drawsSelected = [];
 
   state.boardDrawShowOrder = [...state.boardDrawZOrder];
 };
@@ -183,8 +184,8 @@ const newSelectedDraw = (state, drawSelected, clientRectPosition) => {
     drawSelected.x = clientRectPosition.x;
     drawSelected.y = clientRectPosition.y;
 
-    state.sessionState.elementsSelected = [
-      ...state.sessionState.elementsSelected,
+    state.sessionState.drawsSelected = [
+      ...state.sessionState.drawsSelected,
       drawSelected.id,
     ];
 
@@ -217,8 +218,8 @@ const updateDrawPosition = (state, draw, posVariation) => {
 
   let newPositionVariationForConnector = {
     x: newDraw.x - draw.x,
-    y: newDraw.y - draw.y
-  }
+    y: newDraw.y - draw.y,
+  };
 
   state.draws[draw.id] = newDraw;
 
@@ -247,13 +248,15 @@ const updateChildrensLastPosition = (state, draw) => {
 const updateConnectors = (draw, state, onMouseMovePositionVariant) => {
   const connectorsList = state.connectors;
   for (let i = 0; i < draw.connectors.length; i++) {
-    console.log('Atualizando conector.');
+    console.log("Atualizando conector.");
     const connRef = draw.connectors[i];
     const conn = connectorsList[connRef.id];
 
     let newPositions = [...conn.endPoints];
-    newPositions[connRef.endPoint].x = conn.endPoints[connRef.endPoint].x + onMouseMovePositionVariant.x;
-    newPositions[connRef.endPoint].y = conn.endPoints[connRef.endPoint].y + onMouseMovePositionVariant.y;
+    newPositions[connRef.endPoint].x =
+      conn.endPoints[connRef.endPoint].x + onMouseMovePositionVariant.x;
+    newPositions[connRef.endPoint].y =
+      conn.endPoints[connRef.endPoint].y + onMouseMovePositionVariant.y;
 
     conn.endPoints = newPositions;
   }
@@ -268,39 +271,40 @@ const updateConnectorsFromResize = (draw, connectorsList, variants) => {
     const connRef = draw.connectors[i];
     const conn = connectorsList[connRef.id];
 
-    let varY, varX = 0;
+    let varY,
+      varX = 0;
 
-    switch (connRef.angle){
+    switch (connRef.angle) {
       case 0: //se w variar em valor diferente de x || se y variar +/- que variação de H|| se h variar
         varY = (variants.varH + variants.varY) / 2;
         varX = variants.varW;
         conn.endPoints[connRef.endPoint].x += varX;
         conn.endPoints[connRef.endPoint].y += varY;
-      break;
+        break;
 
-      case 90: 
-      varY = variants.varY;
-      varX = (variants.varW + variants.varX) /2;
-      conn.endPoints[connRef.endPoint].x += varX;
-      conn.endPoints[connRef.endPoint].y += varY;
+      case 90:
+        varY = variants.varY;
+        varX = (variants.varW + variants.varX) / 2;
+        conn.endPoints[connRef.endPoint].x += varX;
+        conn.endPoints[connRef.endPoint].y += varY;
 
-      break;
+        break;
 
-      case 180: 
-      varY = (variants.varH + variants.varY ) / 2;
-      varX = variants.varX;
-      conn.endPoints[connRef.endPoint].x += varX;
-      conn.endPoints[connRef.endPoint].y += varY;
+      case 180:
+        varY = (variants.varH + variants.varY) / 2;
+        varX = variants.varX;
+        conn.endPoints[connRef.endPoint].x += varX;
+        conn.endPoints[connRef.endPoint].y += varY;
 
-      break;
+        break;
 
-      case 270: 
-      varY = variants.varH;
-      varX = (variants.varW + variants.varX) / 2;
-      conn.endPoints[connRef.endPoint].x += varX;
-      conn.endPoints[connRef.endPoint].y += varY;
+      case 270:
+        varY = variants.varH;
+        varX = (variants.varW + variants.varX) / 2;
+        conn.endPoints[connRef.endPoint].x += varX;
+        conn.endPoints[connRef.endPoint].y += varY;
 
-      break;
+        break;
     }
 
     conn.endPoints = [...conn.endPoints];
@@ -485,13 +489,4 @@ const removeDrawFromBoard = (state, drawId) => {
 
 const addDrawToBoard = (state, drawId) => {
   state.boardDrawZOrder.push(drawId);
-};
-
-const removeFromArray = (array, valueToRemove) => {
-  let index = array.indexOf(valueToRemove);
-  if (index > -1) {
-    let newArray = [...array];
-    newArray.splice(index, 1);
-    return newArray;
-  } else return array;
 };
