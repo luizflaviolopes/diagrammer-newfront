@@ -41,7 +41,10 @@ class Connector extends Component {
           strokeWidth="3"
           markerEnd="url(#triangle)"
           onClick={(evt) => {
-            this.props.select({ id: this.props.id });
+            this.props.select({
+              id: this.props.id,
+              shiftPressed: evt.shiftKey,
+            });
           }}
           strokeDasharray={this.props.selected ? 2 : "none"}
         />

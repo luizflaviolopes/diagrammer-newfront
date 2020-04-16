@@ -1,5 +1,5 @@
 import { intermediatePointsCalculator } from "../helpers/connectorPointsCalculator";
-import { selectionClear } from "./drawResolver";
+import { clearDrawSelected } from "./drawResolver";
 
 export const connectorDrawingStart = (state, actionPayload) => {
   state.sessionState.connectorDrawing = true;
@@ -94,10 +94,18 @@ export const connectorDrawingEnd = (state, actionPayload) => {
 };
 
 export const selectConector = (state, actionPayload) => {
-  selectionClear(state, actionPayload);
-  clearConnectorSelection(state);
+  clearDrawSelected(state, actionPayload);
 
-  state.sessionState.connectorsSelected = [actionPayload.id];
+  if (!actionPayload.shiftPressed) {
+    clearConnectorSelection(state);
+  }
+
+  const selectedConnectors = state.sessionState.connectorsSelected;
+
+  state.sessionState.connectorsSelected = [
+    ...selectedConnectors,
+    actionPayload.id,
+  ];
   state.connectors[actionPayload.id].selected = true;
 
   return state;
