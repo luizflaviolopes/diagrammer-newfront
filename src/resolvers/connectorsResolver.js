@@ -11,15 +11,16 @@ export const connectorDrawingStart = (state, actionPayload) => {
     id: idFrom,
     x: actionPayload.variant.absolutePosition.x,
     y: actionPayload.variant.absolutePosition.y,
-    angle: actionPayload.variant.angle
+    angle: actionPayload.variant.angle,
   };
 
   state.connectors = {
     ...state.connectors,
     [conId]: {
+      id: conId,
       endPoints: [from, { ...from, id: undefined }],
-      drawing: true
-    }
+      drawing: true,
+    },
   };
 
   return state;
@@ -32,7 +33,7 @@ export const connectorDrawing = (state, actionPayload) => {
   let newEndpoint = [...connector.endPoints];
 
   newEndpoint[1] = {
-    ...actionPayload
+    ...actionPayload,
   };
 
   connector.endPoints = newEndpoint;
@@ -53,8 +54,8 @@ export const connectorDrawingEnd = (state, actionPayload) => {
       {
         id: connCounter,
         endPoint: 0,
-        angle: connObject.endPoints[0].angle
-      }
+        angle: connObject.endPoints[0].angle,
+      },
     ];
 
     drawB.connectors = [
@@ -62,8 +63,8 @@ export const connectorDrawingEnd = (state, actionPayload) => {
       {
         id: connCounter,
         endPoint: 1,
-        angle: actionPayload.variants.angle
-      }
+        angle: actionPayload.variants.angle,
+      },
     ];
 
     let connEndpoints = [...connObject.endPoints];
@@ -96,20 +97,21 @@ export const selectConector = (state, actionPayload) => {
   selectionClear(state, actionPayload);
   clearConnectorSelection(state);
 
-  state.sessionState.connectorSelected = [actionPayload.id];
+  state.sessionState.connectorsSelected = [actionPayload.id];
   state.connectors[actionPayload.id].selected = true;
 
   return state;
 };
 
-export const clearConnectorSelection = state => {
-  for (let i = 0; i < state.sessionState.connectorSelected.length; i++) {
-    const connector = state.connectors[state.sessionState.connectorSelected[i]];
-    state.connectors[state.sessionState.connectorSelected[i]] = {
+export const clearConnectorSelection = (state) => {
+  for (let i = 0; i < state.sessionState.connectorsSelected.length; i++) {
+    const connector =
+      state.connectors[state.sessionState.connectorsSelected[i]];
+    state.connectors[state.sessionState.connectorsSelected[i]] = {
       ...connector,
-      selected: false
+      selected: false,
     };
   }
 
-  state.sessionState.connectorSelected = [];
+  state.sessionState.connectorsSelected = [];
 };

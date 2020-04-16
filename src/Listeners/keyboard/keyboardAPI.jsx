@@ -6,11 +6,11 @@ const keyboardAPI = {
     window.onkeydown = keyPressed;
   },
   stop: () => {
-    window.onkeypress = undefined;
-  }
+    window.onkeydown = undefined;
+  },
 };
 
-const keyPressed = evt => {
+const keyPressed = (evt) => {
   switch (evt.key) {
     case "Delete":
       store.dispatch(deletePressed());
