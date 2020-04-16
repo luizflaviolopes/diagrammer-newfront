@@ -34,7 +34,7 @@ export default (state = setState(), action = {}) => {
     case actionTypes.BOARD_DRAW_ADD:
       return drawResolver.drawAdd({ ...state }, action.payload);
     case actionTypes.BOARD_SELECTION_CLEAR:
-      return drawResolver.selectionClear({ ...state }, action.payload);
+      return drawResolver.clearAllSelections({ ...state }, action.payload);
     case actionTypes.BOARD_CONNECTOR_DRAWING:
       return connectorResolvers.connectorDrawing({ ...state }, action.payload);
     case actionTypes.BOARD_CONNECTOR_DRAWING_START:

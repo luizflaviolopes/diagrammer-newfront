@@ -8,7 +8,7 @@ export const selectDraw = (state, actionPayload) => {
   const selectedDraw = state.draws[drawId];
 
   if (!actionPayload.shiftPressed) {
-    clearSelecteds(state);
+    clearDrawSelected(state);
   }
 
   newSelectedDraw(state, selectedDraw, actionPayload.clientRectPosition);
@@ -154,13 +154,13 @@ export const drawAdd = (state, actionPayload) => {
   return state;
 };
 
-export const selectionClear = (state, actionPayload) => {
-  clearSelecteds(state);
+export const clearAllSelections = (state, actionPayload) => {
+  clearDrawSelected(state);
   clearConnectorSelection(state);
   return state;
 };
 
-const clearSelecteds = (state) => {
+export const clearDrawSelected = (state) => {
   let list = state.sessionState.drawsSelected;
   for (let i = 0; i < list.length; i++) {
     let actualDraw = state.draws[list[i]];
