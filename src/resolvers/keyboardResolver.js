@@ -14,16 +14,59 @@ export const deleteSelecteds = (state) => {
     deleteConnector(state, connector);
   }
 
+  for (let i = 0; i < selectedObjects.draws.length; i++) {
+    const drawId = selectedObjects.draws[i];
+    const draw = state.draws[drawId];
+
+    deleteDraw(state, draw);
+  }
+
   state.sessionState.connectorsSelected = [];
+
+  state.sessionState.drawsSelected = [];
 
   return state;
 };
 
 const deleteDraw = (state, draw) => {
-  //------------------------------------------------------------------------implementar
-};
+
+  //Constante para manter a listagem original de conectores
+  const drawConnectors = draw.connectors;
+
+  for (let i = 0; i < drawConnectors.length; i++) {
+    const connectorId = drawConnectors[i].id;
+    const connector = state.connectors[connectorId];
+
+    //Remove conector do state
+    deleteConnector(state, connector);
+  }
+
+  if(!draw.parent){
+    state.boardDrawZOrder = removeFromArray(state.boardDrawZOrder, draw.id);
+  }
+  else{
+    const parent = state.draws[draw.parent];
+    parent.childrens = removeFromArray(parent.childrens, draw.id);
+  }
+
+  //Constante para manter a listagem original de filhos
+  const drawChildrens = draw.childrens;
+
+  for (let i = 0; i < drawChildrens.length; i++) {
+    const childrenId = drawChildrens[i];
+    const children = state.draws[childrenId];
+
+    //Remove filho
+    deleteDraw(state, children);
+  }
+
+  const draws = { ...state.draws };
+  delete draws[draw.id];
+  state.draws = draws;
+}
 
 const deleteConnector = (state, connector) => {
+  if(connector){
   //remover as referencias nos draws
 
   const fromDrawId = connector.endPoints[0].id;
@@ -31,8 +74,6 @@ const deleteConnector = (state, connector) => {
 
   const fromDraw = state.draws[fromDrawId];
   const toDraw = state.draws[toDrawId];
-
-  console.log("deletando...", fromDraw);
 
   if (fromDraw != undefined) {
     fromDraw.connectors = removeFromArray(fromDraw.connectors, (obj) => {
@@ -49,4 +90,5 @@ const deleteConnector = (state, connector) => {
   const connectors = { ...state.connectors };
   delete connectors[connector.id];
   state.connectors = connectors;
+}
 };
