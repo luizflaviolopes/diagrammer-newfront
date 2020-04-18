@@ -13,6 +13,11 @@ class Connector extends Component {
   }
 
   render() {
+    let pointerEvent = "stroke";
+
+    if(this.props.drawing || this.props.onDrawDragging){
+      pointerEvent = "none";
+    }
     let from = this.props.endPoints[0];
     let to = this.props.endPoints[1];
     console.log("connector", from, to, this.props.intermediatePoints);
@@ -33,7 +38,7 @@ class Connector extends Component {
       <g>
         <polyline
           style={{
-            pointerEvents: this.props.drawing ? "none" : "stroke",
+            pointerEvents: pointerEvent,
             fill: "none",
           }}
           points={polylinePointsTransformation(points)}
@@ -62,6 +67,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state, ownProps) => ({
   ...state.elements.connectors[ownProps.id],
+  onDrawDragging: state.elements.sessionState.draggingElement
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Connector);
