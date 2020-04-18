@@ -12,6 +12,7 @@ const keyboardAPI = {
 
 const keyPressed = (evt) => {
   switch (evt.key) {
+    case "Backspace":
     case "Delete":
       store.dispatch(deletePressed());
       break;
