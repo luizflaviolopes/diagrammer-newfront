@@ -43,8 +43,9 @@ const ConnectionPoints = props => {
   // };
 
   return (
+    <React.Fragment>
     <circle
-      id="anchorPoint"
+      id="anchorPointDummy"
       cx={props.x}
       cy={props.y}
       pointRef={props.pointRef}
@@ -53,6 +54,18 @@ const ConnectionPoints = props => {
       element={props.elementId}
       angle={props.angle}
     />
+    <circle
+      id="anchorPoint"
+      cx={props.x}
+      cy={props.y}
+      pointRef={props.pointRef}
+      r="20"
+      fill="white"
+      opacity="0"
+      element={props.elementId}
+      angle={props.angle}
+    />
+    </React.Fragment>
   );
 };
 
