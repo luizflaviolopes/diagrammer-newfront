@@ -56,8 +56,8 @@ export const drawdrop = (state, actionPayload) => {
       state,
       parent,
       {
-        x: actionPayload.x,
-        y: actionPayload.y,
+        x: actionPayload.x - state.boardView.x,
+        y: actionPayload.y - state.boardView.y,
       },
       { minX, minY, maxRight, maxBottom, padding }
     );
@@ -137,8 +137,8 @@ export const drawAdd = (state, actionPayload) => {
   let newDraw = {
     type: actionPayload.type,
     text: "",
-    x: actionPayload.position.x,
-    y: actionPayload.position.y,
+    x: actionPayload.position.x - state.boardView.x,
+    y: actionPayload.position.y - state.boardView.y,
     heigth: 100,
     width: 100,
     id: newID,
@@ -173,16 +173,21 @@ export const clearDrawSelected = (state) => {
 };
 
 const newSelectedDraw = (state, drawSelected, clientRectPosition) => {
+  const absolutePositionGBased = {
+    x: clientRectPosition.x - state.boardView.x,
+    y: clientRectPosition.y - state.boardView.y,
+  };
+
   drawSelected.absolutePosition = {
-    x: clientRectPosition.x,
-    y: clientRectPosition.y,
+    x: absolutePositionGBased.x,
+    y: absolutePositionGBased.y,
   };
 
   if (!drawSelected.selected) {
     drawSelected.selected = true;
 
-    drawSelected.x = clientRectPosition.x;
-    drawSelected.y = clientRectPosition.y;
+    drawSelected.x = absolutePositionGBased.x;
+    drawSelected.y = absolutePositionGBased.y;
 
     state.sessionState.drawsSelected = [
       ...state.sessionState.drawsSelected,
