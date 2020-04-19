@@ -51,6 +51,17 @@ export default (state = setState(), action = {}) => {
       return connectorResolvers.selectConector({ ...state }, action.payload);
     case actionTypes.BOARD_DELETE_PRESSED:
       return keyboardResolver.deleteSelecteds({ ...state }, action.payload);
+    case "teste":
+      const newstate = { ...state };
+      for (let i = 0; i < newstate.boardDrawZOrder.length; i++) {
+        console.log("teste");
+        const drawId = newstate.boardDrawZOrder[i];
+        const draw = newstate.draws[drawId];
+
+        draw.x += 20;
+        draw.y += 20;
+      }
+      return newstate;
     default:
       return state;
   }
