@@ -1,5 +1,7 @@
 import { intermediatePointsCalculator } from "../helpers/connectorPointsCalculator";
+
 import { clearDrawSelected } from "./drawResolver";
+import { getPositionBoardRelative } from "../helpers/getPositionBoardRelative";
 
 export const connectorDrawingStart = (state, actionPayload) => {
   state.sessionState.connectorDrawing = true;
@@ -7,10 +9,14 @@ export const connectorDrawingStart = (state, actionPayload) => {
   const conId = state.counters.connectors;
   const idFrom = +actionPayload.id;
 
+  const positionBoardRelative = getPositionBoardRelative(
+    state,
+    actionPayload.variant.absolutePosition
+  );
+
   let from = {
     id: idFrom,
-    x: actionPayload.variant.absolutePosition.x,
-    y: actionPayload.variant.absolutePosition.y,
+    ...positionBoardRelative,
     angle: actionPayload.variant.angle,
   };
 
@@ -32,8 +38,10 @@ export const connectorDrawing = (state, actionPayload) => {
   const connector = state.connectors[state.counters.connectors];
   let newEndpoint = [...connector.endPoints];
 
+  const positionBoardRelative = getPositionBoardRelative(state, actionPayload);
+
   newEndpoint[1] = {
-    ...actionPayload,
+    ...positionBoardRelative,
   };
 
   connector.endPoints = newEndpoint;
@@ -68,7 +76,11 @@ export const connectorDrawingEnd = (state, actionPayload) => {
     ];
 
     let connEndpoints = [...connObject.endPoints];
-    connEndpoints[1].id = +actionPayload.id;
+    connEndpoints[1] = {
+      ...connEndpoints[1],
+      id: +actionPayload.id,
+      angle: +actionPayload.variants.angle,
+    };
 
     connObject.endPoints = connEndpoints;
     connObject.drawing = undefined;
