@@ -56,7 +56,9 @@ const Board = (props) => {
           onDoubleClick={addDraw}
           onClick={clearSelection}
         />
-        <g transform={`translate(${props.boardView.x},${props.boardView.y})`}>
+        <g
+          transform={`matrix(${props.boardView.zoom},0,0,${props.boardView.zoom},${props.boardView.x},${props.boardView.y})`}
+        >
           {drawDraws(props.showSequence)}
           {drawconnectors()}
           <SelectedDraws />

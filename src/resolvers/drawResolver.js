@@ -112,11 +112,15 @@ export const drawdrop = (state, actionPayload) => {
 export const drawAdd = (state, actionPayload) => {
   const newID = state.counters.draws++;
 
+  const positionBoardRelative = getPositionBoardRelative(
+    state,
+    actionPayload.position
+  );
+
   let newDraw = {
     type: actionPayload.type,
     text: "",
-    x: actionPayload.position.x - state.boardView.x,
-    y: actionPayload.position.y - state.boardView.y,
+    ...positionBoardRelative,
     heigth: 100,
     width: 100,
     id: newID,
@@ -196,8 +200,14 @@ const detachChildrenFromParentOnSelect = (parent, children_id) => {
 const updateDrawPosition = (state, draw, posVariation) => {
   const newDraw = { ...draw };
 
-  newDraw.x = draw.absolutePosition.x + posVariation.x;
-  newDraw.y = draw.absolutePosition.y + posVariation.y;
+  const mouseMovementZoomRelative = getPositionBoardRelative(
+    state,
+    posVariation,
+    true
+  );
+
+  newDraw.x = draw.absolutePosition.x + mouseMovementZoomRelative.x;
+  newDraw.y = draw.absolutePosition.y + mouseMovementZoomRelative.y;
 
   let newPositionVariationForConnector = {
     x: newDraw.x - draw.x,

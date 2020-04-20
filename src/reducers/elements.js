@@ -6,9 +6,9 @@ import * as keyboardResolver from "../resolvers/keyboardResolver";
 
 const setState = () => ({
   boardView: {
-    x: 100,
-    y: 50,
-    zoom: 0,
+    x: 0,
+    y: 0,
+    zoom: 1.5,
   },
   counters: {
     draws: 1,
