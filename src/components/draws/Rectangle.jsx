@@ -1,22 +1,22 @@
 import React from "react";
 
-const Rectangle = props => {
+const Rectangle = (props) => {
   let overlayVariations = {
     opacity: 1,
-    visibility: "hidden"
+    visibility: "hidden",
   };
 
   if (props.highlightConnection) {
     overlayVariations = {
       fill: "steelblue",
       opacity: "0.2",
-      visibility: "visible"
+      visibility: "visible",
     };
   } else if (props.highlightDrawDragging)
     overlayVariations = {
       fill: "red",
       opacity: "0.2",
-      visibility: "visible"
+      visibility: "visible",
     };
   else if (props.selected) {
     overlayVariations = {
@@ -25,7 +25,7 @@ const Rectangle = props => {
       visibility: "visible",
       stroke: "white",
       strokeWidth: "3",
-      strokeDasharray: 6
+      strokeDasharray: 6,
     };
   }
 
@@ -60,7 +60,7 @@ const Rectangle = props => {
   );
 };
 
-const Overlay = props => {
+const Overlay = (props) => {
   return (
     <rect
       x="0"
@@ -71,6 +71,10 @@ const Overlay = props => {
       style={{ pointerEvents: "none" }}
     ></rect>
   );
+};
+
+export const Demo = (props) => {
+  return <rect x="0" y="0" height={100} width={100}></rect>;
 };
 
 export default Rectangle;

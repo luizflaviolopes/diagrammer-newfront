@@ -1,10 +1,10 @@
 import { combineReducers } from "redux";
 import boardView from "./boardView";
 import elements from "./elements";
-import toolboxElements from "./toolboxElements";
+import tabDrawList from "./tabDrawList";
 
 export default combineReducers({
   boardView,
   elements,
-  toolboxElements
+  tabDrawList,
 });

@@ -1,25 +1,25 @@
 import React from "react";
 
-const Circle = props => {
+const Circle = (props) => {
   const radius =
     props.width > props.heigth ? props.width / 2 : props.heigth / 2;
 
   let overlayVariations = {
     opacity: 1,
-    visibility: "hidden"
+    visibility: "hidden",
   };
 
   if (props.highlightConnection)
     overlayVariations = {
       fill: "steelblue",
       opacity: "0.2",
-      visibility: "visible"
+      visibility: "visible",
     };
   else if (props.highlightDrawDragging)
     overlayVariations = {
       fill: "red",
       opacity: "0.2",
-      visibility: "visible"
+      visibility: "visible",
     };
   else if (props.selected) {
     overlayVariations = {
@@ -28,7 +28,7 @@ const Circle = props => {
       visibility: "visible",
       stroke: "white",
       strokeWidth: "3",
-      strokeDasharray: 6
+      strokeDasharray: 6,
     };
   }
 
@@ -55,7 +55,7 @@ const Circle = props => {
   );
 };
 
-const Overlay = props => {
+const Overlay = (props) => {
   return (
     <circle
       cx={props.radius}
@@ -65,6 +65,10 @@ const Overlay = props => {
       {...props.variations}
     />
   );
+};
+
+export const Demo = (props) => {
+  return <circle cx={50} cy={50} r={50} opacity={1} />;
 };
 
 export default Circle;
