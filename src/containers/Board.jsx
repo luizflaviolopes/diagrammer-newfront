@@ -77,7 +77,7 @@ const mapStateToProps = (state) => ({
   boardView: state.boardView,
   showSequence: state.elements.boardDrawShowOrder,
   selectedDraws: state.elements.sessionState.drawsSelected,
-  selectedElement: state.toolboxElements.elementSelected,
+  selectedElement: state.tabDrawList.elementSelected,
   connectors: state.elements.connectors,
 });
 

@@ -10,7 +10,6 @@ const OuterDiv = styled.div`
   bottom: 0;
   width: ${(props) => (props.show ? "320px" : "0")};
   background-color: ${(props) => props.color};
-  opacity: 0.9;
   transition: width 0.1s linear;
 `;
 
@@ -25,12 +24,23 @@ const SideTab = styled.div`
 
 const InnerDiv = styled.div`
   position: absolute;
-  background-color: white;
-  opacity: 0.5;
   top: 15px;
   left: 10px;
   right: 10px;
   bottom: 12px;
+  overflow: hidden;
+`;
+
+const InnerBackground = styled.div`
+  position: absolute;
+  background-color: white;
+  top: 15px;
+  left: 10px;
+  right: 10px;
+  bottom: 12px;
+  overflow: hidden;
+  border-radius: 10px;
+  opacity: 0.6;
 `;
 
 const TabTitle = styled.label`
@@ -49,8 +59,6 @@ const TabTitle = styled.label`
 const Tab = (props) => {
   const [isVisible, toggleVisible] = useState(false);
 
-  color = props.color;
-
   return (
     <OuterDiv show={isVisible} color={props.color}>
       <SideTab
@@ -60,7 +68,8 @@ const Tab = (props) => {
       >
         <TabTitle>{props.name}</TabTitle>
       </SideTab>
-      <InnerDiv>{props.childrens}</InnerDiv>
+      <InnerBackground></InnerBackground>
+      <InnerDiv>{props.children}</InnerDiv>
     </OuterDiv>
   );
 };
