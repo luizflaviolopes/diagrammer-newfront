@@ -52,6 +52,7 @@ const DrawListBlocks = connect(
     const Draw = Draws[draw];
     return (
       <DrawBlock
+        key={Draw.type}
         selected={props.selected == Draw.type}
         changeSelection={props.changeSelected}
         type={Draw.type}
@@ -65,7 +66,7 @@ const DrawListBlocks = connect(
 const DrawListTab = (props) => {
   console.log(Object.keys(Draws));
   return (
-    <Tab name="Lista de desenhos" color="blue">
+    <Tab name="Lista de desenhos" color="rgb(70, 70, 146)">
       <DrawListBlocks></DrawListBlocks>
     </Tab>
   );
