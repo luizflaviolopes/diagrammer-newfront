@@ -5,7 +5,8 @@ import { connect } from "react-redux";
 import Tab from "./Tab";
 import Draws from "./draws/Demos";
 
-import * as actions from "../actions/tabDrawListActions";
+import * as actions from "../actions/tabDrawListBoxActions";
+import { onDragStart } from "../Listeners/mouse/draggingDrawListBlock";
 
 const strokeWidth = 2;
 
@@ -27,15 +28,21 @@ const DrawBlockStyled = styled.svg`
 `;
 
 const DrawBlock = (props) => {
+  const viewBoxData = `${-strokeWidth} ${-strokeWidth} ${
+    100 + strokeWidth * 2
+  } ${100 + strokeWidth * 2}`;
+
+  const onClickHandler = (evt) => {
+    props.changeSelection({ selected: props.type });
+  };
+
   return (
     <DrawBlockStyled
-      viewBox={`${-strokeWidth} ${-strokeWidth} ${100 + strokeWidth * 2} ${
-        100 + strokeWidth * 2
-      }`}
+      viewBox={viewBoxData}
       selected={props.selected}
-      onClick={(evt) => {
-        props.changeSelection({ selected: props.type });
-      }}
+      onClick={onClickHandler}
+      type={props.type}
+      onMouseDown={onDragStart}
     >
       {props.children}
     </DrawBlockStyled>
@@ -43,7 +50,7 @@ const DrawBlock = (props) => {
 };
 
 const DrawListBlocks = connect(
-  (state) => ({ selected: state.tabDrawList.elementSelected }),
+  (state) => ({ selected: state.elements.drawListBoxSelection }),
   { changeSelected: actions.changeSelected }
 )((props) => {
   const allDraws = Object.keys(Draws);
