@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 
-const Grid = props => {
+const Grid = (props) => {
   return (
     <React.Fragment>
       <defs>
@@ -32,10 +32,10 @@ const Grid = props => {
       <rect
         transform={`translate(${props.offsetX % 40},${props.offsetY % 40})`}
         id="surface"
-        x="-40"
-        y="-40"
-        width="2000"
-        height="2000"
+        x="0"
+        y="0"
+        width="100%"
+        height="100%"
         fill="url(#grid)"
         onDoubleClick={props.onDoubleClick}
         onClick={props.onClick}
