@@ -1,5 +1,8 @@
 import store from "../../store";
-import { dragBlock } from "../../actions/tabDrawListBoxActions";
+import {
+  dragBlock,
+  dropBlockOutOfBoard,
+} from "../../actions/tabDrawListBoxActions";
 import { dragging, drop } from "../../actions/drawing";
 import { IsDraw } from "./draggingDraw";
 
@@ -13,22 +16,29 @@ export const onDragStart = (evt) => {
     onMove: onDrawDragging,
     onDrop: onDrawDrop,
     startPosition: { x: evt.clientX, y: evt.clientY },
+    type: evt.target.getAttribute("type"),
   };
-
-  let drawType = evt.target.getAttribute("type");
-
-  store.dispatch(
-    dragBlock({
-      position: { x: evt.clientX, y: evt.clientY },
-      type: drawType,
-    })
-  );
 };
 
 export const onDrawDragging = (evt) => {
-  let x = evt.clientX - window.dragging.startPosition.x;
-  let y = evt.clientY - window.dragging.startPosition.y;
-  store.dispatch(dragging({ position: { x: x, y: y } }));
+  if (evt.toElement.id == "surface" && !window.dragging.created) {
+    window.dragging.created = true;
+
+    store.dispatch(
+      dragBlock({
+        position: {
+          x: window.dragging.startPosition.x,
+          y: window.dragging.startPosition.y,
+        },
+        type: window.dragging.type,
+      })
+    );
+  }
+  if (window.dragging.created) {
+    let x = evt.clientX - window.dragging.startPosition.x;
+    let y = evt.clientY - window.dragging.startPosition.y;
+    store.dispatch(dragging({ position: { x: x, y: y } }));
+  }
 };
 
 export const onDrawDrop = (evt) => {
@@ -43,7 +53,10 @@ export const onDrawDrop = (evt) => {
         y: evtMeasures.y,
       })
     );
-  } else store.dispatch(drop({}));
+  } else if (evt.toElement.id == "surface") store.dispatch(drop({}));
+  else {
+    store.dispatch(dropBlockOutOfBoard({}));
+  }
 
   window.dragging = undefined;
 };

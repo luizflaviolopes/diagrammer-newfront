@@ -72,9 +72,13 @@ export default (state = setState(), action = {}) => {
         { ...state },
         action.payload
       );
-
     case actionTypes.DRAWLIST_DRAG_BLOCK:
       return drawListBoxResolver.startDragDrawListBoxDraw(
+        { ...state },
+        action.payload
+      );
+    case actionTypes.DRAWLIST_DROP_BLOCK_OUT_OF_BOARD:
+      return drawListBoxResolver.deleteDrawDroppedOutOfBoard(
         { ...state },
         action.payload
       );

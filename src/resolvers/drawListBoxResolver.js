@@ -1,4 +1,5 @@
 import * as drawResolver from "./drawResolver";
+import * as keyboardResolver from "./keyboardResolver";
 
 export const changeDrawListBoxSelection = (state, payload) => {
   state.drawListBoxSelection = payload.selected;
@@ -22,4 +23,9 @@ export const startDragDrawListBoxDraw = (state, payload) => {
   });
 
   return newstate;
+};
+
+export const deleteDrawDroppedOutOfBoard = (state, payload) => {
+  return keyboardResolver.deleteSelecteds(state);
+  return state;
 };
