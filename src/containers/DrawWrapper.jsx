@@ -27,9 +27,7 @@ class DrawWrapper extends Component {
   componentDidUpdate = () => {};
 
   onDragOver = (evt) => {
-    if (
-      this.props.sessionState.connectorDrawing
-    ) {
+    if (this.props.sessionState.connectorDrawing) {
       this.setState({ highlightConnector: true });
     } else if (
       this.props.sessionState.draggingElement &&
@@ -73,7 +71,7 @@ class DrawWrapper extends Component {
       ));
     }
 
-    if (this.props.childrens ) {
+    if (this.props.childrens) {
       childrens = this.props.childrens.map((element) => {
         console.log("renderizando filho");
         return <DrawWrapperConnected key={element} id={element} />;
@@ -95,7 +93,8 @@ class DrawWrapper extends Component {
       >
         <g
           onMouseEnter={(evt) => {
-            this.setState({ showConnectors: true });
+            if (!this.props.sessionState.draggingElement)
+              this.setState({ showConnectors: true });
           }}
           onMouseLeave={() => this.setState({ showConnectors: false })}
         >

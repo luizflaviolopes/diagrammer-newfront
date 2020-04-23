@@ -2,6 +2,7 @@ import elementsConnectorPointsCalculator from "../helpers/elementsConnectorPoint
 import { clearConnectorSelection } from "./connectorsResolver";
 import { drop } from "../actions/drawing";
 import { removeFromArray } from "../helpers/arrayManipulation";
+import { getPositionBoardRelative } from "../helpers/getPositionBoardRelative";
 
 export const selectDraw = (state, actionPayload) => {
   const drawId = actionPayload.id;
@@ -52,13 +53,15 @@ export const drawdrop = (state, actionPayload) => {
         maxBottom = elementSelected.y + elementSelected.heigth;
     }
 
+    const positionBoardRelative = getPositionBoardRelative(
+      state,
+      actionPayload
+    );
+
     const newAbsolutePosition = updateParentSize(
       state,
       parent,
-      {
-        x: actionPayload.x,
-        y: actionPayload.y,
-      },
+      positionBoardRelative,
       { minX, minY, maxRight, maxBottom, padding }
     );
 
@@ -84,10 +87,6 @@ export const drawdrop = (state, actionPayload) => {
       if (!droppedDraw.parent) {
         addParentInChildren(droppedDraw, actionPayload.id);
         removeDrawFromBoard(state, droppedDraw.id);
-        // updateDroppedChildrenPosition(
-        //   droppedDraw,
-        //   newAbsolutePosition
-        // );
       } else {
         addParentInChildren(droppedDraw, actionPayload.id);
       }
@@ -103,27 +102,6 @@ export const drawdrop = (state, actionPayload) => {
     }
   }
 
-  //iteration in all droped draws
-  // for (let i = 0; i < selecteds.length; i++) {
-  //   let draw = state.draws[selecteds[i]];
-
-  //   // updateDrawLastPosition(state, draw);
-
-  //   if (actionPayload.id) {
-  //     // parent1 to parent2
-  //     else if (actionPayload.id !== draw.parent) {
-  //       removeDrawFromParent(state, draw);
-  //       addDrawToParent(state, draw, actionPayload.id);
-  //     }
-  //   } else {
-  //     //parent to board
-  //     if (draw.parent) {
-  //       removeDrawFromParent(state, draw);
-  //       addDrawToBoard(state, draw.id);
-  //     }
-  //   }
-  // }
-
   let newSession = { ...state.sessionState };
   newSession.draggingElement = false;
 
@@ -134,11 +112,15 @@ export const drawdrop = (state, actionPayload) => {
 export const drawAdd = (state, actionPayload) => {
   const newID = state.counters.draws++;
 
+  const positionBoardRelative = getPositionBoardRelative(
+    state,
+    actionPayload.position
+  );
+
   let newDraw = {
     type: actionPayload.type,
     text: "",
-    x: actionPayload.position.x,
-    y: actionPayload.position.y,
+    ...positionBoardRelative,
     heigth: 100,
     width: 100,
     id: newID,
@@ -173,16 +155,21 @@ export const clearDrawSelected = (state) => {
 };
 
 const newSelectedDraw = (state, drawSelected, clientRectPosition) => {
+  const positionBoardRelative = getPositionBoardRelative(
+    state,
+    clientRectPosition
+  );
+
   drawSelected.absolutePosition = {
-    x: clientRectPosition.x,
-    y: clientRectPosition.y,
+    x: positionBoardRelative.x,
+    y: positionBoardRelative.y,
   };
 
   if (!drawSelected.selected) {
     drawSelected.selected = true;
 
-    drawSelected.x = clientRectPosition.x;
-    drawSelected.y = clientRectPosition.y;
+    drawSelected.x = positionBoardRelative.x;
+    drawSelected.y = positionBoardRelative.y;
 
     state.sessionState.drawsSelected = [
       ...state.sessionState.drawsSelected,
@@ -213,8 +200,14 @@ const detachChildrenFromParentOnSelect = (parent, children_id) => {
 const updateDrawPosition = (state, draw, posVariation) => {
   const newDraw = { ...draw };
 
-  newDraw.x = draw.absolutePosition.x + posVariation.x;
-  newDraw.y = draw.absolutePosition.y + posVariation.y;
+  const mouseMovementZoomRelative = getPositionBoardRelative(
+    state,
+    posVariation,
+    true
+  );
+
+  newDraw.x = draw.absolutePosition.x + mouseMovementZoomRelative.x;
+  newDraw.y = draw.absolutePosition.y + mouseMovementZoomRelative.y;
 
   let newPositionVariationForConnector = {
     x: newDraw.x - draw.x,

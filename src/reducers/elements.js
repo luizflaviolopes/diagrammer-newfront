@@ -6,6 +6,11 @@ import * as keyboardResolver from "../resolvers/keyboardResolver";
 import * as drawListBoxResolver from "../resolvers/drawListBoxResolver";
 
 const setState = () => ({
+  boardView: {
+    x: 0,
+    y: 0,
+    zoom: 1.5,
+  },
   counters: {
     draws: 1,
     connectors: 1,
