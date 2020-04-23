@@ -6,7 +6,8 @@ var color = "white";
 const OuterDiv = styled.div`
   position: absolute;
   top: 0;
-  left: 0;
+  left: ${(props) => (props.side == "left" ? "0" : "auto")};
+  right: ${(props) => (props.side == "left" ? "auto" : "0")};
   bottom: 0;
   width: ${(props) => (props.show ? "320px" : "0")};
   background-color: ${(props) => props.color};
@@ -15,11 +16,16 @@ const OuterDiv = styled.div`
 
 const SideTab = styled.div`
   position: absolute;
-  left: 100%;
+  left: ${(props) => (props.side == "left" ? "100%" : "auto")};
+  right: ${(props) => (props.side == "left" ? "auto" : "100%")};
   top: 20%;
   background-color: ${(props) => props.color};
   width: 25px;
   height: ${(props) => props.length / 1.5 + "em"};
+  > label {
+    transform: ${(props) =>
+      props.side == "left" ? "unset" : "rotate(-180deg)"};
+  }
 `;
 
 const InnerDiv = styled.div`
@@ -60,11 +66,12 @@ const Tab = (props) => {
   const [isVisible, toggleVisible] = useState(false);
 
   return (
-    <OuterDiv show={isVisible} color={props.color}>
+    <OuterDiv show={isVisible} color={props.color} side={props.side}>
       <SideTab
         onClick={(evt) => toggleVisible(!isVisible)}
         length={props.name.length}
         color={props.color}
+        side={props.side}
       >
         <TabTitle>{props.name}</TabTitle>
       </SideTab>
