@@ -9,7 +9,7 @@ const setState = () => ({
   boardView: {
     x: 0,
     y: 0,
-    zoom: 1.5,
+    zoom: 1,
   },
   counters: {
     draws: 1,

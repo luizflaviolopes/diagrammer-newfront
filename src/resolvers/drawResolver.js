@@ -3,6 +3,7 @@ import { clearConnectorSelection } from "./connectorsResolver";
 import { drop } from "../actions/drawing";
 import { removeFromArray } from "../helpers/arrayManipulation";
 import { getPositionBoardRelative } from "../helpers/getPositionBoardRelative";
+import * as drawTypes from "../types/drawTypes";
 
 export const selectDraw = (state, actionPayload) => {
   const drawId = actionPayload.id;
@@ -37,33 +38,28 @@ export const drawdrop = (state, actionPayload) => {
   if (actionPayload.id) {
     const parent = state.draws[actionPayload.id];
     const padding = 10;
-    const firstElement = state.draws[selecteds[0]];
-    let minX = firstElement.x;
-    let minY = firstElement.y;
-    let maxRight = firstElement.x + firstElement.width;
-    let maxBottom = firstElement.y + firstElement.heigth;
-
-    for (let z = 1; z < selecteds.length; z++) {
-      let elementSelected = state.draws[selecteds[z]];
-      if (elementSelected.x < minX) minX = elementSelected.x;
-      if (elementSelected.y < minY) minY = elementSelected.y;
-      if (elementSelected.x + elementSelected.width > maxRight)
-        maxRight = elementSelected.x + elementSelected.width;
-      if (elementSelected.y + elementSelected.heigth > maxBottom)
-        maxBottom = elementSelected.y + elementSelected.heigth;
-    }
 
     const positionBoardRelative = getPositionBoardRelative(
       state,
       actionPayload
     );
 
-    const newAbsolutePosition = updateParentSize(
-      state,
-      parent,
-      positionBoardRelative,
-      { minX, minY, maxRight, maxBottom, padding }
-    );
+    let newAbsolutePosition;
+
+    if (parent.type == drawTypes.DRAW_CIRCLE)
+      newAbsolutePosition = updateParentSizeCircle(
+        state,
+        parent,
+        positionBoardRelative,
+        padding
+      );
+    else
+      newAbsolutePosition = updateParentSizeRect(
+        state,
+        parent,
+        positionBoardRelative,
+        padding
+      );
 
     resizeGrandParents(state, parent, padding);
 
@@ -301,65 +297,199 @@ const updateConnectorsFromResize = (draw, connectorsList, variants) => {
     }
 
     conn.endPoints = [...conn.endPoints];
-
-    // const connectorPoints = elementsConnectorPointsCalculator(
-    //   draw.type,
-    //   draw.width,
-    //   draw.heigth
-    // );
-    // const point = connectorPoints.find((el) => {
-    //   return el.pointRef == connRef.centerVariant.pointRef;
-    // });
-
-    // draw.connectors[i].centerVariant = point;
-
-    // let newPositions = [...conn.endPoints];
-
-    // newPositions[connRef.endPoint].x = draw.x + point.x;
-    // newPositions[connRef.endPoint].y = draw.y + point.y;
-
-    // conn.endPoints = newPositions;
   }
 };
 
-const updateParentSize = (state, parent, absolutePosition, measures) => {
-  const padding = measures.padding;
+const updateParentSizeCircle = (
+  state,
+  parent,
+  absolutePosition,
+  paddingFull
+) => {
+  const padding = paddingFull / 2;
+  const radius = Math.max(parent.width, parent.heigth) / 2;
+
   console.log("atualizando tamanho");
   let variationX = 0;
   let variationY = 0;
   let variationH = 0;
   let variationW = 0;
 
-  if (measures.minX < absolutePosition.x + padding) {
-    variationX = measures.minX - (absolutePosition.x + padding);
+  // const centerPoint = {
+  //   x: parent.x + parent.width / 2,
+  //   y: parent.y + parent.heigth / 2,
+  // };
+
+  const calcHipotenusa = (pointA, PointB) => {
+    const adjacent = Math.abs(pointA.x - PointB.x);
+    const oposite = Math.abs(pointA.y - PointB.y);
+
+    return Math.sqrt(adjacent * adjacent + oposite * oposite);
+  };
+
+  let selecteds = state.sessionState.drawsSelected;
+
+  const rectToCircleDiagonal = Math.sqrt(2 * (radius * radius)) - radius;
+  const rectToCircle = Math.sqrt(
+    (rectToCircleDiagonal * rectToCircleDiagonal) / 2
+  );
+
+  let pointTopLeft = {
+    x: parent.x + rectToCircle,
+    y: parent.y + rectToCircle,
+  };
+  let pointTopRight = {
+    x: parent.x + parent.width - rectToCircle,
+    y: parent.y + rectToCircle,
+  };
+  let pointBottomRight = {
+    x: parent.x + parent.width - rectToCircle,
+    y: parent.y + parent.heigth - rectToCircle,
+  };
+  let pointBottomLeft = {
+    x: parent.x + rectToCircle,
+    y: parent.y + parent.heigth - rectToCircle,
+  };
+
+  //let selecteds = state.sessionState.drawsSelected;
+  for (let z = 0; z < selecteds.length; z++) {
+    const dropped = state.draws[selecteds[z]];
+
+    if (dropped.x + dropped.y < pointTopLeft.x + pointTopLeft.y)
+      pointTopLeft = { x: dropped.x, y: dropped.y };
+
+    if (
+      (dropped.x + dropped.width) / dropped.y >
+      pointTopRight.x / pointTopRight.y
+    )
+      pointTopRight = { x: dropped.x + dropped.width, y: dropped.y };
+
+    if (
+      dropped.x + dropped.width + dropped.y + dropped.heigth >
+      pointBottomRight.x + pointBottomRight.y
+    )
+      pointBottomRight = {
+        x: dropped.x + dropped.width,
+        y: dropped.y + dropped.heigth,
+      };
+
+    if (
+      (dropped.y + dropped.heigth) / dropped.x >
+      pointBottomLeft.y / pointBottomLeft.x
+    )
+      pointBottomLeft = { x: dropped.x, y: dropped.y + dropped.heigth };
+  }
+
+  const centerX =
+    (pointTopLeft.x +
+      pointTopRight.x +
+      pointBottomRight.x +
+      pointBottomLeft.x) /
+    4;
+  const centerY =
+    (pointTopLeft.y +
+      pointTopRight.y +
+      pointBottomRight.y +
+      pointBottomLeft.y) /
+    4;
+
+  const centerPoint = { x: centerX, y: centerY };
+
+  // const topLine = calcHipotenusa(pointTopLeft,pointTopRight);
+  // const rigthLine = calcHipotenusa(pointTopLeft,pointTopRight);
+
+  const distanceToTopLeft = calcHipotenusa(centerPoint, pointTopLeft);
+  const distanceToTopRigth = calcHipotenusa(centerPoint, pointTopRight);
+  const distanceToBottomRigth = calcHipotenusa(centerPoint, pointBottomRight);
+  const distanceToBottomLeft = calcHipotenusa(centerPoint, pointBottomLeft);
+
+  const pointsDistancesToCenter = [
+    distanceToTopLeft,
+    distanceToTopRigth,
+    distanceToBottomRigth,
+    distanceToBottomLeft,
+  ];
+
+  //pointsDistancesToCenter.push(parent.width / 2);
+
+  const newRadius = Math.max(...pointsDistancesToCenter);
+
+  const newPosition = {
+    x: centerPoint.x - newRadius,
+    y: centerPoint.y - newRadius,
+  };
+
+  variationX = newPosition.x - parent.x;
+  variationY = newPosition.y - parent.y;
+  variationH = newRadius - parent.heigth;
+  variationW = newRadius - parent.width;
+
+  parent.x = newPosition.x;
+  parent.y = newPosition.y;
+  parent.heigth = newRadius * 2;
+  parent.width = newRadius * 2;
+
+  const newPositions = {
+    x: absolutePosition.x + variationX,
+    y: absolutePosition.y + variationY,
+    varX: variationX,
+    varY: variationY,
+    varW: variationW,
+    varH: variationH,
+  };
+
+  updateConnectorsFromResize(parent, state.connectors, newPositions);
+
+  parent.absolutePosition = { x: newPositions.x, y: newPositions.y };
+
+  return newPositions;
+};
+
+const updateParentSizeRect = (state, parent, absolutePosition, padding) => {
+  console.log("atualizando tamanho");
+
+  let selecteds = state.sessionState.drawsSelected;
+  const firstElement = state.draws[selecteds[0]];
+  let minX = firstElement.x;
+  let minY = firstElement.y;
+  let maxRight = firstElement.x + firstElement.width;
+  let maxBottom = firstElement.y + firstElement.heigth;
+
+  for (let z = 1; z < selecteds.length; z++) {
+    let elementSelected = state.draws[selecteds[z]];
+    if (elementSelected.x < minX) minX = elementSelected.x;
+    if (elementSelected.y < minY) minY = elementSelected.y;
+    if (elementSelected.x + elementSelected.width > maxRight)
+      maxRight = elementSelected.x + elementSelected.width;
+    if (elementSelected.y + elementSelected.heigth > maxBottom)
+      maxBottom = elementSelected.y + elementSelected.heigth;
+  }
+
+  let variationX = 0;
+  let variationY = 0;
+  let variationH = 0;
+  let variationW = 0;
+
+  if (minX < absolutePosition.x + padding) {
+    variationX = minX - (absolutePosition.x + padding);
 
     parent.x = parent.x + variationX;
     parent.width = parent.width - variationX;
   }
-  if (measures.minY < absolutePosition.y + padding) {
-    variationY = measures.minY - (absolutePosition.y + padding);
+  if (minY < absolutePosition.y + padding) {
+    variationY = minY - (absolutePosition.y + padding);
 
     parent.y = parent.y + variationY;
     parent.heigth = parent.heigth - variationY;
   }
-  if (
-    measures.maxRight >
-    absolutePosition.x + variationX + parent.width - padding
-  ) {
+  if (maxRight > absolutePosition.x + variationX + parent.width - padding) {
     variationW =
-      measures.maxRight +
-      padding -
-      (absolutePosition.x + variationX + parent.width);
+      maxRight + padding - (absolutePosition.x + variationX + parent.width);
     parent.width = parent.width + variationW;
   }
-  if (
-    measures.maxBottom >
-    absolutePosition.y + variationY + parent.heigth - padding
-  ) {
+  if (maxBottom > absolutePosition.y + variationY + parent.heigth - padding) {
     variationH =
-      measures.maxBottom +
-      padding -
-      (absolutePosition.y + variationY + parent.heigth);
+      maxBottom + padding - (absolutePosition.y + variationY + parent.heigth);
     parent.heigth = parent.heigth + variationH;
   }
 
