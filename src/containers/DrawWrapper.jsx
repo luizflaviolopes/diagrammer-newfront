@@ -85,34 +85,45 @@ class DrawWrapper extends Component {
     };
     const pointerEvents = calcPointerEvents();
 
+    let markers = [];
+    if (this.props.resizePoints) markers = this.props.resizePoints;
+
     return (
-      <g
-        onMouseOver={this.onDragOver}
-        onMouseOut={this.onDragOut}
-        transform={`translate(${this.props.x}, ${this.props.y})`}
-      >
+      <React.Fragment>
         <g
-          onMouseEnter={(evt) => {
-            if (!this.props.sessionState.draggingElement)
-              this.setState({ showConnectors: true });
-          }}
-          onMouseLeave={() => this.setState({ showConnectors: false })}
+          onMouseOver={this.onDragOver}
+          onMouseOut={this.onDragOut}
+          transform={`translate(${this.props.x}, ${this.props.y})`}
         >
-          <Element
-            text={this.props.text}
-            heigth={this.props.heigth}
-            width={this.props.width}
-            radius={this.props.radius}
-            highlightConnection={this.state.highlightConnector}
-            highlightDrawDragging={this.state.highlightDrawDragging}
-            selected={this.props.selected}
-            id={this.props.id}
-            pointerEvents={pointerEvents}
-          />
-          {connectionPoints}
+          <g
+            onMouseEnter={(evt) => {
+              if (!this.props.sessionState.draggingElement)
+                this.setState({ showConnectors: true });
+            }}
+            onMouseLeave={() => this.setState({ showConnectors: false })}
+          >
+            <Element
+              text={this.props.text}
+              heigth={this.props.heigth}
+              width={this.props.width}
+              radius={this.props.radius}
+              highlightConnection={this.state.highlightConnector}
+              highlightDrawDragging={this.state.highlightDrawDragging}
+              selected={this.props.selected}
+              id={this.props.id}
+              pointerEvents={pointerEvents}
+            />
+            {connectionPoints}
+          </g>
+
+          {childrens}
         </g>
-        {childrens}
-      </g>
+        {markers.map((item) => {
+          return (
+            <circle cx={item.x} cy={item.y} r={5} opacity={1} fill="black" />
+          );
+        })}
+      </React.Fragment>
     );
   }
 }
