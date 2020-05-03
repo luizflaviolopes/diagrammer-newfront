@@ -87,6 +87,11 @@ export default (state = setState(), action = {}) => {
         { ...state },
         action.payload
       );
+    case "teste":
+      let newstate = { ...state };
+      newstate.boardView = { ...newstate.boardView };
+      newstate.boardView.zoom = action.payload.zoom;
+      return newstate;
 
     default:
       return state;

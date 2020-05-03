@@ -2,96 +2,111 @@ import * as drawTypes from "../../types/drawTypes";
 
 export const autoResize = (state, parent, positionBoardRelative, padding) => {
   autoResizeParent(state, parent, positionBoardRelative, padding);
-
-  autoResizeGrandParents(state, parent, padding);
 };
 
 const autoResizeParent = (state, parent, positionBoardRelative, padding) => {
-  let variations;
+  let selecteds = state.sessionState.drawsSelected;
+  const firstElement = state.draws[selecteds[0]];
 
-  if (parent.type == drawTypes.DRAW_CIRCLE)
-    variations = updateParentSizeCircle(
-      state,
-      parent,
-      positionBoardRelative,
-      padding
-    );
-  else
-    variations = updateParentSizeRect(
-      state,
-      parent,
-      positionBoardRelative,
-      padding
-    );
+  let childrenLimitPoints = {
+    left: firstElement.x,
+    top: firstElement.y,
+    right: firstElement.x + firstElement.width,
+    bottom: firstElement.y + firstElement.heigth,
+  };
 
-  repositionChildrens(state, parent, {
-    x: variations.varX,
-    y: variations.varY,
-  });
+  for (let z = 1; z < selecteds.length; z++) {
+    let elementSelected = state.draws[selecteds[z]];
+    if (elementSelected.x < childrenLimitPoints.left)
+      childrenLimitPoints.left = elementSelected.x;
+    if (elementSelected.y < childrenLimitPoints.top)
+      childrenLimitPoints.top = elementSelected.y;
+    if (elementSelected.x + elementSelected.width > childrenLimitPoints.right)
+      childrenLimitPoints.right = elementSelected.x + elementSelected.width;
+    if (elementSelected.y + elementSelected.heigth > childrenLimitPoints.bottom)
+      childrenLimitPoints.bottom = elementSelected.y + elementSelected.heigth;
+  }
+
+  let drawLimitPoints = {
+    left: positionBoardRelative.x,
+    top: positionBoardRelative.y,
+    right: positionBoardRelative.x + parent.width,
+    bottom: positionBoardRelative.y + parent.heigth,
+  };
+
+  autoResizeDraws(state, parent, padding, childrenLimitPoints, drawLimitPoints);
+
+  if (parent.parent) {
+    let grandParent = state.draws[parent.parent];
+    autoResizeGrandParent(state, parent, grandParent, padding);
+  }
 };
 
-const autoResizeGrandParents = (state, parent, padding) => {
-  if (!parent.parent) return;
-
-  const grandParent = state.draws[parent.parent];
-
-  const limits = {
+const autoResizeGrandParent = (state, parent, grandParent, padding) => {
+  let childrenLimitPoints = {
     left: parent.x,
     top: parent.y,
     right: parent.x + parent.width,
     bottom: parent.y + parent.heigth,
   };
 
-  const variations = calculoDoQuadrado(grandParent, padding, limits);
+  let drawLimitPoints = {
+    left: 0,
+    top: 0,
+    right: grandParent.width,
+    bottom: grandParent.heigth,
+  };
 
-  //   let variationX = 0;
-  //   let variationY = 0;
-  //   let variationW = 0;
-  //   let variationH = 0;
-  //   let isUpdated = false;
+  autoResizeDraws(
+    state,
+    grandParent,
+    padding,
+    childrenLimitPoints,
+    drawLimitPoints
+  );
 
-  //   if (parent.x < padding) {
-  //     variationX = parent.x - padding;
+  if (grandParent.parent) {
+    let greatGrandParent = state.draws[grandParent.parent];
+    autoResizeGrandParent(state, grandParent, greatGrandParent, padding);
+  }
+};
 
-  //     grandParent.x = grandParent.x + variationX;
-  //     grandParent.width = grandParent.width - variationX;
-  //     isUpdated = true;
-  //   }
-  //   if (parent.y < padding) {
-  //     variationY = parent.y - padding;
+const autoResizeDraws = (
+  state,
+  draw,
+  padding,
+  childrensLimitPoints,
+  drawLimitPoints
+) => {
+  let variationsFromResize;
 
-  //     grandParent.y = grandParent.y + variationY;
-  //     grandParent.heigth = grandParent.heigth - variationY;
-  //     isUpdated = true;
-  //   }
-  //   if (parent.x + parent.width - variationX > grandParent.width - padding) {
-  //     let calcW = parent.x + parent.width + padding - variationX;
-  //     variationW = calcW - grandParent.width;
-  //     grandParent.width = calcW;
-  //     isUpdated = true;
-  //   }
-  //   if (parent.y + parent.heigth - variationY > grandParent.heigth - padding) {
-  //     let calcH = parent.y + parent.heigth + padding - variationY;
-  //     variationH = calcH - grandParent.heigth;
-  //     grandParent.heigth = calcH;
-  //     isUpdated = true;
-  //   }
+  if (draw.type == drawTypes.DRAW_CIRCLE)
+    variationsFromResize = resizeCircle(
+      draw,
+      padding,
+      childrensLimitPoints,
+      drawLimitPoints
+    );
+  else if (draw.type == drawTypes.DRAW_RECTANGLE)
+    variationsFromResize = resizeRect(
+      draw,
+      padding,
+      childrensLimitPoints,
+      drawLimitPoints
+    );
+  else throw { error: "desenho inválido" };
 
-  //   const variations = {
-  //     varX: variationX,
-  //     varY: variationY,
-  //     varW: variationW,
-  //     varH: variationH,
-  //   };
-
-  repositionChildrens(state, grandParent, {
-    x: variations.varX,
-    y: variations.varY,
+  repositionChildrens(state, draw, {
+    x: variationsFromResize.varX,
+    y: variationsFromResize.varY,
   });
 
-  updateConnectorsFromResize(grandParent, state.connectors, variations);
+  updateConnectorsFromResize(draw, state.connectors, variationsFromResize);
 
-  if (variations.isUpdated) autoResizeGrandParents(state, grandParent, padding);
+  draw.absolutePosition = {
+    x: draw.absolutePosition.x + variationsFromResize.varX,
+    y: draw.absolutePosition.y + variationsFromResize.varY,
+  };
 };
 
 const repositionChildrens = (state, drawUpdated, variationsXY) => {
@@ -253,80 +268,6 @@ const updateParentSizeCircle = (
   return newPositions;
 };
 
-const updateParentSizeRect = (state, parent, absolutePosition, padding) => {
-  console.log("atualizando tamanho");
-
-  let selecteds = state.sessionState.drawsSelected;
-  const firstElement = state.draws[selecteds[0]];
-
-  let limits = {
-    left: firstElement.x,
-    top: firstElement.y,
-    right: firstElement.x + firstElement.width,
-    bottom: firstElement.y + firstElement.heigth,
-  };
-
-  for (let z = 1; z < selecteds.length; z++) {
-    let elementSelected = state.draws[selecteds[z]];
-    if (elementSelected.x < limits.left) limits.left = elementSelected.x;
-    if (elementSelected.y < limits.top) limits.top = elementSelected.y;
-    if (elementSelected.x + elementSelected.width > limits.right)
-      limits.right = elementSelected.x + elementSelected.width;
-    if (elementSelected.y + elementSelected.heigth > limits.bottom)
-      limits.bottom = elementSelected.y + elementSelected.heigth;
-  }
-
-  const newPositions = calculoDoQuadrado(
-    parent,
-    padding,
-    limits,
-    absolutePosition
-  );
-
-  //   let variationX = 0;
-  //   let variationY = 0;
-  //   let variationH = 0;
-  //   let variationW = 0;
-
-  //   if (minX < absolutePosition.x + padding) {
-  //     variationX = minX - (absolutePosition.x + padding);
-
-  //     parent.x = parent.x + variationX;
-  //     parent.width = parent.width - variationX;
-  //   }
-  //   if (minY < absolutePosition.y + padding) {
-  //     variationY = minY - (absolutePosition.y + padding);
-
-  //     parent.y = parent.y + variationY;
-  //     parent.heigth = parent.heigth - variationY;
-  //   }
-  //   if (maxRight > absolutePosition.x + variationX + parent.width - padding) {
-  //     variationW =
-  //       maxRight + padding - (absolutePosition.x + variationX + parent.width);
-  //     parent.width = parent.width + variationW;
-  //   }
-  //   if (maxBottom > absolutePosition.y + variationY + parent.heigth - padding) {
-  //     variationH =
-  //       maxBottom + padding - (absolutePosition.y + variationY + parent.heigth);
-  //     parent.heigth = parent.heigth + variationH;
-  //   }
-
-  //   const newPositions = {
-  //     x: absolutePosition.x + variationX,
-  //     y: absolutePosition.y + variationY,
-  //     varX: variationX,
-  //     varY: variationY,
-  //     varW: variationW,
-  //     varH: variationH,
-  //   };
-
-  updateConnectorsFromResize(parent, state.connectors, newPositions);
-
-  parent.absolutePosition = { x: newPositions.x, y: newPositions.y };
-
-  return newPositions;
-};
-
 const updateConnectorsFromResize = (draw, connectorsList, variants) => {
   for (let i = 0; i < draw.connectors.length; i++) {
     const connRef = draw.connectors[i];
@@ -377,11 +318,11 @@ const updateChildrensPositionOnParentResize = (children, variation) => {
   children.y = children.y - variation.y;
 };
 
-const calculoDoQuadrado = (
+const resizeRect = (
   drawToResize,
   padding,
-  limitPoints,
-  absolutePosition = { x: 0, y: 0 }
+  childrensLimitPoints,
+  drawLimitPoints
 ) => {
   let variationX = 0;
   let variationY = 0;
@@ -389,33 +330,48 @@ const calculoDoQuadrado = (
   let variationH = 0;
   let isUpdated = false;
 
-  if (limitPoints.left < absolutePosition.x + padding) {
-    variationX = limitPoints.left - (absolutePosition.x + padding);
+  //comparando esquerda
+  if (childrensLimitPoints.left < drawLimitPoints.left + padding) {
+    variationX = childrensLimitPoints.left - (drawLimitPoints.left + padding);
 
     drawToResize.x = drawToResize.x + variationX;
     drawToResize.width = drawToResize.width - variationX;
     isUpdated = true;
   }
-  if (limitPoints.top < absolutePosition.y + padding) {
-    variationY = limitPoints.top - (absolutePosition.y + padding);
+
+  //comparando topo
+  if (childrensLimitPoints.top < drawLimitPoints.top + padding) {
+    variationY = childrensLimitPoints.top - (drawLimitPoints.top + padding);
 
     drawToResize.y = drawToResize.y + variationY;
     drawToResize.heigth = drawToResize.heigth - variationY;
     isUpdated = true;
   }
-  if (
-    limitPoints.right - variationX >
-    absolutePosition.x + drawToResize.width - padding
-  ) {
-    let calcW = limitPoints.right + padding - (absolutePosition.x + variationX);
+
+  //comparando direita
+  if (childrensLimitPoints.right > drawLimitPoints.right - padding) {
+    //calcular nova largura
+    let calcW =
+      childrensLimitPoints.right +
+      padding -
+      (drawLimitPoints.left + variationX);
+    //comparar largura anterior e nova
     variationW = calcW - drawToResize.width;
+    //definir nova largura
     drawToResize.width = calcW;
     isUpdated = true;
   }
-  if (limitPoints.bottom - variationY > drawToResize.heigth - padding) {
+
+  //comparando baixo
+  if (childrensLimitPoints.bottom > drawLimitPoints.bottom - padding) {
+    //calcular nova altura
     let calcH =
-      limitPoints.bottom + padding - (absolutePosition.y + variationY);
+      childrensLimitPoints.bottom +
+      padding -
+      (drawLimitPoints.top + variationY);
+    //comparar altura anterior e nova
     variationH = calcH - drawToResize.heigth;
+    //definir nova altura
     drawToResize.heigth = calcH;
     isUpdated = true;
   }
@@ -429,4 +385,126 @@ const calculoDoQuadrado = (
   };
 
   return variations;
+};
+
+const resizeCircle = (
+  drawToResize,
+  padding,
+  childrensLimitPoints,
+  drawLimitPoints
+) => {
+  const radius = Math.max(drawToResize.width, drawToResize.heigth) / 2;
+
+  const calcHipotenusa = (pointA, PointB) => {
+    const adjacent = Math.abs(pointA.x - PointB.x);
+    const oposite = Math.abs(pointA.y - PointB.y);
+
+    return Math.sqrt(adjacent * adjacent + oposite * oposite);
+  };
+
+  const rectToCircleDiagonal = Math.sqrt(2 * (radius * radius)) - radius;
+  const rectToCircle = Math.sqrt(
+    (rectToCircleDiagonal * rectToCircleDiagonal) / 2
+  );
+
+  let pointTopLeftDraw = {
+    x: drawLimitPoints.left + rectToCircle,
+    y: drawLimitPoints.top + rectToCircle,
+  };
+  let pointTopRightDraw = {
+    x: drawLimitPoints.right - rectToCircle,
+    y: drawLimitPoints.top + rectToCircle,
+  };
+  let pointBottomRightDraw = {
+    x: drawLimitPoints.right - rectToCircle,
+    y: drawLimitPoints.bottom - rectToCircle,
+  };
+  let pointBottomLeftDraw = {
+    x: drawLimitPoints.left + rectToCircle,
+    y: drawLimitPoints.bottom - rectToCircle,
+  };
+
+  let actualCenterPoint = {
+    x: (drawLimitPoints.left + drawLimitPoints.right) / 2,
+    y: (drawLimitPoints.top + drawLimitPoints.bottom) / 2,
+  };
+
+  let pointsToCalc = [
+    pointTopLeftDraw,
+    pointTopRightDraw,
+    pointBottomRightDraw,
+    pointBottomLeftDraw,
+  ];
+
+  let pointTopLeft = {
+    x: childrensLimitPoints.left,
+    y: childrensLimitPoints.top,
+  };
+  let pointTopRight = {
+    x: childrensLimitPoints.right,
+    y: childrensLimitPoints.top,
+  };
+  let pointBottomRight = {
+    x: childrensLimitPoints.right,
+    y: childrensLimitPoints.bottom,
+  };
+  let pointBottomLeft = {
+    x: childrensLimitPoints.left,
+    y: childrensLimitPoints.bottom,
+  };
+
+  if (calcHipotenusa(actualCenterPoint, pointTopLeft) > radius)
+    pointsToCalc.push(pointTopLeft);
+  if (calcHipotenusa(actualCenterPoint, pointTopRight) > radius)
+    pointsToCalc.push(pointTopRight);
+  if (calcHipotenusa(actualCenterPoint, pointBottomRight) > radius)
+    pointsToCalc.push(pointBottomRight);
+  if (calcHipotenusa(actualCenterPoint, pointBottomLeft) > radius)
+    pointsToCalc.push(pointBottomLeft);
+
+  const centerX =
+    pointsToCalc.reduce((p, c) => {
+      return p + c.x;
+    }, 0) / pointsToCalc.length;
+  const centerY =
+    pointsToCalc.reduce((p, c) => {
+      return p + c.y;
+    }, 0) / pointsToCalc.length;
+
+  const newCenterPoint = { x: centerX, y: centerY };
+
+  const pointsDistancesToCenter = pointsToCalc.reduce((p, c) => {
+    p.push(calcHipotenusa(newCenterPoint, c));
+    return p;
+  }, []);
+
+  const newRadius = Math.max(...pointsDistancesToCenter);
+
+  const newPosition = {
+    x: newCenterPoint.x - newRadius,
+    y: newCenterPoint.y - newRadius,
+  };
+
+  //drawToResize.resizePoints = [...pointsToCalc, actualCenterPoint];
+
+  let variationX = newPosition.x - drawLimitPoints.left;
+  let variationY = newPosition.y - drawLimitPoints.top;
+  let variationH = newRadius * 2 - drawToResize.heigth + variationY;
+  let variationW = newRadius * 2 - drawToResize.width + variationX;
+
+  drawToResize.x += variationX;
+  drawToResize.y += variationY;
+  drawToResize.heigth = newRadius * 2;
+  drawToResize.width = newRadius * 2;
+
+  const newPositions = {
+    x: newPosition.x,
+    y: newPosition.y,
+    varX: variationX,
+    varY: variationY,
+    varW: variationW,
+    varH: variationH,
+  };
+
+  return newPositions;
 };

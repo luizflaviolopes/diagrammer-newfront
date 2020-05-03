@@ -45,6 +45,8 @@ export const drawdrop = (state, actionPayload) => {
       actionPayload
     );
 
+    parent.absolutePosition = positionBoardRelative;
+
     autoResize(state, parent, positionBoardRelative, padding);
 
     for (let a = 0; a < selecteds.length; a++) {
@@ -94,6 +96,7 @@ export const drawAdd = (state, actionPayload) => {
     connectors: [],
     parent: undefined,
     childrens: [],
+    absolutePosition: { ...positionBoardRelative },
   };
 
   state.draws[newID] = newDraw;
