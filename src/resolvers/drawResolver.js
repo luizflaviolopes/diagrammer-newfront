@@ -4,7 +4,7 @@ import { drop } from "../actions/drawing";
 import { removeFromArray } from "../helpers/arrayManipulation";
 import { getPositionBoardRelative } from "../helpers/getPositionBoardRelative";
 import * as drawTypes from "../types/drawTypes";
-import { autoResize } from "./calcs/resize";
+import { autoResize, manualResize } from "./calcs/resize";
 
 export const selectDraw = (state, actionPayload) => {
   const drawId = actionPayload.id;
@@ -244,18 +244,24 @@ const addParentInChildren = (children, parentId) => {
   children.parent = parentId;
 };
 
-// const removeDrawFromParent = (state, drawToRemove) => {
-//   let parent = state.draws[drawToRemove.parent];
-//   let newChildrens = removeFromArray(parent.childrens, drawToRemove.id);
-//   parent.childrens = newChildrens;
-
-//   drawToRemove.parent = undefined;
-// };
-
 const removeDrawFromBoard = (state, drawId) => {
   state.boardDrawZOrder = removeFromArray(state.boardDrawZOrder, +drawId);
 };
 
-const addDrawToBoard = (state, drawId) => {
-  state.boardDrawZOrder.push(drawId);
+export const startResizeDraw = (state, payload) => {
+  const draw = state.draws[payload.id];
+
+  draw.absolutePosition.x = draw.x;
+  draw.absolutePosition.y = draw.y;
+  draw.absolutePosition.heigth = draw.heigth;
+  draw.absolutePosition.width = draw.width;
+
+  return state;
+};
+
+export const resizeDraw = (state, payload) => {
+  const draw = state.draws[payload.id];
+
+  manualResize(draw, payload.position, payload.corner);
+  return state;
 };

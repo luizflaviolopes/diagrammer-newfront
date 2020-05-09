@@ -1,4 +1,5 @@
 import * as drawTypes from "../../types/drawTypes";
+import { startDragDrawListBoxDraw } from "../drawListBoxResolver";
 
 export const autoResize = (state, parent, positionBoardRelative, padding) => {
   autoResizeParent(state, parent, positionBoardRelative, padding);
@@ -507,4 +508,48 @@ const resizeCircle = (
   };
 
   return newPositions;
+};
+
+export const manualResize = (draw, dragPosition, corner) => {
+  for (let i = 0; i < corner.length; i++) {
+    const side = corner[i];
+
+    switch (side) {
+      case "n":
+        resizeN(draw, dragPosition);
+        break;
+      case "e":
+        resizeE(draw, dragPosition);
+        break;
+      case "s":
+        resizeS(draw, dragPosition);
+        break;
+      case "w":
+        resizeW(draw, dragPosition);
+        break;
+    }
+  }
+};
+
+const resizeN = (draw, position) => {
+  const variation = position.y;
+
+  draw.y = draw.absolutePosition.y + variation;
+  draw.heigth = draw.absolutePosition.heigth - variation;
+};
+const resizeE = (draw, position) => {
+  const variation = position.x;
+
+  draw.width = draw.absolutePosition.width + variation;
+};
+const resizeS = (draw, position) => {
+  const variation = position.y;
+
+  draw.heigth = draw.absolutePosition.heigth + variation;
+};
+const resizeW = (draw, position) => {
+  const variation = position.x;
+
+  draw.x = draw.absolutePosition.x + variation;
+  draw.width = draw.absolutePosition.width - variation;
 };
