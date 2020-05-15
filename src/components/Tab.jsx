@@ -26,6 +26,7 @@ const SideTab = styled.div`
     transform: ${(props) =>
       props.side == "left" ? "unset" : "rotate(-180deg)"};
   }
+  text-align: center;
 `;
 
 const InnerDiv = styled.div`

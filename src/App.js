@@ -1,14 +1,20 @@
 import React from "react";
-import logo from "./logo.svg";
-import "./App.css";
-import Board from "./containers/Board";
-import DrawListTab from "./components/DrawListTab";
+import { Router, Link } from "@reach/router";
+import BoardPage from "./pages/BoardPage";
+import LoginPage from "./authentication/pages/LoginPage";
+import "./css/base.css";
+import Amplify, { Auth } from "aws-amplify";
+import awsconfig from "./aws-exports";
+
+Amplify.configure(awsconfig);
 
 function App() {
   return (
     <div className="App">
-      <Board></Board>
-      <DrawListTab></DrawListTab>
+      <Router>
+        <BoardPage path="/"></BoardPage>
+        <LoginPage path="/auth/*"></LoginPage>
+      </Router>
     </div>
   );
 }
