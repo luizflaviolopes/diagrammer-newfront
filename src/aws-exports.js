@@ -18,30 +18,24 @@ export default {
     // Note: if the secure flag is set to true, then the cookie transmission requires a secure protocol
     cookieStorage: {
       // REQUIRED - Cookie domain (only required if cookieStorage is provided)
-      domain: ".yourdomain.com",
-      // OPTIONAL - Cookie path
-      path: "/",
-      // OPTIONAL - Cookie expiration in days
-      expires: 365,
-      // OPTIONAL - Cookie secure flag
-      // Either true or false, indicating if the cookie transmission requires a secure protocol (https).
-      secure: true,
+      domain: "localhost",
+      secure: false,
     },
 
-    // OPTIONAL - Hosted UI configuration
-    oauth: {
-      domain: "your_cognito_domain",
-      scope: [
-        "phone",
-        "email",
-        "profile",
-        "openid",
-        "aws.cognito.signin.user.admin",
-      ],
-      redirectSignIn: "http://localhost:3000/",
-      redirectSignOut: "http://localhost:3000/",
-      responseType: "code", // or 'token', note that REFRESH token will only be generated when the responseType is code
-    },
+    // // OPTIONAL - Hosted UI configuration
+    // oauth: {
+    //   domain: "your_cognito_domain",
+    //   scope: [
+    //     "phone",
+    //     "email",
+    //     "profile",
+    //     "openid",
+    //     "aws.cognito.signin.user.admin",
+    //   ],
+    //   redirectSignIn: "http://localhost:3000/",
+    //   redirectSignOut: "http://localhost:3000/",
+    //   responseType: "code", // or 'token', note that REFRESH token will only be generated when the responseType is code
+    // },
   },
 };
 

@@ -24,6 +24,7 @@ const Login = () => {
 
     try {
       const user = await Auth.signIn(userName, password);
+      console.log(user);
     } catch (error) {
       if (error.code == "NotAuthorizedException")
         setErrors([
