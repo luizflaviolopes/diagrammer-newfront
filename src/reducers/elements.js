@@ -9,7 +9,7 @@ const setState = () => ({
   boardView: {
     x: 0,
     y: 0,
-    zoom: 1.5,
+    zoom: 1,
   },
   counters: {
     draws: 1,
@@ -47,6 +47,10 @@ export default (state = setState(), action = {}) => {
       return drawResolver.drawAdd({ ...state }, action.payload);
     case actionTypes.BOARD_SELECTION_CLEAR:
       return drawResolver.clearAllSelections({ ...state }, action.payload);
+    case actionTypes.BOARD_DRAW_START_RESIZE:
+      return drawResolver.startResizeDraw({ ...state }, action.payload);
+    case actionTypes.BOARD_DRAW_RESIZE:
+      return drawResolver.resizeDraw({ ...state }, action.payload);
 
     //connector actions
 
@@ -87,6 +91,11 @@ export default (state = setState(), action = {}) => {
         { ...state },
         action.payload
       );
+    case "teste":
+      let newstate = { ...state };
+      newstate.boardView = { ...newstate.boardView };
+      newstate.boardView.zoom = action.payload.zoom;
+      return newstate;
 
     default:
       return state;
