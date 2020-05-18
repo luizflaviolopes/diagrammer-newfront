@@ -4,7 +4,13 @@ import { drop } from "../actions/drawing";
 import { removeFromArray } from "../helpers/arrayManipulation";
 import { getPositionBoardRelative } from "../helpers/getPositionBoardRelative";
 import * as drawTypes from "../types/drawTypes";
-import { autoResize, manualResize } from "./calcs/resize";
+import {
+  autoResize,
+  manualResize,
+  findLimitPointsFromDrawArray,
+} from "./calcs/resize";
+
+const padding = 10;
 
 export const selectDraw = (state, actionPayload) => {
   const drawId = actionPayload.id;
@@ -38,7 +44,6 @@ export const drawdrop = (state, actionPayload) => {
 
   if (actionPayload.id) {
     const parent = state.draws[actionPayload.id];
-    const padding = 10;
 
     const positionBoardRelative = getPositionBoardRelative(
       state,
@@ -249,6 +254,8 @@ const removeDrawFromBoard = (state, drawId) => {
 };
 
 export const startResizeDraw = (state, payload) => {
+  clearAllSelections(state);
+
   const draw = state.draws[payload.id];
 
   draw.absolutePosition.x = draw.x;
@@ -256,12 +263,40 @@ export const startResizeDraw = (state, payload) => {
   draw.absolutePosition.heigth = draw.heigth;
   draw.absolutePosition.width = draw.width;
 
+  let childrensIds = draw.childrens;
+  let childrenElements = childrensIds.map((id) => {
+    return state.draws[id];
+  });
+
+  for (let i = 0; i < childrenElements.length; i++) {
+    let children = childrenElements[i];
+
+    children.absolutePosition = { x: children.x, y: children.y };
+  }
+
+  if (childrensIds.length > 0) {
+    const limits = findLimitPointsFromDrawArray(childrenElements);
+
+    draw.limitPoints = {
+      top: limits.top - padding,
+      right: limits.right + padding,
+      bottom: limits.bottom + padding,
+      left: limits.left - padding,
+    };
+  } else
+    draw.limitPoints = {
+      top: draw.heigth - padding,
+      right: padding,
+      bottom: padding,
+      left: draw.width - padding,
+    };
+
   return state;
 };
 
 export const resizeDraw = (state, payload) => {
   const draw = state.draws[payload.id];
 
-  manualResize(draw, payload.position, payload.corner);
+  manualResize(state, draw, payload.position, payload.corner);
   return state;
 };
