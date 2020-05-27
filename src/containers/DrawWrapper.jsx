@@ -37,7 +37,7 @@ class DrawWrapper extends Component {
       let points = elementsConnectorPointsCalculator(
         this.props.type,
         this.props.width,
-        this.props.heigth,
+        this.props.height,
         this.props.radius
       );
 

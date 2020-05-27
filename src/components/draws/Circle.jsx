@@ -2,7 +2,7 @@ import React from "react";
 
 const Circle = (props) => {
   const radius =
-    props.width > props.heigth ? props.width / 2 : props.heigth / 2;
+    props.width > props.height ? props.width / 2 : props.height / 2;
 
   return (
     <React.Fragment>

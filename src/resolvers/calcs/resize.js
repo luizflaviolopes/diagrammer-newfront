@@ -1,5 +1,6 @@
 import * as drawTypes from "../../types/drawTypes";
 import { startDragDrawListBoxDraw } from "../drawListBoxResolver";
+import { updateConnectors } from "../drawResolver";
 
 export const autoResize = (state, parent, positionBoardRelative, padding) => {
   autoResizeParent(state, parent, positionBoardRelative, padding);
@@ -12,7 +13,7 @@ export const findLimitPointsFromDrawArray = (elementArray) => {
     left: firstElement.x,
     top: firstElement.y,
     right: firstElement.x + firstElement.width,
-    bottom: firstElement.y + firstElement.heigth,
+    bottom: firstElement.y + firstElement.height,
   };
 
   for (let z = 1; z < elementArray.length; z++) {
@@ -23,8 +24,8 @@ export const findLimitPointsFromDrawArray = (elementArray) => {
       childrenLimitPoints.top = elementSelected.y;
     if (elementSelected.x + elementSelected.width > childrenLimitPoints.right)
       childrenLimitPoints.right = elementSelected.x + elementSelected.width;
-    if (elementSelected.y + elementSelected.heigth > childrenLimitPoints.bottom)
-      childrenLimitPoints.bottom = elementSelected.y + elementSelected.heigth;
+    if (elementSelected.y + elementSelected.height > childrenLimitPoints.bottom)
+      childrenLimitPoints.bottom = elementSelected.y + elementSelected.height;
   }
 
   return childrenLimitPoints;
@@ -43,7 +44,7 @@ const autoResizeParent = (state, parent, positionBoardRelative, padding) => {
     left: positionBoardRelative.x,
     top: positionBoardRelative.y,
     right: positionBoardRelative.x + parent.width,
-    bottom: positionBoardRelative.y + parent.heigth,
+    bottom: positionBoardRelative.y + parent.height,
   };
 
   autoResizeDraws(state, parent, padding, childrenLimitPoints, drawLimitPoints);
@@ -59,14 +60,14 @@ const autoResizeGrandParent = (state, parent, grandParent, padding) => {
     left: parent.x,
     top: parent.y,
     right: parent.x + parent.width,
-    bottom: parent.y + parent.heigth,
+    bottom: parent.y + parent.height,
   };
 
   let drawLimitPoints = {
     left: 0,
     top: 0,
     right: grandParent.width,
-    bottom: grandParent.heigth,
+    bottom: grandParent.height,
   };
 
   autoResizeDraws(
@@ -140,7 +141,7 @@ const updateParentSizeCircle = (
   paddingFull
 ) => {
   const padding = paddingFull / 2;
-  const radius = Math.max(parent.width, parent.heigth) / 2;
+  const radius = Math.max(parent.width, parent.height) / 2;
 
   console.log("atualizando tamanho");
   let variationX = 0;
@@ -172,11 +173,11 @@ const updateParentSizeCircle = (
   };
   let pointBottomRight = {
     x: parent.x + parent.width - rectToCircle,
-    y: parent.y + parent.heigth - rectToCircle,
+    y: parent.y + parent.height - rectToCircle,
   };
   let pointBottomLeft = {
     x: parent.x + rectToCircle,
-    y: parent.y + parent.heigth - rectToCircle,
+    y: parent.y + parent.height - rectToCircle,
   };
 
   for (let z = 0; z < selecteds.length; z++) {
@@ -192,19 +193,19 @@ const updateParentSizeCircle = (
       pointTopRight = { x: dropped.x + dropped.width, y: dropped.y };
 
     if (
-      (dropped.x + dropped.width) * (dropped.y + dropped.heigth) >
+      (dropped.x + dropped.width) * (dropped.y + dropped.height) >
       pointBottomRight.x * pointBottomRight.y
     )
       pointBottomRight = {
         x: dropped.x + dropped.width,
-        y: dropped.y + dropped.heigth,
+        y: dropped.y + dropped.height,
       };
 
     if (
-      (dropped.y + dropped.heigth) / dropped.x >
+      (dropped.y + dropped.height) / dropped.x >
       pointBottomLeft.y / pointBottomLeft.x
     )
-      pointBottomLeft = { x: dropped.x, y: dropped.y + dropped.heigth };
+      pointBottomLeft = { x: dropped.x, y: dropped.y + dropped.height };
   }
 
   const centerX =
@@ -256,12 +257,12 @@ const updateParentSizeCircle = (
 
   variationX = newPosition.x - parent.x;
   variationY = newPosition.y - parent.y;
-  variationH = newRadius - parent.heigth;
+  variationH = newRadius - parent.height;
   variationW = newRadius - parent.width;
 
   parent.x = newPosition.x;
   parent.y = newPosition.y;
-  parent.heigth = newRadius * 2;
+  parent.height = newRadius * 2;
   parent.width = newRadius * 2;
 
   const newPositions = {
@@ -356,7 +357,7 @@ const resizeRect = (
     variationY = childrensLimitPoints.top - (drawLimitPoints.top + padding);
 
     drawToResize.y = drawToResize.y + variationY;
-    drawToResize.heigth = drawToResize.heigth - variationY;
+    drawToResize.height = drawToResize.height - variationY;
     isUpdated = true;
   }
 
@@ -382,9 +383,9 @@ const resizeRect = (
       padding -
       (drawLimitPoints.top + variationY);
     //comparar altura anterior e nova
-    variationH = calcH - drawToResize.heigth;
+    variationH = calcH - drawToResize.height;
     //definir nova altura
-    drawToResize.heigth = calcH;
+    drawToResize.height = calcH;
     isUpdated = true;
   }
 
@@ -405,7 +406,7 @@ const resizeCircle = (
   childrensLimitPoints,
   drawLimitPoints
 ) => {
-  const radius = Math.max(drawToResize.width, drawToResize.heigth) / 2;
+  const radius = Math.max(drawToResize.width, drawToResize.height) / 2;
 
   const calcHipotenusa = (pointA, PointB) => {
     const adjacent = Math.abs(pointA.x - PointB.x);
@@ -501,12 +502,12 @@ const resizeCircle = (
 
   let variationX = newPosition.x - drawLimitPoints.left;
   let variationY = newPosition.y - drawLimitPoints.top;
-  let variationH = newRadius * 2 - drawToResize.heigth + variationY;
+  let variationH = newRadius * 2 - drawToResize.height + variationY;
   let variationW = newRadius * 2 - drawToResize.width + variationX;
 
   drawToResize.x += variationX;
   drawToResize.y += variationY;
-  drawToResize.heigth = newRadius * 2;
+  drawToResize.height = newRadius * 2;
   drawToResize.width = newRadius * 2;
 
   const newPositions = {
@@ -522,13 +523,9 @@ const resizeCircle = (
 };
 
 export const manualResize = (state, draw, dragPosition, corner) => {
-  // let childrenElements = draw.childrens.map((id) => {
-  //   return state.draws[id];
-  // });
-
-  // let limitpoints = childrenElements.length > 0 ? findLimitPointsFromDrawArray(childrenElements):
-
   let limitpoints = draw.limitPoints;
+
+  const variations = {};
 
   for (let i = 0; i < corner.length; i++) {
     const side = corner[i];
@@ -537,55 +534,68 @@ export const manualResize = (state, draw, dragPosition, corner) => {
       case "n":
         const variationY = resizeN(draw, dragPosition, limitpoints.top);
         repositionChildrensFromAbsolutePosition(state, draw, variationY);
+        variations.varN = variationY.relative;
         break;
       case "e":
-        resizeE(draw, dragPosition, limitpoints.right);
+        const variationE = resizeE(draw, dragPosition, limitpoints.right);
+        variations.varE = variationE;
         break;
       case "s":
-        resizeS(draw, dragPosition, limitpoints.bottom);
+        const variationS = resizeS(draw, dragPosition, limitpoints.bottom);
+        variations.varS = variationS;
         break;
       case "w":
         const variationX = resizeW(draw, dragPosition, limitpoints.left);
         repositionChildrensFromAbsolutePosition(state, draw, variationX);
+        variations.varW = variationX.relative;
         break;
     }
   }
+
+  return variations;
 };
 
 const resizeN = (draw, position, limit) => {
   let variation = position.y;
+  const lastY = draw.y;
 
   if (variation > limit) variation = limit;
 
   draw.y = draw.absolutePosition.y + variation;
-  draw.heigth = draw.absolutePosition.heigth - variation;
+  draw.height = draw.absolutePosition.height - variation;
 
-  return { y: variation, x: undefined };
+  return { y: variation, x: undefined, relative: draw.y - lastY };
 };
 const resizeE = (draw, position, limit) => {
   const variation = position.x;
+  const lastWidth = draw.width;
   let newWidth = draw.absolutePosition.width + variation;
 
   if (newWidth < limit) newWidth = limit;
   draw.width = newWidth;
+
+  return draw.width - lastWidth;
 };
 const resizeS = (draw, position, limit) => {
   const variation = position.y;
-  let newHeigth = draw.absolutePosition.heigth + variation;
+  const lastHeight = draw.height;
+  let newheight = draw.absolutePosition.height + variation;
 
-  if (newHeigth < limit) newHeigth = limit;
+  if (newheight < limit) newheight = limit;
+  draw.height = newheight;
 
-  draw.heigth = newHeigth;
+  return draw.height - lastHeight;
 };
 const resizeW = (draw, position, limit) => {
   let variation = position.x;
+  const lastX = draw.x;
 
   if (variation > limit) variation = limit;
 
   draw.x = draw.absolutePosition.x + variation;
   draw.width = draw.absolutePosition.width - variation;
 
-  return { x: variation, y: undefined };
+  return { x: variation, y: undefined, relative: draw.x - lastX };
 };
 
 const repositionChildrensFromAbsolutePosition = (
@@ -606,5 +616,126 @@ const repositionChildrensFromAbsolutePosition = (
 
       children.y = children.absolutePosition.y - variation.y;
     }
+  }
+};
+
+export const repositionSiblingsFromManualResize = (
+  state,
+  draw,
+  siblings,
+  variations
+) => {
+  const margin = 20;
+
+  const drawAbsoluteLimits = {
+    top: draw.absolutePosition.y,
+    right: draw.absolutePosition.x + draw.absolutePosition.width,
+    bottom: draw.absolutePosition.y + draw.absolutePosition.height,
+    left: draw.absolutePosition.x,
+  };
+
+  const drawLimits = {
+    top: draw.y,
+    right: draw.x + draw.width,
+    bottom: draw.y + draw.height,
+    left: draw.x,
+  };
+
+  for (let i = 0; i < siblings.length; i++) {
+    const sibling = siblings[i];
+    const connectorVariation = { x: 0, y: 0 };
+
+    const siblingLimits = {
+      top: sibling.y,
+      right: sibling.x + sibling.width,
+      bottom: sibling.y + sibling.height,
+      left: sibling.x,
+    };
+
+    if (
+      variations.varN &&
+      checkIfRepositionNorthNeeded(
+        drawLimits,
+        siblingLimits,
+        drawAbsoluteLimits,
+        "n"
+      )
+    ) {
+      sibling.y += variations.varN;
+      connectorVariation.y = variations.varN;
+    }
+
+    if (
+      variations.varE &&
+      sibling.x > drawAbsoluteLimits.right &&
+      siblingLimits.left < drawLimits.right + margin
+    ) {
+      console.log(variations.varE);
+      sibling.x += variations.varE;
+      connectorVariation.x = variations.varE;
+    }
+
+    if (
+      variations.varS &&
+      sibling.y > drawAbsoluteLimits.bottom &&
+      siblingLimits.top < drawLimits.bottom + margin
+    ) {
+      sibling.y += variations.varS;
+      connectorVariation.y = variations.varS;
+    }
+
+    if (
+      variations.varW &&
+      sibling.x < drawAbsoluteLimits.left &&
+      siblingLimits.right > drawLimits.left - margin
+    ) {
+      sibling.x += variations.varW;
+      connectorVariation.x = variations.varW;
+    }
+
+    if (connectorVariation.x > 0 || connectorVariation.y > 0)
+      updateConnectors(draw, state, connectorVariation);
+  }
+};
+
+const checkIfRepositionNorthNeeded = (
+  drawLimits,
+  drawAbsoluteLimits,
+  siblingLimits,
+  hemisphere
+) => {
+  const margin = 20;
+  switch (hemisphere) {
+    case "n":
+      //verificar bottom
+      if (
+        siblingLimits.bottom < drawAbsoluteLimits.top &&
+        siblingLimits.bottom > drawLimits.top - margin
+      ) {
+        if (
+          siblingLimits.right > drawLimits.left - margin &&
+          siblingLimits.right < drawLimits.right + margin
+        )
+          return true;
+        if (
+          siblingLimits.left < drawLimits.right + margin &&
+          siblingLimits.left > drawLimits.left - margin
+        )
+          return true;
+      }
+      break;
+    case "e":
+      if (siblingLimits.left < drawLimits.right - margin) {
+        if (
+          siblingLimits.right > drawLimits.left - margin &&
+          siblingLimits.right < drawLimits.right + margin
+        )
+          return true;
+        if (
+          siblingLimits.left < drawLimits.right + margin &&
+          siblingLimits.left > drawLimits.left - margin
+        )
+          return true;
+      }
   }
 };

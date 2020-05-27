@@ -8,6 +8,7 @@ import {
   autoResize,
   manualResize,
   findLimitPointsFromDrawArray,
+  repositionSiblingsFromManualResize,
 } from "./calcs/resize";
 
 const padding = 10;
@@ -95,7 +96,7 @@ export const drawAdd = (state, actionPayload) => {
     type: actionPayload.type,
     text: "",
     ...positionBoardRelative,
-    heigth: 100,
+    height: 100,
     width: 100,
     id: newID,
     connectors: [],
@@ -213,7 +214,7 @@ const updateChildrensLastPosition = (state, draw) => {
   }
 };
 
-const updateConnectors = (draw, state, onMouseMovePositionVariant) => {
+export const updateConnectors = (draw, state, onMouseMovePositionVariant) => {
   const connectorsList = state.connectors;
   for (let i = 0; i < draw.connectors.length; i++) {
     console.log("Atualizando conector.");
@@ -260,7 +261,7 @@ export const startResizeDraw = (state, payload) => {
 
   draw.absolutePosition.x = draw.x;
   draw.absolutePosition.y = draw.y;
-  draw.absolutePosition.heigth = draw.heigth;
+  draw.absolutePosition.height = draw.height;
   draw.absolutePosition.width = draw.width;
 
   let childrensIds = draw.childrens;
@@ -285,7 +286,7 @@ export const startResizeDraw = (state, payload) => {
     };
   } else
     draw.limitPoints = {
-      top: draw.heigth - padding,
+      top: draw.height - padding,
       right: padding,
       bottom: padding,
       left: draw.width - padding,
@@ -297,6 +298,43 @@ export const startResizeDraw = (state, payload) => {
 export const resizeDraw = (state, payload) => {
   const draw = state.draws[payload.id];
 
-  manualResize(state, draw, payload.position, payload.corner);
+  const positionBoardRelative = getPositionBoardRelative(
+    state,
+    payload.position
+  );
+
+  const variations = manualResize(
+    state,
+    draw,
+    positionBoardRelative,
+    payload.corner
+  );
+
+  const siblings = getSiblings(state, draw);
+
+  repositionSiblingsFromManualResize(state, draw, siblings, variations);
+
   return state;
+};
+
+const getSiblings = (state, draw) => {
+  let allChildrens;
+
+  if (draw.parent) {
+    const parent = state.draws[draw.parent];
+    allChildrens = parent.childrens;
+  } else {
+    allChildrens = state.boardDrawZOrder;
+  }
+
+  const siblings = [];
+
+  for (let i = 0; i < allChildrens.length; i++) {
+    if (allChildrens[i] != draw.id) {
+      const children = state.draws[allChildrens[i]];
+      siblings.push(children);
+    }
+  }
+
+  return siblings;
 };
