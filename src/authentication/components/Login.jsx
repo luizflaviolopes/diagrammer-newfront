@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "@reach/router";
+import { Link, useNavigate } from "@reach/router";
 import { Auth } from "aws-amplify";
 import ButtonWait from "./ButtonWait";
 
@@ -8,6 +8,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState([]);
   const [wait, setWait] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (evt) => {
     evt.preventDefault();
@@ -24,7 +25,8 @@ const Login = () => {
 
     try {
       const user = await Auth.signIn(userName, password);
-      console.log(user);
+
+      navigate("/diagrams");
     } catch (error) {
       if (error.code == "NotAuthorizedException")
         setErrors([
@@ -44,11 +46,13 @@ const Login = () => {
         <p className="attribute-validation">{err.message}</p>
       ))}
       <input
+        id="email"
         type="text"
         placeholder="e-mail"
         onChange={(evt) => setUserName(evt.target.value)}
       />
       <input
+        id="password"
         type="password"
         placeholder="senha"
         onChange={(evt) => setPassword(evt.target.value)}
