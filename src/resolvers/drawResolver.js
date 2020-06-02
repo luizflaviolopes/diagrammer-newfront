@@ -9,6 +9,7 @@ import {
   manualResize,
   findLimitPointsFromDrawArray,
   repositionSiblingsFromManualResize,
+  autoResizeFromResizeChildren,
 } from "./calcs/resize";
 
 const padding = 10;
@@ -303,6 +304,13 @@ export const resizeDraw = (state, payload) => {
     payload.position
   );
 
+  const drawLimitsBeforeResize = {
+    top: draw.y,
+    right: draw.x + draw.width,
+    bottom: draw.y + draw.height,
+    left: draw.x,
+  };
+
   const variations = manualResize(
     state,
     draw,
@@ -312,7 +320,20 @@ export const resizeDraw = (state, payload) => {
 
   const siblings = getSiblings(state, draw);
 
-  repositionSiblingsFromManualResize(state, draw, siblings, variations);
+  repositionSiblingsFromManualResize(
+    state,
+    draw,
+    siblings,
+    variations,
+    drawLimitsBeforeResize
+  );
+
+  if (draw.parent) {
+    autoResizeFromResizeChildren(state, draw, 10, {
+      x: draw.x - drawLimitsBeforeResize.left,
+      y: draw.y - drawLimitsBeforeResize.top,
+    });
+  }
 
   return state;
 };

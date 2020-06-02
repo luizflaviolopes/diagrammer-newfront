@@ -3,7 +3,7 @@ import { startDragDrawListBoxDraw } from "../drawListBoxResolver";
 import { updateConnectors } from "../drawResolver";
 
 export const autoResize = (state, parent, positionBoardRelative, padding) => {
-  autoResizeParent(state, parent, positionBoardRelative, padding);
+  autoResizeFromDropChildren(state, parent, positionBoardRelative, padding);
 };
 
 export const findLimitPointsFromDrawArray = (elementArray) => {
@@ -31,7 +31,12 @@ export const findLimitPointsFromDrawArray = (elementArray) => {
   return childrenLimitPoints;
 };
 
-const autoResizeParent = (state, parent, positionBoardRelative, padding) => {
+const autoResizeFromDropChildren = (
+  state,
+  parent,
+  positionBoardRelative,
+  padding
+) => {
   let selectedsIds = state.sessionState.drawsSelected;
 
   let selectedDraws = selectedsIds.map((id) => {
@@ -47,7 +52,53 @@ const autoResizeParent = (state, parent, positionBoardRelative, padding) => {
     bottom: positionBoardRelative.y + parent.height,
   };
 
-  autoResizeDraws(state, parent, padding, childrenLimitPoints, drawLimitPoints);
+  autoResizeParent(
+    state,
+    parent,
+    childrenLimitPoints,
+    drawLimitPoints,
+    padding
+  );
+};
+
+export const autoResizeFromResizeChildren = (
+  state,
+  children,
+  padding,
+  correction
+) => {
+  const parent = state.draws[children.parent];
+
+  let childrens = parent.childrens.map((id) => {
+    return state.draws[id];
+  });
+
+  let childrenLimitPoints = findLimitPointsFromDrawArray(childrens);
+
+  let drawLimitPoints = {
+    left: 0,
+    top: 0,
+    right: parent.width,
+    bottom: parent.height,
+  };
+
+  autoResizeParent(
+    state,
+    parent,
+    childrenLimitPoints,
+    drawLimitPoints,
+    padding
+  );
+};
+
+const autoResizeParent = (
+  state,
+  parent,
+  childrenLimits,
+  drawLimits,
+  padding
+) => {
+  autoResizeDraws(state, parent, padding, childrenLimits, drawLimits);
 
   if (parent.parent) {
     let grandParent = state.draws[parent.parent];
@@ -623,22 +674,16 @@ export const repositionSiblingsFromManualResize = (
   state,
   draw,
   siblings,
-  variations
+  variations,
+  drawLimitsBeforeResize
 ) => {
   const margin = 20;
 
-  const drawAbsoluteLimits = {
-    top: draw.absolutePosition.y,
-    right: draw.absolutePosition.x + draw.absolutePosition.width,
-    bottom: draw.absolutePosition.y + draw.absolutePosition.height,
-    left: draw.absolutePosition.x,
-  };
-
   const drawLimits = {
-    top: draw.y,
-    right: draw.x + draw.width,
-    bottom: draw.y + draw.height,
-    left: draw.x,
+    top: () => draw.y,
+    right: () => draw.x + draw.width,
+    bottom: () => draw.y + draw.height,
+    left: () => draw.x,
   };
 
   for (let i = 0; i < siblings.length; i++) {
@@ -646,59 +691,76 @@ export const repositionSiblingsFromManualResize = (
     const connectorVariation = { x: 0, y: 0 };
 
     const siblingLimits = {
+      top: () => {
+        return sibling.y;
+      },
+      right: () => {
+        return sibling.x + sibling.width;
+      },
+      bottom: () => {
+        return sibling.y + sibling.height;
+      },
+      left: () => {
+        return sibling.x;
+      },
+    };
+
+    const limitsBeforeReposition = {
       top: sibling.y,
       right: sibling.x + sibling.width,
       bottom: sibling.y + sibling.height,
       left: sibling.x,
     };
 
-    if (
-      variations.varN &&
-      checkIfRepositionNorthNeeded(
+    let positionChanged = false;
+
+    const checkRepositionCaller = (hemisphere) =>
+      checkIfRepositionNeeded(
         drawLimits,
+        drawLimitsBeforeResize,
         siblingLimits,
-        drawAbsoluteLimits,
-        "n"
-      )
-    ) {
+        hemisphere
+      );
+
+    if (variations.varN < 0 && checkRepositionCaller("n")) {
       sibling.y += variations.varN;
       connectorVariation.y = variations.varN;
+      positionChanged = true;
     }
 
-    if (
-      variations.varE &&
-      sibling.x > drawAbsoluteLimits.right &&
-      siblingLimits.left < drawLimits.right + margin
-    ) {
-      console.log(variations.varE);
+    if (variations.varE > 0 && checkRepositionCaller("e")) {
       sibling.x += variations.varE;
       connectorVariation.x = variations.varE;
+      positionChanged = true;
     }
 
-    if (
-      variations.varS &&
-      sibling.y > drawAbsoluteLimits.bottom &&
-      siblingLimits.top < drawLimits.bottom + margin
-    ) {
+    if (variations.varS > 0 && checkRepositionCaller("s")) {
       sibling.y += variations.varS;
       connectorVariation.y = variations.varS;
+      positionChanged = true;
     }
 
-    if (
-      variations.varW &&
-      sibling.x < drawAbsoluteLimits.left &&
-      siblingLimits.right > drawLimits.left - margin
-    ) {
+    if (variations.varW < 0 && checkRepositionCaller("w")) {
       sibling.x += variations.varW;
       connectorVariation.x = variations.varW;
+      positionChanged = true;
     }
+
+    if (positionChanged)
+      repositionSiblingsFromManualResize(
+        state,
+        sibling,
+        siblings,
+        variations,
+        limitsBeforeReposition
+      );
 
     if (connectorVariation.x > 0 || connectorVariation.y > 0)
       updateConnectors(draw, state, connectorVariation);
   }
 };
 
-const checkIfRepositionNorthNeeded = (
+const checkIfRepositionNeeded = (
   drawLimits,
   drawAbsoluteLimits,
   siblingLimits,
@@ -709,33 +771,71 @@ const checkIfRepositionNorthNeeded = (
     case "n":
       //verificar bottom
       if (
-        siblingLimits.bottom < drawAbsoluteLimits.top &&
-        siblingLimits.bottom > drawLimits.top - margin
+        siblingLimits.bottom() < drawAbsoluteLimits.top &&
+        siblingLimits.bottom() > drawLimits.top() - margin
       ) {
         if (
-          siblingLimits.right > drawLimits.left - margin &&
-          siblingLimits.right < drawLimits.right + margin
+          siblingLimits.right() > drawLimits.left() - margin &&
+          siblingLimits.right() < drawLimits.right() + margin
         )
           return true;
         if (
-          siblingLimits.left < drawLimits.right + margin &&
-          siblingLimits.left > drawLimits.left - margin
+          siblingLimits.left() < drawLimits.right() + margin &&
+          siblingLimits.left() > drawLimits.left() - margin
         )
           return true;
       }
       break;
     case "e":
-      if (siblingLimits.left < drawLimits.right - margin) {
+      if (
+        siblingLimits.left() > drawAbsoluteLimits.right &&
+        siblingLimits.left() < drawLimits.right() + margin
+      ) {
         if (
-          siblingLimits.right > drawLimits.left - margin &&
-          siblingLimits.right < drawLimits.right + margin
+          siblingLimits.bottom() > drawLimits.top() - margin &&
+          siblingLimits.bottom() < drawLimits.bottom() + margin
         )
           return true;
         if (
-          siblingLimits.left < drawLimits.right + margin &&
-          siblingLimits.left > drawLimits.left - margin
+          siblingLimits.top() > drawLimits.top() - margin &&
+          siblingLimits.top() < drawLimits.bottom() + margin
         )
           return true;
       }
+      break;
+    case "s":
+      if (
+        siblingLimits.top() > drawAbsoluteLimits.bottom &&
+        siblingLimits.top() < drawLimits.bottom() + margin
+      ) {
+        if (
+          siblingLimits.left() < drawLimits.right() + margin &&
+          siblingLimits.left() > drawLimits.left() - margin
+        )
+          return true;
+        if (
+          siblingLimits.right() > drawLimits.left() - margin &&
+          siblingLimits.right() < drawLimits.right() + margin
+        )
+          return true;
+      }
+      break;
+    case "w":
+      if (
+        siblingLimits.right() < drawAbsoluteLimits.left &&
+        siblingLimits.right() > drawLimits.left() - margin
+      ) {
+        if (
+          siblingLimits.bottom() > drawLimits.top() - margin &&
+          siblingLimits.bottom() < drawLimits.bottom() + margin
+        )
+          return true;
+        if (
+          siblingLimits.top() > drawLimits.top() - margin &&
+          siblingLimits.top() < drawLimits.bottom() + margin
+        )
+          return true;
+      }
+      break;
   }
 };
