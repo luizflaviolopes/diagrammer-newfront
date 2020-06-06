@@ -2,9 +2,11 @@ import React from "react";
 import { Auth } from "aws-amplify";
 import { Link, useNavigate } from "@reach/router";
 import conf from "../../config.js";
+import api from "../../tools/api.js";
 import Slot from "./Slot.jsx";
 import styled from "styled-components";
 import ButtonCreate from "./ButtonCreate.jsx";
+import { useEffect } from "react";
 
 const DiagramsListStyled = styled.div`
   display: flex;
@@ -17,17 +19,12 @@ const DiagramsListStyled = styled.div`
 `;
 
 const DiagramsListPanel = (props) => {
-  const handleCreateDiagram = async (evt) => {
-    const user = await Auth.currentSession();
-    console.log(user);
+  useEffect(() => {
+    fillDiagrams();
+  });
 
-    fetch(conf.apiDomain + "diagrams", {
-      // method: "post",
-      headers: { Authorization: user.getIdToken().jwtToken },
-    })
-      .then((data) => data.json())
-      .then((d) => console.log(d))
-      .catch((err) => console.log(err));
+  const fillDiagrams = () => {
+    api.get("diagrams").then((a) => console.log(a));
   };
 
   return (

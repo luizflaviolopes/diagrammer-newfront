@@ -25,7 +25,6 @@ const Login = () => {
 
     try {
       const user = await Auth.signIn(userName, password);
-
       navigate("/diagrams");
     } catch (error) {
       if (error.code == "NotAuthorizedException")

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { CSSTransition } from "react-transition-group";
 import "../../css/animations.css";
 import IconButton from "./IconButton";
+import api from "../../tools/api";
 
 const ButtonCreateStyled = styled.div`
   width: 100%;
@@ -130,6 +131,12 @@ const InputNameStyled = styled.div`
 `;
 
 const FormNewDiagram = (props) => {
+  const [name, setName] = useState();
+
+  const handleCreateDiagram = async (evt) => {
+    api.post("diagrams/create", { name: name }).then();
+  };
+
   return (
     <CSSTransition
       in={props.in}
@@ -146,6 +153,8 @@ const FormNewDiagram = (props) => {
             name="diagramName"
             id="diagramName"
             required
+            value={name}
+            onChange={(evt) => setName(evt.target.value)}
           />
           <label for="diagramName">Nome</label>
         </InputNameStyled>
@@ -153,6 +162,7 @@ const FormNewDiagram = (props) => {
           icon={AiOutlineCheckCircle}
           size="larger"
           style={{ display: "inline-block" }}
+          onClick={handleCreateDiagram}
         ></IconButton>
         <IconButton
           icon={AiOutlineCloseCircle}
