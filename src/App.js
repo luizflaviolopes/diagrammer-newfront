@@ -12,7 +12,7 @@ function App() {
   return (
     <div className="App">
       <Router>
-        <BoardPage path="/"></BoardPage>
+        <BoardPage default></BoardPage>
         <LoginPage path="/auth/*"></LoginPage>
       </Router>
     </div>

@@ -1,6 +1,6 @@
 import * as drawTypes from "../../types/drawTypes";
 import { startDragDrawListBoxDraw } from "../drawListBoxResolver";
-import { updateConnectors } from "../drawResolver";
+import { updateConnectors, getSiblings } from "../drawResolver";
 
 export const autoResize = (state, parent, positionBoardRelative, padding) => {
   autoResizeFromDropChildren(state, parent, positionBoardRelative, padding);
@@ -61,12 +61,7 @@ const autoResizeFromDropChildren = (
   );
 };
 
-export const autoResizeFromResizeChildren = (
-  state,
-  children,
-  padding,
-  correction
-) => {
+export const autoResizeFromResizeChildren = (state, children, padding) => {
   const parent = state.draws[children.parent];
 
   let childrens = parent.childrens.map((id) => {
@@ -121,7 +116,7 @@ const autoResizeGrandParent = (state, parent, grandParent, padding) => {
     bottom: grandParent.height,
   };
 
-  autoResizeDraws(
+  const variations = autoResizeDraws(
     state,
     grandParent,
     padding,
@@ -133,6 +128,8 @@ const autoResizeGrandParent = (state, parent, grandParent, padding) => {
     let greatGrandParent = state.draws[grandParent.parent];
     autoResizeGrandParent(state, grandParent, greatGrandParent, padding);
   }
+
+  return variations;
 };
 
 const autoResizeDraws = (
@@ -142,6 +139,13 @@ const autoResizeDraws = (
   childrensLimitPoints,
   drawLimitPoints
 ) => {
+  const drawLimitsBeforeResize = {
+    top: draw.y,
+    right: draw.x + draw.width,
+    bottom: draw.y + draw.height,
+    left: draw.x,
+  };
+
   let variationsFromResize;
 
   if (draw.type == drawTypes.DRAW_CIRCLE)
@@ -171,16 +175,31 @@ const autoResizeDraws = (
     x: draw.absolutePosition.x + variationsFromResize.varX,
     y: draw.absolutePosition.y + variationsFromResize.varY,
   };
+
+  const variations = {
+    varN: variationsFromResize.varY,
+    varE: variationsFromResize.varW - variationsFromResize.varX,
+    varS: variationsFromResize.varH - variationsFromResize.varY,
+    varW: variationsFromResize.varX,
+  };
+
+  const siblings = getSiblings(state, draw);
+
+  repositionSiblingsFromManualResize(
+    state,
+    draw,
+    siblings,
+    variations,
+    drawLimitsBeforeResize
+  );
 };
 
 const repositionChildrens = (state, drawUpdated, variationsXY) => {
   //é possível aumentar a performance, separando o calculo para x e y.
   if (variationsXY.x < 0 || variationsXY.y < 0) {
     for (let c = 0; c < drawUpdated.childrens.length; c++) {
-      updateChildrensPositionOnParentResize(
-        state.draws[drawUpdated.childrens[c]],
-        variationsXY
-      );
+      const children = state.draws[drawUpdated.childrens[c]];
+      updateChildrensPositionOnParentResize(children, variationsXY);
     }
   }
 };
@@ -332,13 +351,12 @@ const updateParentSizeCircle = (
   return newPositions;
 };
 
-const updateConnectorsFromResize = (draw, connectorsList, variants) => {
+export const updateConnectorsFromResize = (draw, connectorsList, variants) => {
   for (let i = 0; i < draw.connectors.length; i++) {
     const connRef = draw.connectors[i];
     const conn = connectorsList[connRef.id];
 
-    let varY,
-      varX = 0;
+    let varY, varX;
 
     switch (connRef.angle) {
       case 0: //se w variar em valor diferente de x || se y variar +/- que variação de H|| se h variar
@@ -542,7 +560,7 @@ const resizeCircle = (
     return p;
   }, []);
 
-  const newRadius = Math.max(...pointsDistancesToCenter);
+  const newRadius = Math.max(...pointsDistancesToCenter) + 10;
 
   const newPosition = {
     x: newCenterPoint.x - newRadius,
@@ -576,7 +594,12 @@ const resizeCircle = (
 export const manualResize = (state, draw, dragPosition, corner) => {
   let limitpoints = draw.limitPoints;
 
-  const variations = {};
+  const variations = {
+    varN: 0,
+    varE: 0,
+    varS: 0,
+    varW: 0,
+  };
 
   for (let i = 0; i < corner.length; i++) {
     const side = corner[i];
@@ -612,7 +635,10 @@ const resizeN = (draw, position, limit) => {
 
   if (variation > limit) variation = limit;
 
-  draw.y = draw.absolutePosition.y + variation;
+  const lastVariation = draw.height - draw.absolutePosition.height;
+  const currentVariation = variation + lastVariation;
+
+  draw.y += currentVariation;
   draw.height = draw.absolutePosition.height - variation;
 
   return { y: variation, x: undefined, relative: draw.y - lastY };
@@ -643,7 +669,10 @@ const resizeW = (draw, position, limit) => {
 
   if (variation > limit) variation = limit;
 
-  draw.x = draw.absolutePosition.x + variation;
+  const lastVariation = draw.width - draw.absolutePosition.width;
+  const currentVariation = variation + lastVariation;
+
+  draw.x += currentVariation;
   draw.width = draw.absolutePosition.width - variation;
 
   return { x: variation, y: undefined, relative: draw.x - lastX };
@@ -686,9 +715,17 @@ export const repositionSiblingsFromManualResize = (
     left: () => draw.x,
   };
 
+  let isRepositioned = false;
+
   for (let i = 0; i < siblings.length; i++) {
     const sibling = siblings[i];
-    const connectorVariation = { x: 0, y: 0 };
+
+    if (draw.id == siblings[i].id) continue;
+
+    const varToConnectors = {
+      varX: 0,
+      varY: 0,
+    };
 
     const siblingLimits = {
       top: () => {
@@ -724,29 +761,36 @@ export const repositionSiblingsFromManualResize = (
 
     if (variations.varN < 0 && checkRepositionCaller("n")) {
       sibling.y += variations.varN;
-      connectorVariation.y = variations.varN;
+      varToConnectors.varY += variations.varN;
       positionChanged = true;
     }
 
     if (variations.varE > 0 && checkRepositionCaller("e")) {
       sibling.x += variations.varE;
-      connectorVariation.x = variations.varE;
+      varToConnectors.varX += variations.varE;
       positionChanged = true;
     }
 
     if (variations.varS > 0 && checkRepositionCaller("s")) {
       sibling.y += variations.varS;
-      connectorVariation.y = variations.varS;
+      varToConnectors.varY += variations.varS;
       positionChanged = true;
     }
 
     if (variations.varW < 0 && checkRepositionCaller("w")) {
       sibling.x += variations.varW;
-      connectorVariation.x = variations.varW;
+      varToConnectors.varX += variations.varW;
       positionChanged = true;
     }
 
-    if (positionChanged)
+    if (positionChanged) {
+      isRepositioned = true;
+
+      varToConnectors.varH = varToConnectors.varY;
+      varToConnectors.varW = varToConnectors.varX;
+
+      updateConnectorsFromResize(sibling, state.connectors, varToConnectors);
+
       repositionSiblingsFromManualResize(
         state,
         sibling,
@@ -754,9 +798,11 @@ export const repositionSiblingsFromManualResize = (
         variations,
         limitsBeforeReposition
       );
+    }
+  }
 
-    if (connectorVariation.x > 0 || connectorVariation.y > 0)
-      updateConnectors(draw, state, connectorVariation);
+  if (draw.parent && isRepositioned) {
+    autoResizeFromResizeChildren(state, draw, 10);
   }
 };
 

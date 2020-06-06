@@ -10,6 +10,7 @@ import {
   findLimitPointsFromDrawArray,
   repositionSiblingsFromManualResize,
   autoResizeFromResizeChildren,
+  updateConnectorsFromResize,
 } from "./calcs/resize";
 
 const padding = 10;
@@ -318,6 +319,15 @@ export const resizeDraw = (state, payload) => {
     payload.corner
   );
 
+  const varToConnectors = {
+    varX: variations.varW,
+    varY: variations.varN,
+    varW: variations.varE,
+    varH: variations.varS,
+  };
+
+  updateConnectorsFromResize(draw, state.connectors, varToConnectors);
+
   const siblings = getSiblings(state, draw);
 
   repositionSiblingsFromManualResize(
@@ -329,23 +339,20 @@ export const resizeDraw = (state, payload) => {
   );
 
   if (draw.parent) {
-    autoResizeFromResizeChildren(state, draw, 10, {
-      x: draw.x - drawLimitsBeforeResize.left,
-      y: draw.y - drawLimitsBeforeResize.top,
-    });
+    autoResizeFromResizeChildren(state, draw, 10);
   }
 
   return state;
 };
 
-const getSiblings = (state, draw) => {
+export const getSiblings = (state, draw) => {
   let allChildrens;
 
   if (draw.parent) {
     const parent = state.draws[draw.parent];
     allChildrens = parent.childrens;
   } else {
-    allChildrens = state.boardDrawZOrder;
+    allChildrens = state.boardDrawShowOrder;
   }
 
   const siblings = [];
