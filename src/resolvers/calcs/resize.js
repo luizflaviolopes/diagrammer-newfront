@@ -479,11 +479,11 @@ const resizeCircle = (
     const xDiff = Math.abs(pointA.x - pointB.x);
     const yDiff = Math.abs(pointA.y - pointB.y);
 
-    const distance = Math.sqrt(xDiff ^ (2 + yDiff) ^ 2);
+    const distance = Math.sqrt((xDiff ^ 2) + (yDiff ^ 2));
     return distance;
   };
 
-  //precisa checar se distance dos limites pro foco da elipse são maiores que o atual pra saber se o resize é necessário
+  //precisa checar se a distancia dos limites pro foco da elipse são maiores que o atual pra saber se o resize é necessário
 
   const sqrt = Math.sqrt(2);
 
