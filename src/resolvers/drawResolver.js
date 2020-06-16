@@ -319,14 +319,7 @@ export const resizeDraw = (state, payload) => {
     payload.corner
   );
 
-  const varToConnectors = {
-    varX: variations.varW,
-    varY: variations.varN,
-    varW: variations.varE,
-    varH: variations.varS,
-  };
-
-  updateConnectorsFromResize(draw, state.connectors, varToConnectors);
+  updateConnectorsFromResize(draw, state.connectors, variations);
 
   const siblings = getSiblings(state, draw);
 

@@ -165,22 +165,15 @@ const autoResizeDraws = (
   else throw { error: "desenho inválido" };
 
   repositionChildrens(state, draw, {
-    x: variationsFromResize.varX,
-    y: variationsFromResize.varY,
+    x: variationsFromResize.varW,
+    y: variationsFromResize.varN,
   });
 
   updateConnectorsFromResize(draw, state.connectors, variationsFromResize);
 
   draw.absolutePosition = {
-    x: draw.absolutePosition.x + variationsFromResize.varX,
-    y: draw.absolutePosition.y + variationsFromResize.varY,
-  };
-
-  const variations = {
-    varN: variationsFromResize.varY,
-    varE: variationsFromResize.varW - variationsFromResize.varX,
-    varS: variationsFromResize.varH - variationsFromResize.varY,
-    varW: variationsFromResize.varX,
+    x: draw.absolutePosition.x + variationsFromResize.varW,
+    y: draw.absolutePosition.y + variationsFromResize.varN,
   };
 
   const siblings = getSiblings(state, draw);
@@ -189,7 +182,7 @@ const autoResizeDraws = (
     state,
     draw,
     siblings,
-    variations,
+    variationsFromResize,
     drawLimitsBeforeResize
   );
 };
@@ -204,152 +197,152 @@ const repositionChildrens = (state, drawUpdated, variationsXY) => {
   }
 };
 
-const updateParentSizeCircle = (
-  state,
-  parent,
-  absolutePosition,
-  paddingFull
-) => {
-  const padding = paddingFull / 2;
-  const radius = Math.max(parent.width, parent.height) / 2;
+// const updateParentSizeCircle = (
+//   state,
+//   parent,
+//   absolutePosition,
+//   paddingFull
+// ) => {
+//   const padding = paddingFull / 2;
+//   const radius = Math.max(parent.width, parent.height) / 2;
 
-  console.log("atualizando tamanho");
-  let variationX = 0;
-  let variationY = 0;
-  let variationH = 0;
-  let variationW = 0;
+//   console.log("atualizando tamanho");
+//   let variationX = 0;
+//   let variationY = 0;
+//   let variationH = 0;
+//   let variationW = 0;
 
-  const calcHipotenusa = (pointA, PointB) => {
-    const adjacent = Math.abs(pointA.x - PointB.x);
-    const oposite = Math.abs(pointA.y - PointB.y);
+//   const calcHipotenusa = (pointA, PointB) => {
+//     const adjacent = Math.abs(pointA.x - PointB.x);
+//     const oposite = Math.abs(pointA.y - PointB.y);
 
-    return Math.sqrt(adjacent * adjacent + oposite * oposite);
-  };
+//     return Math.sqrt(adjacent * adjacent + oposite * oposite);
+//   };
 
-  let selecteds = state.sessionState.drawsSelected;
+//   let selecteds = state.sessionState.drawsSelected;
 
-  const rectToCircleDiagonal = Math.sqrt(2 * (radius * radius)) - radius;
-  const rectToCircle = Math.sqrt(
-    (rectToCircleDiagonal * rectToCircleDiagonal) / 2
-  );
+//   const rectToCircleDiagonal = Math.sqrt(2 * (radius * radius)) - radius;
+//   const rectToCircle = Math.sqrt(
+//     (rectToCircleDiagonal * rectToCircleDiagonal) / 2
+//   );
 
-  let pointTopLeft = {
-    x: parent.x + rectToCircle,
-    y: parent.y + rectToCircle,
-  };
-  let pointTopRight = {
-    x: parent.x + parent.width - rectToCircle,
-    y: parent.y + rectToCircle,
-  };
-  let pointBottomRight = {
-    x: parent.x + parent.width - rectToCircle,
-    y: parent.y + parent.height - rectToCircle,
-  };
-  let pointBottomLeft = {
-    x: parent.x + rectToCircle,
-    y: parent.y + parent.height - rectToCircle,
-  };
+//   let pointTopLeft = {
+//     x: parent.x + rectToCircle,
+//     y: parent.y + rectToCircle,
+//   };
+//   let pointTopRight = {
+//     x: parent.x + parent.width - rectToCircle,
+//     y: parent.y + rectToCircle,
+//   };
+//   let pointBottomRight = {
+//     x: parent.x + parent.width - rectToCircle,
+//     y: parent.y + parent.height - rectToCircle,
+//   };
+//   let pointBottomLeft = {
+//     x: parent.x + rectToCircle,
+//     y: parent.y + parent.height - rectToCircle,
+//   };
 
-  for (let z = 0; z < selecteds.length; z++) {
-    const dropped = state.draws[selecteds[z]];
+//   for (let z = 0; z < selecteds.length; z++) {
+//     const dropped = state.draws[selecteds[z]];
 
-    if (dropped.x + dropped.y < pointTopLeft.x + pointTopLeft.y)
-      pointTopLeft = { x: dropped.x, y: dropped.y };
+//     if (dropped.x + dropped.y < pointTopLeft.x + pointTopLeft.y)
+//       pointTopLeft = { x: dropped.x, y: dropped.y };
 
-    if (
-      (dropped.x + dropped.width) / dropped.y >
-      pointTopRight.x / pointTopRight.y
-    )
-      pointTopRight = { x: dropped.x + dropped.width, y: dropped.y };
+//     if (
+//       (dropped.x + dropped.width) / dropped.y >
+//       pointTopRight.x / pointTopRight.y
+//     )
+//       pointTopRight = { x: dropped.x + dropped.width, y: dropped.y };
 
-    if (
-      (dropped.x + dropped.width) * (dropped.y + dropped.height) >
-      pointBottomRight.x * pointBottomRight.y
-    )
-      pointBottomRight = {
-        x: dropped.x + dropped.width,
-        y: dropped.y + dropped.height,
-      };
+//     if (
+//       (dropped.x + dropped.width) * (dropped.y + dropped.height) >
+//       pointBottomRight.x * pointBottomRight.y
+//     )
+//       pointBottomRight = {
+//         x: dropped.x + dropped.width,
+//         y: dropped.y + dropped.height,
+//       };
 
-    if (
-      (dropped.y + dropped.height) / dropped.x >
-      pointBottomLeft.y / pointBottomLeft.x
-    )
-      pointBottomLeft = { x: dropped.x, y: dropped.y + dropped.height };
-  }
+//     if (
+//       (dropped.y + dropped.height) / dropped.x >
+//       pointBottomLeft.y / pointBottomLeft.x
+//     )
+//       pointBottomLeft = { x: dropped.x, y: dropped.y + dropped.height };
+//   }
 
-  const centerX =
-    (pointTopLeft.x +
-      pointTopRight.x +
-      pointBottomRight.x +
-      pointBottomLeft.x) /
-    4;
-  const centerY =
-    (pointTopLeft.y +
-      pointTopRight.y +
-      pointBottomRight.y +
-      pointBottomLeft.y) /
-    4;
+//   const centerX =
+//     (pointTopLeft.x +
+//       pointTopRight.x +
+//       pointBottomRight.x +
+//       pointBottomLeft.x) /
+//     4;
+//   const centerY =
+//     (pointTopLeft.y +
+//       pointTopRight.y +
+//       pointBottomRight.y +
+//       pointBottomLeft.y) /
+//     4;
 
-  const centerPoint = { x: centerX, y: centerY };
+//   const centerPoint = { x: centerX, y: centerY };
 
-  parent.resizePoints = [
-    pointTopLeft,
-    pointTopRight,
-    pointBottomRight,
-    pointBottomLeft,
-    centerPoint,
-  ];
+//   parent.resizePoints = [
+//     pointTopLeft,
+//     pointTopRight,
+//     pointBottomRight,
+//     pointBottomLeft,
+//     centerPoint,
+//   ];
 
-  // const topLine = calcHipotenusa(pointTopLeft,pointTopRight);
-  // const rigthLine = calcHipotenusa(pointTopLeft,pointTopRight);
+//   // const topLine = calcHipotenusa(pointTopLeft,pointTopRight);
+//   // const rigthLine = calcHipotenusa(pointTopLeft,pointTopRight);
 
-  const distanceToTopLeft = calcHipotenusa(centerPoint, pointTopLeft);
-  const distanceToTopRigth = calcHipotenusa(centerPoint, pointTopRight);
-  const distanceToBottomRigth = calcHipotenusa(centerPoint, pointBottomRight);
-  const distanceToBottomLeft = calcHipotenusa(centerPoint, pointBottomLeft);
+//   const distanceToTopLeft = calcHipotenusa(centerPoint, pointTopLeft);
+//   const distanceToTopRigth = calcHipotenusa(centerPoint, pointTopRight);
+//   const distanceToBottomRigth = calcHipotenusa(centerPoint, pointBottomRight);
+//   const distanceToBottomLeft = calcHipotenusa(centerPoint, pointBottomLeft);
 
-  const pointsDistancesToCenter = [
-    distanceToTopLeft,
-    distanceToTopRigth,
-    distanceToBottomRigth,
-    distanceToBottomLeft,
-  ];
+//   const pointsDistancesToCenter = [
+//     distanceToTopLeft,
+//     distanceToTopRigth,
+//     distanceToBottomRigth,
+//     distanceToBottomLeft,
+//   ];
 
-  //pointsDistancesToCenter.push(parent.width / 2);
+//   //pointsDistancesToCenter.push(parent.width / 2);
 
-  const newRadius = Math.max(...pointsDistancesToCenter);
+//   const newRadius = Math.max(...pointsDistancesToCenter);
 
-  const newPosition = {
-    x: centerPoint.x - newRadius,
-    y: centerPoint.y - newRadius,
-  };
+//   const newPosition = {
+//     x: centerPoint.x - newRadius,
+//     y: centerPoint.y - newRadius,
+//   };
 
-  variationX = newPosition.x - parent.x;
-  variationY = newPosition.y - parent.y;
-  variationH = newRadius - parent.height;
-  variationW = newRadius - parent.width;
+//   variationX = newPosition.x - parent.x;
+//   variationY = newPosition.y - parent.y;
+//   variationH = newRadius - parent.height;
+//   variationW = newRadius - parent.width;
 
-  parent.x = newPosition.x;
-  parent.y = newPosition.y;
-  parent.height = newRadius * 2;
-  parent.width = newRadius * 2;
+//   parent.x = newPosition.x;
+//   parent.y = newPosition.y;
+//   parent.height = newRadius * 2;
+//   parent.width = newRadius * 2;
 
-  const newPositions = {
-    x: absolutePosition.x + variationX,
-    y: absolutePosition.y + variationY,
-    varX: variationX,
-    varY: variationY,
-    varW: variationW,
-    varH: variationH,
-  };
+//   const newPositions = {
+//     x: absolutePosition.x + variationX,
+//     y: absolutePosition.y + variationY,
+//     varX: variationX,
+//     varY: variationY,
+//     varW: variationW,
+//     varH: variationH,
+//   };
 
-  updateConnectorsFromResize(parent, state.connectors, newPositions);
+//   updateConnectorsFromResize(parent, state.connectors, newPositions);
 
-  parent.absolutePosition = { x: newPositions.x, y: newPositions.y };
+//   parent.absolutePosition = { x: newPositions.x, y: newPositions.y };
 
-  return newPositions;
-};
+//   return newPositions;
+// };
 
 export const updateConnectorsFromResize = (draw, connectorsList, variants) => {
   for (let i = 0; i < draw.connectors.length; i++) {
@@ -360,31 +353,31 @@ export const updateConnectorsFromResize = (draw, connectorsList, variants) => {
 
     switch (connRef.angle) {
       case 0: //se w variar em valor diferente de x || se y variar +/- que variação de H|| se h variar
-        varY = (variants.varH + variants.varY) / 2;
+        varY = (variants.varS + variants.varN) / 2;
         varX = variants.varW;
         conn.endPoints[connRef.endPoint].x += varX;
         conn.endPoints[connRef.endPoint].y += varY;
         break;
 
       case 90:
-        varY = variants.varY;
-        varX = (variants.varW + variants.varX) / 2;
+        varY = variants.varN;
+        varX = (variants.varW + variants.varE) / 2;
         conn.endPoints[connRef.endPoint].x += varX;
         conn.endPoints[connRef.endPoint].y += varY;
 
         break;
 
       case 180:
-        varY = (variants.varH + variants.varY) / 2;
-        varX = variants.varX;
+        varY = (variants.varS + variants.varN) / 2;
+        varX = variants.varW;
         conn.endPoints[connRef.endPoint].x += varX;
         conn.endPoints[connRef.endPoint].y += varY;
 
         break;
 
       case 270:
-        varY = variants.varH;
-        varX = (variants.varW + variants.varX) / 2;
+        varY = variants.varS;
+        varX = (variants.varW + variants.varE) / 2;
         conn.endPoints[connRef.endPoint].x += varX;
         conn.endPoints[connRef.endPoint].y += varY;
 
@@ -406,65 +399,56 @@ const resizeRect = (
   childrensLimitPoints,
   drawLimitPoints
 ) => {
-  let variationX = 0;
-  let variationY = 0;
-  let variationW = 0;
-  let variationH = 0;
+  let variations = {
+    varN: 0,
+    varE: 0,
+    varS: 0,
+    varW: 0,
+  };
+
   let isUpdated = false;
 
   //comparando esquerda
-  if (childrensLimitPoints.left < drawLimitPoints.left + padding) {
-    variationX = childrensLimitPoints.left - (drawLimitPoints.left + padding);
+  if (childrensLimitPoints.left - padding < drawLimitPoints.left) {
+    variations.varW =
+      childrensLimitPoints.left - padding - drawLimitPoints.left;
 
-    drawToResize.x = drawToResize.x + variationX;
-    drawToResize.width = drawToResize.width - variationX;
+    drawToResize.x += variations.varW;
+    drawToResize.width -= variations.varW;
     isUpdated = true;
   }
 
   //comparando topo
-  if (childrensLimitPoints.top < drawLimitPoints.top + padding) {
-    variationY = childrensLimitPoints.top - (drawLimitPoints.top + padding);
+  if (childrensLimitPoints.top - padding < drawLimitPoints.top) {
+    variations.varN = childrensLimitPoints.top - padding - drawLimitPoints.top;
 
-    drawToResize.y = drawToResize.y + variationY;
-    drawToResize.height = drawToResize.height - variationY;
+    drawToResize.y += variations.varN;
+    drawToResize.height -= variations.varN;
     isUpdated = true;
   }
 
   //comparando direita
-  if (childrensLimitPoints.right > drawLimitPoints.right - padding) {
+  if (childrensLimitPoints.right + padding > drawLimitPoints.right) {
     //calcular nova largura
-    let calcW =
-      childrensLimitPoints.right +
-      padding -
-      (drawLimitPoints.left + variationX);
-    //comparar largura anterior e nova
-    variationW = calcW - drawToResize.width;
-    //definir nova largura
-    drawToResize.width = calcW;
+    variations.varE =
+      childrensLimitPoints.right + padding - drawLimitPoints.right;
+
+    //incluir variação em largura
+    drawToResize.width += variations.varE;
     isUpdated = true;
   }
 
   //comparando baixo
-  if (childrensLimitPoints.bottom > drawLimitPoints.bottom - padding) {
+  if (childrensLimitPoints.bottom + padding > drawLimitPoints.bottom) {
     //calcular nova altura
-    let calcH =
-      childrensLimitPoints.bottom +
-      padding -
-      (drawLimitPoints.top + variationY);
-    //comparar altura anterior e nova
-    variationH = calcH - drawToResize.height;
+    variations.varS =
+      childrensLimitPoints.bottom + padding - drawLimitPoints.bottom;
     //definir nova altura
-    drawToResize.height = calcH;
+    drawToResize.height += variations.varS;
     isUpdated = true;
   }
 
-  const variations = {
-    varX: variationX,
-    varY: variationY,
-    varW: variationW,
-    varH: variationH,
-    isUpdated,
-  };
+  variations.isUpdated = isUpdated;
 
   return variations;
 };
@@ -569,26 +553,19 @@ const resizeCircle = (
 
   //drawToResize.resizePoints = [...pointsToCalc, actualCenterPoint];
 
-  let variationX = newPosition.x - drawLimitPoints.left;
-  let variationY = newPosition.y - drawLimitPoints.top;
-  let variationH = newRadius * 2 - drawToResize.height + variationY;
-  let variationW = newRadius * 2 - drawToResize.width + variationX;
+  const variations = {
+    varN: newPosition.y - drawLimitPoints.top,
+    varE: newPosition.x + newRadius * 2 - drawLimitPoints.right,
+    varS: newPosition.y + newRadius * 2 - drawLimitPoints.bottom,
+    varW: newPosition.x - drawLimitPoints.left,
+  };
 
-  drawToResize.x += variationX;
-  drawToResize.y += variationY;
+  drawToResize.x = newPosition.x;
+  drawToResize.y = newPosition.y;
   drawToResize.height = newRadius * 2;
   drawToResize.width = newRadius * 2;
 
-  const newPositions = {
-    x: newPosition.x,
-    y: newPosition.y,
-    varX: variationX,
-    varY: variationY,
-    varW: variationW,
-    varH: variationH,
-  };
-
-  return newPositions;
+  return variations;
 };
 
 export const manualResize = (state, draw, dragPosition, corner) => {
@@ -723,8 +700,10 @@ export const repositionSiblingsFromManualResize = (
     if (draw.id == siblings[i].id) continue;
 
     const varToConnectors = {
-      varX: 0,
-      varY: 0,
+      varN: 0,
+      varE: 0,
+      varS: 0,
+      varW: 0,
     };
 
     const siblingLimits = {
@@ -761,33 +740,30 @@ export const repositionSiblingsFromManualResize = (
 
     if (variations.varN < 0 && checkRepositionCaller("n")) {
       sibling.y += variations.varN;
-      varToConnectors.varY += variations.varN;
+      varToConnectors.varN = variations.varN;
       positionChanged = true;
     }
 
     if (variations.varE > 0 && checkRepositionCaller("e")) {
       sibling.x += variations.varE;
-      varToConnectors.varX += variations.varE;
+      varToConnectors.varE = variations.varE;
       positionChanged = true;
     }
 
     if (variations.varS > 0 && checkRepositionCaller("s")) {
       sibling.y += variations.varS;
-      varToConnectors.varY += variations.varS;
+      varToConnectors.varS = variations.varS;
       positionChanged = true;
     }
 
     if (variations.varW < 0 && checkRepositionCaller("w")) {
       sibling.x += variations.varW;
-      varToConnectors.varX += variations.varW;
+      varToConnectors.varW = variations.varW;
       positionChanged = true;
     }
 
     if (positionChanged) {
       isRepositioned = true;
-
-      varToConnectors.varH = varToConnectors.varY;
-      varToConnectors.varW = varToConnectors.varX;
 
       updateConnectorsFromResize(sibling, state.connectors, varToConnectors);
 
