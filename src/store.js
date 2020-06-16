@@ -1,10 +1,13 @@
-import { createStore } from "redux";
-import indexStore from "./reducers";
+import { createStore, compose, applyMiddleware } from "redux";
+import actionSenderMiddleware from "./middlewares/actionSenderMiddleware";
+import indexReducers from "./reducers";
 
-const storeBoard = createStore(
-  indexStore,
+const store = createStore(
+  indexReducers,
   {},
-  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+  compose(
+    applyMiddleware(actionSenderMiddleware),
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+  )
 );
-
-export default storeBoard;
+export default store;
