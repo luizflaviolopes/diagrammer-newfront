@@ -1,4 +1,5 @@
 import * as types from "../types/actionTypes";
+import syncController from "../boardSync/syncController";
 
 const actionSenderMiddleware = (store) => (next) => (action) => {
   switch (action.type) {
@@ -21,7 +22,7 @@ const actionSenderMiddleware = (store) => (next) => (action) => {
     case types.DRAWLIST_CHANGE_SELECTED:
     case types.DRAWLIST_DRAG_BLOCK:
     case types.DRAWLIST_DROP_BLOCK_OUT_OF_BOARD:
-      console.log(action.type);
+      syncController.newAction(action);
       break;
   }
 
