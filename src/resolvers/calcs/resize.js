@@ -525,16 +525,11 @@ const resizeCircle = (
   ellipseMeasures.x = center.x - ellipseMeasures.w / 2;
   ellipseMeasures.y = center.y - ellipseMeasures.h / 2;
 
-  const newPosition = {
-    x: ellipseMeasures.x,
-    y: ellipseMeasures.y,
-  };
-
   const variations = {
-    varN: newPosition.y - drawLimitPoints.top,
-    varE: newPosition.x + ellipseMeasures.w - drawLimitPoints.right,
-    varS: newPosition.y + ellipseMeasures.h - drawLimitPoints.bottom,
-    varW: newPosition.x - drawLimitPoints.left,
+    varN: ellipseMeasures.y - drawLimitPoints.top,
+    varE: ellipseMeasures.x + ellipseMeasures.w - drawLimitPoints.right,
+    varS: ellipseMeasures.y + ellipseMeasures.h - drawLimitPoints.bottom,
+    varW: ellipseMeasures.x - drawLimitPoints.left,
   };
 
   drawToResize.x += variations.varW;
