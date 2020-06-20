@@ -459,111 +459,88 @@ const resizeCircle = (
   childrensLimitPoints,
   drawLimitPoints
 ) => {
-  const radius = Math.max(drawToResize.width, drawToResize.height) / 2;
+  const calcPointsDistance = (pointA, pointB) => {
+    const xDiff = Math.abs(pointA.x - pointB.x);
+    const yDiff = Math.abs(pointA.y - pointB.y);
 
-  const calcHipotenusa = (pointA, PointB) => {
-    const adjacent = Math.abs(pointA.x - PointB.x);
-    const oposite = Math.abs(pointA.y - PointB.y);
-
-    return Math.sqrt(adjacent * adjacent + oposite * oposite);
+    const distance = Math.sqrt((xDiff ^ 2) + (yDiff ^ 2));
+    return distance;
   };
 
-  const rectToCircleDiagonal = Math.sqrt(2 * (radius * radius)) - radius;
-  const rectToCircle = Math.sqrt(
-    (rectToCircleDiagonal * rectToCircleDiagonal) / 2
-  );
+  //precisa checar se a distancia dos limites pro foco da elipse são maiores que o atual pra saber se o resize é necessário
 
-  let pointTopLeftDraw = {
-    x: drawLimitPoints.left + rectToCircle,
-    y: drawLimitPoints.top + rectToCircle,
-  };
-  let pointTopRightDraw = {
-    x: drawLimitPoints.right - rectToCircle,
-    y: drawLimitPoints.top + rectToCircle,
-  };
-  let pointBottomRightDraw = {
-    x: drawLimitPoints.right - rectToCircle,
-    y: drawLimitPoints.bottom - rectToCircle,
-  };
-  let pointBottomLeftDraw = {
-    x: drawLimitPoints.left + rectToCircle,
-    y: drawLimitPoints.bottom - rectToCircle,
+  const sqrt = Math.sqrt(2);
+
+  const drawCenter = {
+    x: (drawLimitPoints.right + drawLimitPoints.left) / 2,
+    y: (drawLimitPoints.bottom + drawLimitPoints.top) / 2,
   };
 
-  let actualCenterPoint = {
-    x: (drawLimitPoints.left + drawLimitPoints.right) / 2,
-    y: (drawLimitPoints.top + drawLimitPoints.bottom) / 2,
+  const boxInsideEllipseMeasures = {
+    w: (drawLimitPoints.right - drawCenter.x) * sqrt - padding,
+    h: (drawLimitPoints.bottom - drawCenter.y) * sqrt - padding,
   };
 
-  let pointsToCalc = [
-    pointTopLeftDraw,
-    pointTopRightDraw,
-    pointBottomRightDraw,
-    pointBottomLeftDraw,
-  ];
-
-  let pointTopLeft = {
-    x: childrensLimitPoints.left,
-    y: childrensLimitPoints.top,
-  };
-  let pointTopRight = {
-    x: childrensLimitPoints.right,
-    y: childrensLimitPoints.top,
-  };
-  let pointBottomRight = {
-    x: childrensLimitPoints.right,
-    y: childrensLimitPoints.bottom,
-  };
-  let pointBottomLeft = {
-    x: childrensLimitPoints.left,
-    y: childrensLimitPoints.bottom,
+  const boxInsideEllipseLimits = {
+    left: drawCenter.x - boxInsideEllipseMeasures.w / 2,
+    top: drawCenter.y - boxInsideEllipseMeasures.h / 2,
+    right: drawCenter.x + boxInsideEllipseMeasures.w / 2,
+    bottom: drawCenter.y + boxInsideEllipseMeasures.h / 2,
   };
 
-  if (calcHipotenusa(actualCenterPoint, pointTopLeft) > radius)
-    pointsToCalc.push(pointTopLeft);
-  if (calcHipotenusa(actualCenterPoint, pointTopRight) > radius)
-    pointsToCalc.push(pointTopRight);
-  if (calcHipotenusa(actualCenterPoint, pointBottomRight) > radius)
-    pointsToCalc.push(pointBottomRight);
-  if (calcHipotenusa(actualCenterPoint, pointBottomLeft) > radius)
-    pointsToCalc.push(pointBottomLeft);
+  const newDrawLimits = {
+    left:
+      childrensLimitPoints.left < boxInsideEllipseLimits.left
+        ? childrensLimitPoints.left
+        : boxInsideEllipseLimits.left,
+    right:
+      childrensLimitPoints.right > boxInsideEllipseLimits.right
+        ? childrensLimitPoints.right
+        : boxInsideEllipseLimits.right,
+    top:
+      childrensLimitPoints.top < boxInsideEllipseLimits.top
+        ? childrensLimitPoints.top
+        : boxInsideEllipseLimits.top,
+    bottom:
+      childrensLimitPoints.bottom > boxInsideEllipseLimits.bottom
+        ? childrensLimitPoints.bottom
+        : boxInsideEllipseLimits.bottom,
+  };
 
-  const centerX =
-    pointsToCalc.reduce((p, c) => {
-      return p + c.x;
-    }, 0) / pointsToCalc.length;
-  const centerY =
-    pointsToCalc.reduce((p, c) => {
-      return p + c.y;
-    }, 0) / pointsToCalc.length;
+  const center = {
+    x: (newDrawLimits.left + newDrawLimits.right) / 2,
+    y: (newDrawLimits.top + newDrawLimits.bottom) / 2,
+  };
 
-  const newCenterPoint = { x: centerX, y: centerY };
+  const limitMeasures = {
+    w: newDrawLimits.right - newDrawLimits.left + padding,
+    h: newDrawLimits.bottom - newDrawLimits.top + padding,
+  };
 
-  const pointsDistancesToCenter = pointsToCalc.reduce((p, c) => {
-    p.push(calcHipotenusa(newCenterPoint, c));
-    return p;
-  }, []);
+  const ellipseMeasures = {
+    w: (limitMeasures.w / sqrt) * 2,
+    h: (limitMeasures.h / sqrt) * 2,
+  };
 
-  const newRadius = Math.max(...pointsDistancesToCenter) + 10;
+  ellipseMeasures.x = center.x - ellipseMeasures.w / 2;
+  ellipseMeasures.y = center.y - ellipseMeasures.h / 2;
 
   const newPosition = {
-    x: newCenterPoint.x - newRadius,
-    y: newCenterPoint.y - newRadius,
+    x: ellipseMeasures.x,
+    y: ellipseMeasures.y,
   };
-
-  //drawToResize.resizePoints = [...pointsToCalc, actualCenterPoint];
 
   const variations = {
     varN: newPosition.y - drawLimitPoints.top,
-    varE: newPosition.x + newRadius * 2 - drawLimitPoints.right,
-    varS: newPosition.y + newRadius * 2 - drawLimitPoints.bottom,
+    varE: newPosition.x + ellipseMeasures.w - drawLimitPoints.right,
+    varS: newPosition.y + ellipseMeasures.h - drawLimitPoints.bottom,
     varW: newPosition.x - drawLimitPoints.left,
   };
 
-  drawToResize.x = newPosition.x;
-  drawToResize.y = newPosition.y;
-  drawToResize.height = newRadius * 2;
-  drawToResize.width = newRadius * 2;
+  drawToResize.x += variations.varW;
+  drawToResize.y += variations.varN;
+  drawToResize.height += variations.varS;
+  drawToResize.width += variations.varE;
 
   return variations;
 };

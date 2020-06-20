@@ -4,6 +4,7 @@ import * as drawResolver from "../resolvers/drawResolver";
 import * as connectorResolvers from "../resolvers/connectorsResolver";
 import * as keyboardResolver from "../resolvers/keyboardResolver";
 import * as drawListBoxResolver from "../resolvers/drawListBoxResolver";
+import elementsConnectorPointsCalculator from "../helpers/elementsConnectorPointsCalculator";
 
 const setState = () => ({
   boardView: {
@@ -91,11 +92,40 @@ export default (state = setState(), action = {}) => {
         { ...state },
         action.payload
       );
+
+    //Dev (test) actions
+
     case "teste":
       let newstate = { ...state };
       newstate.boardView = { ...newstate.boardView };
       newstate.boardView.zoom = action.payload.zoom;
       return newstate;
+
+    case "CHANGE_CIRCLE_RADIUS":
+      let newstateChangeCircle = { ...state };
+      let element = { ...newstateChangeCircle.draws[action.payload.el] };
+      const center = {
+        x: element.x + element.width / 2,
+        y: element.y + element.height / 2,
+      };
+      element.width = action.payload.x * 2;
+      element.height = action.payload.y * 2;
+
+      element.x = center.x - element.width / 2;
+      element.y = center.y - element.height / 2;
+      newstateChangeCircle.draws[action.payload.el] = element;
+      return newstateChangeCircle;
+
+    case "TEST_REPOSITION_DRAW":
+      let newstateChangereposition = { ...state };
+      let elementToReposition = {
+        ...newstateChangereposition.draws[action.payload.el],
+      };
+
+      elementToReposition.x = action.payload.x;
+      elementToReposition.y = action.payload.y;
+      newstateChangereposition.draws[action.payload.el] = elementToReposition;
+      return newstateChangereposition;
 
     default:
       return state;

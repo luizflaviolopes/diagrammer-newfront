@@ -2,6 +2,8 @@ import store from "../store";
 
 const bindFunction = () => {
   window.testCreateSomeElements = createSomeElements;
+  window.changeCircleRadius = changeCircleRadius;
+  window.repositionDraw = repositionDraw;
 };
 
 const createSomeElements = (num) => {
@@ -19,6 +21,32 @@ const createSomeElements = (num) => {
 
     store.dispatch(element);
   }
+};
+
+const changeCircleRadius = (el, x, y) => {
+  const update = {
+    type: "CHANGE_CIRCLE_RADIUS",
+    payload: {
+      el,
+      x,
+      y,
+    },
+  };
+
+  store.dispatch(update);
+};
+
+const repositionDraw = (el, x, y) => {
+  const update = {
+    type: "TEST_REPOSITION_DRAW",
+    payload: {
+      el,
+      x,
+      y,
+    },
+  };
+
+  store.dispatch(update);
 };
 
 export default bindFunction;
