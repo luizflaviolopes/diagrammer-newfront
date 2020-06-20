@@ -23,7 +23,7 @@ const sendNextAction = () => {
         console.log(exception);
         timeWait = timeWait + 500;
         processing = false;
-        setTimeout(sendNextAction, timeWait);
+        //setTimeout(sendNextAction, timeWait);
         return;
       }
 
