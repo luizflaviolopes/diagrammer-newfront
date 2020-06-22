@@ -5,6 +5,7 @@ import LoginPage from "./authentication/pages/LoginPage";
 import "./css/base.css";
 import Amplify, { Auth } from "aws-amplify";
 import awsconfig from "./aws-exports";
+import DiagramsBucket from "./pages/DiagramsBucket";
 
 Amplify.configure(awsconfig);
 
@@ -14,6 +15,7 @@ function App() {
       <Router>
         <BoardPage default></BoardPage>
         <LoginPage path="/auth/*"></LoginPage>
+        <DiagramsBucket path="/diagrams"></DiagramsBucket>
       </Router>
     </div>
   );
