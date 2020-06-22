@@ -1,5 +1,21 @@
 import React from "react";
 
+const ResizeHitbox = (props) => {
+  return (
+    <rect
+      opacity="0"
+      cursor={props.corner + "-resize"}
+      type="resizeAnchor"
+      corners={props.corner}
+      x={props.x}
+      y={props.y}
+      height="10"
+      width="10"
+      drawId={props.drawId}
+    ></rect>
+  );
+};
+
 const Circle = (props) => {
   const CalcCirclePoints = () => {
     const initialPoint = { x: 0, y: props.height / 2 };
@@ -41,6 +57,25 @@ const Circle = (props) => {
         d={pathPoints}
         {...props.strokeProperties}
       ></path>
+      <ResizeHitbox x="0" y="0" corner="nw" drawId={props.id}></ResizeHitbox>
+      <ResizeHitbox
+        x={props.width - 10}
+        y="0"
+        corner="ne"
+        drawId={props.id}
+      ></ResizeHitbox>
+      <ResizeHitbox
+        x={props.width - 10}
+        y={props.height - 10}
+        corner="se"
+        drawId={props.id}
+      ></ResizeHitbox>
+      <ResizeHitbox
+        x="0"
+        y={props.height - 10}
+        corner="sw"
+        drawId={props.id}
+      ></ResizeHitbox>
     </React.Fragment>
   );
 };
