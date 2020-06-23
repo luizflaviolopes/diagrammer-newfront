@@ -1,35 +1,43 @@
 import queue from "./queue";
-import actionConnector from "./actionConnector";
+import serverConnector from "./serverConnector";
+import notifier from "./connectionEventsNotifier";
+import * as serverConnectionsActions from "../actions/serverConnectionActions";
 
 let processing = false;
 let timeWait = 100;
 
 const newAction = (action) => {
   queue.add(action);
-  sendNextAction();
+  processActions();
 };
 
-const sendNextAction = () => {
+const processActions = () => {
   if (!processing) {
     processing = true;
-    const nextAction = queue.getNext();
+    notifier(serverConnectionsActions.connectionBusy());
+    sendAction();
+    notifier(serverConnectionsActions.connectionReady());
+    processing = false;
+  }
+};
 
-    if (nextAction) {
-      try {
-        actionConnector.send(nextAction);
-        //chama metodo de envio
-      } catch (exception) {
-        console.log(`erro em envio, aguardando ${timeWait / 1000} segundos`);
-        console.log(exception);
-        timeWait = timeWait + 500;
-        processing = false;
-        //setTimeout(sendNextAction, timeWait);
-        return;
-      }
+const sendAction = () => {
+  const nextAction = queue.getNext();
 
-      queue.commit(nextAction);
+  if (nextAction) {
+    try {
+      serverConnector.send(nextAction);
+    } catch (exception) {
+      console.log(`erro em envio, aguardando ${timeWait / 1000} segundos`);
+      console.log(exception);
+      timeWait = timeWait + 500;
       processing = false;
+      //setTimeout(sendNextAction, timeWait);
+      return;
     }
+
+    queue.commit(nextAction);
+    sendAction();
   }
 };
 
