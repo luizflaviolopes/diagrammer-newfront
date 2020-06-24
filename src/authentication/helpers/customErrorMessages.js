@@ -123,7 +123,7 @@ const convertMessage = (msg) => {
   //     }
   //   }
 
-  console.log("mensagem de erro nova", msg);
+  //console.log("mensagem de erro nova", msg);
 
   return {
     type: "general",

@@ -24,7 +24,7 @@ const DiagramsListPanel = (props) => {
   });
 
   const fillDiagrams = () => {
-    api.get("diagrams").then((a) => console.log(a));
+    api.get("diagrams").then((a) => {}); //console.log(a));
   };
 
   return (

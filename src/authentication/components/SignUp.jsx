@@ -30,7 +30,7 @@ const SignUp = () => {
       .catch((error) => {
         const err = customErrorMessages(error.message);
         setErrors(err);
-        console.log("error signing up:", error);
+        //console.log("error signing up:", error);
         setWait(false);
       });
   };

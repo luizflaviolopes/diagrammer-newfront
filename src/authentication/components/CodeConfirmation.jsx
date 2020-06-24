@@ -29,7 +29,7 @@ const CodeConfirmation = (props) => {
                   "houve um problema ao validar o código, favor tentar novamente mais tarde",
               },
             ]);
-            console.log("error: ", err);
+            //console.log("error: ", err);
           }
           setWait(false);
         });

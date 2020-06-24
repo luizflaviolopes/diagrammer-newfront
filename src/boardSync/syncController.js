@@ -16,28 +16,31 @@ const processActions = () => {
     processing = true;
     notifier(serverConnectionsActions.connectionBusy());
     sendAction();
-    notifier(serverConnectionsActions.connectionReady());
-    processing = false;
   }
 };
 
-const sendAction = () => {
+const sendAction = async () => {
   const nextAction = queue.getNext();
 
   if (nextAction) {
     try {
+      console.time("send");
       serverConnector.send(nextAction);
+      console.timeEnd("send");
     } catch (exception) {
-      console.log(`erro em envio, aguardando ${timeWait / 1000} segundos`);
-      console.log(exception);
+      //console.log(`erro em envio, aguardando ${timeWait / 1000} segundos`);
+      //console.log(exception);
       timeWait = timeWait + 500;
-      processing = false;
-      //setTimeout(sendNextAction, timeWait);
-      return;
+      setTimeout(sendAction, timeWait);
+      //throw exception;
     }
 
     queue.commit(nextAction);
     sendAction();
+  } else {
+    notifier(serverConnectionsActions.connectionReady());
+    processing = false;
+    return;
   }
 };
 

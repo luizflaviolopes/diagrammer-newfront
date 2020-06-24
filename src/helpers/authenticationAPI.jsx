@@ -68,8 +68,8 @@ export const registerUser = async (name, password, email, celphone) => {
     }
 
     cognitoUser = result.user;
-    console.log("user name is " + cognitoUser.getUsername());
-    console.log(cognitoUser);
+    //console.log("user name is " + cognitoUser.getUsername());
+    //console.log(cognitoUser);
     res = { status: "ok" };
   });
 
@@ -86,6 +86,6 @@ export const confirmUser = (code) => {
       alert(err);
       return;
     }
-    console.log("call result: " + result);
+    //console.log("call result: " + result);
   });
 };

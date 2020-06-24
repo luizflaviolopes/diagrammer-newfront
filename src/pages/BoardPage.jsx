@@ -3,6 +3,7 @@ import Board from "../containers/Board";
 import DrawListTab from "../components/DrawListTab";
 import { Provider } from "react-redux";
 import store from "../store";
+import ServerStatus from "../containers/ServerStatus";
 
 const BoardPage = (props) => {
   return (
@@ -10,6 +11,7 @@ const BoardPage = (props) => {
       <div class="full-vh">
         <Board></Board>
         <DrawListTab></DrawListTab>
+        <ServerStatus></ServerStatus>
       </div>
     </Provider>
   );

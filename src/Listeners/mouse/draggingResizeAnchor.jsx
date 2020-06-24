@@ -2,13 +2,13 @@ import store from "../../store";
 import { resizeDraw, startResizeDraw } from "../../actions/drawing";
 
 export const IsResizeAnchor = (element) => {
-  console.log(element);
+  //console.log(element);
   if (element.getAttribute("type") == "resizeAnchor") return true;
   else return false;
 };
 
 export const onManualResizeStart = (evt) => {
-  console.log(evt);
+  //console.log(evt);
   window.dragging = {
     onMove: onResizeMove,
     onDrop: onResizeDrop,
