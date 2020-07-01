@@ -28,7 +28,7 @@ const Rectangle = (props) => {
         id={props.id}
         x="0"
         y="0"
-        height={props.heigth}
+        height={props.height}
         width={props.width}
         stroke="none"
         fill={props.fillColor || "white"}
@@ -42,7 +42,7 @@ const Rectangle = (props) => {
         style={{ pointerEvents: props.pointerEvents }}
         x="0"
         y="0"
-        height={props.heigth}
+        height={props.height}
         width={props.width}
         {...props.strokeProperties}
       ></rect>
@@ -55,13 +55,13 @@ const Rectangle = (props) => {
       ></ResizeHitbox>
       <ResizeHitbox
         x={props.width - 10}
-        y={props.heigth - 10}
+        y={props.height - 10}
         corner="se"
         drawId={props.id}
       ></ResizeHitbox>
       <ResizeHitbox
         x="0"
-        y={props.heigth - 10}
+        y={props.height - 10}
         corner="sw"
         drawId={props.id}
       ></ResizeHitbox>

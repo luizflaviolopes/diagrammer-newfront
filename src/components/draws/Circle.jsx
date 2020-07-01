@@ -1,32 +1,81 @@
 import React from "react";
 
+const ResizeHitbox = (props) => {
+  return (
+    <rect
+      opacity="0"
+      cursor={props.corner + "-resize"}
+      type="resizeAnchor"
+      corners={props.corner}
+      x={props.x}
+      y={props.y}
+      height="10"
+      width="10"
+      drawId={props.drawId}
+    ></rect>
+  );
+};
+
 const Circle = (props) => {
-  const radius =
-    props.width > props.heigth ? props.width / 2 : props.heigth / 2;
+  const CalcCirclePoints = () => {
+    const initialPoint = { x: 0, y: props.height / 2 };
+
+    const firstSemiCircle = ` a ${props.width / 2},${props.height / 2} 0 1,0 ${
+      props.width
+    },0`;
+
+    const secondSemiCircle = ` a ${props.width / 2},${
+      props.height / 2
+    } 0 1,0 ${-props.width},0`;
+
+    const path =
+      `M ${initialPoint.x},${initialPoint.y}` +
+      firstSemiCircle +
+      secondSemiCircle;
+
+    return path;
+  };
+
+  const pathPoints = CalcCirclePoints();
 
   return (
     <React.Fragment>
-      <circle
+      <path
         style={{ pointerEvents: props.pointerEvents }}
         id={props.id}
-        cx={radius}
-        cy={radius}
-        r={radius}
+        d={pathPoints}
         stroke="none"
         fill={props.fillColor || "white"}
         draw="true"
         {...props.fillProperties}
-      ></circle>
-      <circle
+      ></path>
+      <path
         stroke="black"
         strokeWidth="3"
         fill="none"
         style={{ pointerEvents: props.pointerEvents, cursor: "n-resize" }}
-        cx={radius}
-        cy={radius}
-        r={radius}
+        d={pathPoints}
         {...props.strokeProperties}
-      ></circle>
+      ></path>
+      <ResizeHitbox x="0" y="0" corner="nw" drawId={props.id}></ResizeHitbox>
+      <ResizeHitbox
+        x={props.width - 10}
+        y="0"
+        corner="ne"
+        drawId={props.id}
+      ></ResizeHitbox>
+      <ResizeHitbox
+        x={props.width - 10}
+        y={props.height - 10}
+        corner="se"
+        drawId={props.id}
+      ></ResizeHitbox>
+      <ResizeHitbox
+        x="0"
+        y={props.height - 10}
+        corner="sw"
+        drawId={props.id}
+      ></ResizeHitbox>
     </React.Fragment>
   );
 };

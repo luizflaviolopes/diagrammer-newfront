@@ -70,7 +70,7 @@ class DrawAdapter extends React.Component {
       <g onMouseOver={this.onDragOver} onMouseOut={this.onDragOut}>
         <Element
           text={this.props.text}
-          heigth={this.props.heigth}
+          height={this.props.height}
           width={this.props.width}
           radius={this.props.radius}
           selected={this.props.selected}
