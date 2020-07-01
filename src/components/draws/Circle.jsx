@@ -1,70 +1,87 @@
 import React from "react";
 
-const Circle = props => {
-  const radius =
-    props.width > props.heigth ? props.width / 2 : props.heigth / 2;
+const ResizeHitbox = (props) => {
+  return (
+    <rect
+      opacity="0"
+      cursor={props.corner + "-resize"}
+      type="resizeAnchor"
+      corners={props.corner}
+      x={props.x}
+      y={props.y}
+      height="10"
+      width="10"
+      drawId={props.drawId}
+    ></rect>
+  );
+};
 
-  let overlayVariations = {
-    opacity: 1,
-    visibility: "hidden"
+const Circle = (props) => {
+  const CalcCirclePoints = () => {
+    const initialPoint = { x: 0, y: props.height / 2 };
+
+    const firstSemiCircle = ` a ${props.width / 2},${props.height / 2} 0 1,0 ${
+      props.width
+    },0`;
+
+    const secondSemiCircle = ` a ${props.width / 2},${
+      props.height / 2
+    } 0 1,0 ${-props.width},0`;
+
+    const path =
+      `M ${initialPoint.x},${initialPoint.y}` +
+      firstSemiCircle +
+      secondSemiCircle;
+
+    return path;
   };
 
-  if (props.highlightConnection)
-    overlayVariations = {
-      fill: "steelblue",
-      opacity: "0.2",
-      visibility: "visible"
-    };
-  else if (props.highlightDrawDragging)
-    overlayVariations = {
-      fill: "red",
-      opacity: "0.2",
-      visibility: "visible"
-    };
-  else if (props.selected) {
-    overlayVariations = {
-      fill: "none",
-      opacity: "0.7",
-      visibility: "visible",
-      stroke: "white",
-      strokeWidth: "3",
-      strokeDasharray: 6
-    };
-  }
-
-  let overlayObj = (
-    <Overlay {...props} variations={overlayVariations} radius={radius} />
-  );
+  const pathPoints = CalcCirclePoints();
 
   return (
     <React.Fragment>
-      <circle
+      <path
         style={{ pointerEvents: props.pointerEvents }}
         id={props.id}
-        draw="true"
-        cx={radius}
-        cy={radius}
-        r={radius}
-        stroke="black"
-        strokeWidth="2"
+        d={pathPoints}
+        stroke="none"
         fill={props.fillColor || "white"}
-        opacity={props.selected ? "0.7" : "1"}
-      />
-      {overlayObj}
+        draw="true"
+        {...props.fillProperties}
+      ></path>
+      <path
+        stroke="black"
+        strokeWidth="3"
+        fill="none"
+        style={{ pointerEvents: props.pointerEvents, cursor: "n-resize" }}
+        d={pathPoints}
+        {...props.strokeProperties}
+      ></path>
+      <ResizeHitbox x="0" y="0" corner="nw" drawId={props.id}></ResizeHitbox>
+      <ResizeHitbox
+        x={props.width - 10}
+        y="0"
+        corner="ne"
+        drawId={props.id}
+      ></ResizeHitbox>
+      <ResizeHitbox
+        x={props.width - 10}
+        y={props.height - 10}
+        corner="se"
+        drawId={props.id}
+      ></ResizeHitbox>
+      <ResizeHitbox
+        x="0"
+        y={props.height - 10}
+        corner="sw"
+        drawId={props.id}
+      ></ResizeHitbox>
     </React.Fragment>
   );
 };
 
-const Overlay = props => {
-  return (
-    <circle
-      cx={props.radius}
-      cy={props.radius}
-      r={props.radius}
-      style={{ pointerEvents: "none" }}
-      {...props.variations}
-    />
-  );
+export const Demo = (props) => {
+  return <circle cx={50} cy={50} r={50} opacity={1} />;
 };
 
 export default Circle;

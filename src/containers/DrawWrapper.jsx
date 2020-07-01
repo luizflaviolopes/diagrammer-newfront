@@ -2,10 +2,11 @@ import React, { Component, useState } from "react";
 import { connect } from "react-redux";
 
 import * as drawActions from "../actions/drawing";
-import elementTypeResolver from "../helpers/elementTypeResolver";
+
 import ConnectionPoints from "../components/ConnectionPoints";
 
 import elementsConnectorPointsCalculator from "../helpers/elementsConnectorPointsCalculator";
+import DrawAdapter from "../components/DrawAdapter";
 
 class DrawWrapper extends Component {
   constructor(props) {
@@ -26,33 +27,9 @@ class DrawWrapper extends Component {
 
   componentDidUpdate = () => {};
 
-  onDragOver = (evt) => {
-    if (
-      this.props.sessionState.connectorDrawing
-    ) {
-      this.setState({ highlightConnector: true });
-    } else if (
-      this.props.sessionState.draggingElement &&
-      !this.props.selected
-    ) {
-      this.setState({ highlightDrawDragging: true });
-    }
-  };
-
-  onDragOut = (evt) => {
-    if (this.state.highlightConnector) {
-      this.setState({
-        highlightConnector: false,
-      });
-    }
-    if (this.state.highlightDrawDragging) {
-      this.setState({ highlightDrawDragging: false });
-    }
-  };
-
   render() {
     console.log("update", this.props.id);
-    const Element = elementTypeResolver(this.props.type);
+
     let connectionPoints = null;
     let childrens = null;
 
@@ -60,7 +37,7 @@ class DrawWrapper extends Component {
       let points = elementsConnectorPointsCalculator(
         this.props.type,
         this.props.width,
-        this.props.heigth,
+        this.props.height,
         this.props.radius
       );
 
@@ -73,43 +50,26 @@ class DrawWrapper extends Component {
       ));
     }
 
-    if (this.props.childrens ) {
+    if (this.props.childrens) {
       childrens = this.props.childrens.map((element) => {
         console.log("renderizando filho");
         return <DrawWrapperConnected key={element} id={element} />;
       });
     }
 
-    const calcPointerEvents = () => {
-      if (this.props.sessionState.draggingElement && this.props.selected)
-        return "none";
-      else return "painted";
-    };
-    const pointerEvents = calcPointerEvents();
+    let markers = [];
+    if (this.props.resizePoints) markers = this.props.resizePoints;
 
     return (
-      <g
-        onMouseOver={this.onDragOver}
-        onMouseOut={this.onDragOut}
-        transform={`translate(${this.props.x}, ${this.props.y})`}
-      >
+      <g transform={`translate(${this.props.x}, ${this.props.y})`}>
         <g
           onMouseEnter={(evt) => {
-            this.setState({ showConnectors: true });
+            if (!this.props.sessionState.draggingElement)
+              this.setState({ showConnectors: true });
           }}
           onMouseLeave={() => this.setState({ showConnectors: false })}
         >
-          <Element
-            text={this.props.text}
-            heigth={this.props.heigth}
-            width={this.props.width}
-            radius={this.props.radius}
-            highlightConnection={this.state.highlightConnector}
-            highlightDrawDragging={this.state.highlightDrawDragging}
-            selected={this.props.selected}
-            id={this.props.id}
-            pointerEvents={pointerEvents}
-          />
+          <DrawAdapter {...this.props}></DrawAdapter>
           {connectionPoints}
         </g>
         {childrens}

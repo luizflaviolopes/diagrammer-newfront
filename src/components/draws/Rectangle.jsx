@@ -1,36 +1,26 @@
 import React from "react";
 
-const Rectangle = props => {
-  let overlayVariations = {
-    opacity: 1,
-    visibility: "hidden"
-  };
+export const Demo = (props) => {
+  return <rect x="0" y="0" height={100} width={100}></rect>;
+};
 
-  if (props.highlightConnection) {
-    overlayVariations = {
-      fill: "steelblue",
-      opacity: "0.2",
-      visibility: "visible"
-    };
-  } else if (props.highlightDrawDragging)
-    overlayVariations = {
-      fill: "red",
-      opacity: "0.2",
-      visibility: "visible"
-    };
-  else if (props.selected) {
-    overlayVariations = {
-      fill: "none",
-      opacity: "1",
-      visibility: "visible",
-      stroke: "white",
-      strokeWidth: "3",
-      strokeDasharray: 6
-    };
-  }
+const ResizeHitbox = (props) => {
+  return (
+    <rect
+      opacity="0"
+      cursor={props.corner + "-resize"}
+      type="resizeAnchor"
+      corners={props.corner}
+      x={props.x}
+      y={props.y}
+      height="10"
+      width="10"
+      drawId={props.drawId}
+    ></rect>
+  );
+};
 
-  let overlayObj = <Overlay {...props} variations={overlayVariations} />;
-
+const Rectangle = (props) => {
   return (
     <React.Fragment>
       <rect
@@ -38,38 +28,44 @@ const Rectangle = props => {
         id={props.id}
         x="0"
         y="0"
-        height={props.heigth}
+        height={props.height}
         width={props.width}
-        stroke="black"
-        strokeWidth="2"
+        stroke="none"
         fill={props.fillColor || "white"}
         draw="true"
-        opacity={props.selected ? "0.7" : "1"}
+        {...props.fillProperties}
       ></rect>
-      <text
+      <rect
+        stroke="black"
+        strokeWidth="3"
+        fill="none"
+        style={{ pointerEvents: props.pointerEvents }}
         x="0"
         y="0"
-        dominantBaseline="middle"
-        textAnchor="middle"
-        className="svgText"
-      >
-        {props.text}
-      </text>
-      {overlayObj}
+        height={props.height}
+        width={props.width}
+        {...props.strokeProperties}
+      ></rect>
+      <ResizeHitbox x="0" y="0" corner="nw" drawId={props.id}></ResizeHitbox>
+      <ResizeHitbox
+        x={props.width - 10}
+        y="0"
+        corner="ne"
+        drawId={props.id}
+      ></ResizeHitbox>
+      <ResizeHitbox
+        x={props.width - 10}
+        y={props.height - 10}
+        corner="se"
+        drawId={props.id}
+      ></ResizeHitbox>
+      <ResizeHitbox
+        x="0"
+        y={props.height - 10}
+        corner="sw"
+        drawId={props.id}
+      ></ResizeHitbox>
     </React.Fragment>
-  );
-};
-
-const Overlay = props => {
-  return (
-    <rect
-      x="0"
-      y="0"
-      height={props.heigth}
-      width={props.width}
-      {...props.variations}
-      style={{ pointerEvents: "none" }}
-    ></rect>
   );
 };
 

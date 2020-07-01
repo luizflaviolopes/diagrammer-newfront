@@ -1,5 +1,5 @@
-export const polylinePointsTransformation = arrayOfPoints => {
-  const pointsConverted = arrayOfPoints.map(point => {
+export const polylinePointsTransformation = (arrayOfPoints) => {
+  const pointsConverted = arrayOfPoints.map((point) => {
     return `${point.x},${point.y}`;
   });
 
@@ -8,7 +8,7 @@ export const polylinePointsTransformation = arrayOfPoints => {
 
 export const intermediatePointsCalculator = (from, to, margin) => {
   const marginFromPoint = marginPointCalculator(from.x, from.y, from.angle, 0);
-  const marginToPoint = marginPointCalculator(to.x, to.y, to.angle, margin);
+  const marginToPoint = marginPointCalculator(to.x, to.y, to.angle, 0);
 
   const middlePoints = middlePointsCalculator(from, from.angle, to, to.angle);
 
@@ -37,13 +37,13 @@ const middlePointsCalculator = (pointA, anglePointA, pointB, anglePointB) => {
       const middleY = (pointA.y + pointB.y) / 2;
       return [
         { x: pointA.x, y: middleY },
-        { x: pointB.x, y: middleY }
+        { x: pointB.x, y: middleY },
       ];
     } else {
       const middleX = (pointA.x + pointB.x) / 2;
       return [
         { x: middleX, y: pointA.y },
-        { x: middleX, y: pointB.y }
+        { x: middleX, y: pointB.y },
       ];
     }
   }

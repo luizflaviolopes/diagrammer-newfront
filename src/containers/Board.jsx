@@ -51,13 +51,13 @@ const Board = (props) => {
       <svg id="svg" width="100%" height="100%">
         <Marker />
         <Grid
-          offsetX={props.boardView.viewX}
-          offsetY={props.boardView.viewY}
+          offsetX={props.boardView.x}
+          offsetY={props.boardView.y}
           onDoubleClick={addDraw}
           onClick={clearSelection}
         />
         <g
-          transform={`translate(${props.boardView.viewX},${props.boardView.viewY})`}
+          transform={`matrix(${props.boardView.zoom},0,0,${props.boardView.zoom},${props.boardView.x},${props.boardView.y})`}
         >
           {drawDraws(props.showSequence)}
           {drawconnectors()}
@@ -74,10 +74,10 @@ const mapDispatchToProps = {
 };
 
 const mapStateToProps = (state) => ({
-  boardView: state.boardView,
+  boardView: state.elements.boardView,
   showSequence: state.elements.boardDrawShowOrder,
   selectedDraws: state.elements.sessionState.drawsSelected,
-  selectedElement: state.toolboxElements.elementSelected,
+  selectedElement: state.elements.drawListBoxSelection,
   connectors: state.elements.connectors,
 });
 
