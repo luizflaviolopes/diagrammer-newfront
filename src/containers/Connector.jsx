@@ -20,7 +20,7 @@ class Connector extends Component {
     }
     let from = this.props.endPoints[0];
     let to = this.props.endPoints[1];
-    //console.log("connector", from, to, this.props.intermediatePoints);
+    console.log("connector", from, to, this.props.intermediatePoints);
 
     const points = this.props.drawing
       ? [from, to]

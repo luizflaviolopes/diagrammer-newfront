@@ -142,7 +142,7 @@ const updateParentSizeCircle = (
   const padding = paddingFull / 2;
   const radius = Math.max(parent.width, parent.heigth) / 2;
 
-  //console.log("atualizando tamanho");
+  console.log("atualizando tamanho");
   let variationX = 0;
   let variationY = 0;
   let variationH = 0;
