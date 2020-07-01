@@ -75,6 +75,9 @@ export default (state = setState(), action = {}) => {
     case actionTypes.BOARD_DELETE_PRESSED:
       return keyboardResolver.deleteSelecteds({ ...state }, action.payload);
 
+    
+
+
     //drawListBox actions
 
     case actionTypes.DRAWLIST_CHANGE_SELECTED:
@@ -126,6 +129,19 @@ export default (state = setState(), action = {}) => {
       elementToReposition.y = action.payload.y;
       newstateChangereposition.draws[action.payload.el] = elementToReposition;
       return newstateChangereposition;
+
+      case "teste":
+      const newstate = { ...state };
+      for (let i = 0; i < newstate.boardDrawZOrder.length; i++) {
+        console.log("teste");
+        const drawId = newstate.boardDrawZOrder[i];
+        const draw = newstate.draws[drawId];
+
+        draw.x += 20;
+        draw.y += 20;
+      }
+      return newstate;
+      
 
     default:
       return state;

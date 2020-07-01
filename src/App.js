@@ -1,4 +1,5 @@
 import React from "react";
+import { addLotElements } from "./tests/addLotElements";
 import { Router, Link } from "@reach/router";
 import BoardPage from "./pages/BoardPage";
 import LoginPage from "./authentication/pages/LoginPage";
@@ -10,6 +11,8 @@ import DiagramsBucket from "./pages/DiagramsBucket";
 Amplify.configure(awsconfig);
 
 function App() {
+  window.addLotElements = addLotElements;
+
   return (
     <div className="App">
       <Router>
