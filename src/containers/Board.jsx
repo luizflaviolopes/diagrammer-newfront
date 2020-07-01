@@ -61,8 +61,6 @@ const Board = (props) => {
         >
           {drawDraws(props.showSequence)}
           {drawconnectors()}
-        </g>
-        <g>
           <SelectedDraws />
         </g>
       </svg>
