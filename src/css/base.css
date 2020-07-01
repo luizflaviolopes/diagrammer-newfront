@@ -2,3 +2,9 @@
   height: 100vh;
   position: relative;
 }
+
+div.server-notify {
+  position: fixed;
+  top: 0;
+  left: 0;
+}

@@ -15,7 +15,7 @@ class Connector extends Component {
   render() {
     let pointerEvent = "stroke";
 
-    if(this.props.drawing || this.props.onDrawDragging){
+    if (this.props.drawing || this.props.onDrawDragging) {
       pointerEvent = "none";
     }
     let from = this.props.endPoints[0];
@@ -67,7 +67,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state, ownProps) => ({
   ...state.elements.connectors[ownProps.id],
-  onDrawDragging: state.elements.sessionState.draggingElement
+  onDrawDragging: state.elements.sessionState.draggingElement,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Connector);

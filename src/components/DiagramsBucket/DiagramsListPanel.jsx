@@ -7,6 +7,7 @@ import Slot from "./Slot.jsx";
 import styled from "styled-components";
 import ButtonCreate from "./ButtonCreate.jsx";
 import { useEffect } from "react";
+import { useState } from "react";
 
 const DiagramsListStyled = styled.div`
   display: flex;
@@ -23,8 +24,22 @@ const DiagramsListPanel = (props) => {
     fillDiagrams();
   });
 
+  const [diagrams, setDiagrams] = useState(null);
+
   const fillDiagrams = () => {
-    api.get("diagrams").then((a) => console.log(a));
+    api.get("diagrams").then((a) => {
+      setDiagrams(a);
+    });
+  };
+
+  const getDummieSlots = () => {
+    if (diagrams.length >= 8) return null;
+
+    let dummieSlots = [];
+    for (let i = diagrams.length; i < 8; i++) {
+      dummieSlots.push(<Slot></Slot>);
+    }
+    return dummieSlots;
   };
 
   return (
@@ -32,16 +47,24 @@ const DiagramsListPanel = (props) => {
       <Slot>
         <ButtonCreate></ButtonCreate>
       </Slot>
-      <Slot></Slot>
-      <Slot></Slot>
-      <Slot></Slot>
-      <Slot></Slot>
-      <Slot></Slot>
-      <Slot></Slot>
-      <Slot></Slot>
-      <Slot></Slot>
+      {diagrams && diagrams.map((item) => <Slot>{item.id}</Slot>)}
+      {getDummieSlots()}
     </DiagramsListStyled>
   );
 };
+
+const DiagramLoader = (props) => (
+  <ContentLoader
+    speed={2}
+    width={400}
+    height={160}
+    viewBox="0 0 400 160"
+    backgroundColor="#f3f3f3"
+    foregroundColor="#ecebeb"
+    {...props}
+  >
+    <rect x="2" y="15" rx="0" ry="0" width="356" height="96" />
+  </ContentLoader>
+);
 
 export default DiagramsListPanel;
