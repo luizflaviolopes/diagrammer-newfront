@@ -8,6 +8,7 @@ import styled from "styled-components";
 import ButtonCreate from "./ButtonCreate.jsx";
 import { useEffect } from "react";
 import { useState } from "react";
+import ContentLoader from "react-content-loader";
 
 const DiagramsListStyled = styled.div`
   display: flex;
@@ -24,7 +25,7 @@ const DiagramsListPanel = (props) => {
     fillDiagrams();
   });
 
-  const [diagrams, setDiagrams] = useState(null);
+  const [diagrams, setDiagrams] = useState([]);
 
   const fillDiagrams = () => {
     api.get("diagrams").then((a) => {

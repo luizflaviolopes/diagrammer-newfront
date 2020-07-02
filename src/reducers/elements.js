@@ -75,9 +75,6 @@ export default (state = setState(), action = {}) => {
     case actionTypes.BOARD_DELETE_PRESSED:
       return keyboardResolver.deleteSelecteds({ ...state }, action.payload);
 
-    
-
-
     //drawListBox actions
 
     case actionTypes.DRAWLIST_CHANGE_SELECTED:
@@ -96,14 +93,6 @@ export default (state = setState(), action = {}) => {
         action.payload
       );
 
-    //Dev (test) actions
-
-    case "teste":
-      let newstate = { ...state };
-      newstate.boardView = { ...newstate.boardView };
-      newstate.boardView.zoom = action.payload.zoom;
-      return newstate;
-
     case "CHANGE_CIRCLE_RADIUS":
       let newstateChangeCircle = { ...state };
       let element = { ...newstateChangeCircle.draws[action.payload.el] };
@@ -119,6 +108,8 @@ export default (state = setState(), action = {}) => {
       newstateChangeCircle.draws[action.payload.el] = element;
       return newstateChangeCircle;
 
+    //Dev (test) actions
+
     case "TEST_REPOSITION_DRAW":
       let newstateChangereposition = { ...state };
       let elementToReposition = {
@@ -130,7 +121,7 @@ export default (state = setState(), action = {}) => {
       newstateChangereposition.draws[action.payload.el] = elementToReposition;
       return newstateChangereposition;
 
-      case "teste":
+    case "teste":
       const newstate = { ...state };
       for (let i = 0; i < newstate.boardDrawZOrder.length; i++) {
         console.log("teste");
@@ -141,7 +132,6 @@ export default (state = setState(), action = {}) => {
         draw.y += 20;
       }
       return newstate;
-      
 
     default:
       return state;
