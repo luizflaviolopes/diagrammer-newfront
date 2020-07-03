@@ -1,7 +1,5 @@
-import { intermediatePointsCalculator } from "../helpers/connectorPointsCalculator";
-
 import { clearDrawSelected } from "./drawResolver";
-import { getPositionBoardRelative } from "../helpers/getPositionBoardRelative";
+import { getPositionBoardRelative } from "../../helpers/getPositionBoardRelative";
 
 export const connectorDrawingStart = (state, actionPayload) => {
   state.sessionState.connectorDrawing = true;

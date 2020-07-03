@@ -1,6 +1,6 @@
 import { createStore, compose, applyMiddleware } from "redux";
 import actionSenderMiddleware from "./middlewares/actionSenderMiddleware";
-import indexReducers from "./reducers";
+import indexReducers from "./stateManipulators/reducers";
 
 const store = createStore(
   indexReducers,

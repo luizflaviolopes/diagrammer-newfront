@@ -1,9 +1,6 @@
-import elementsConnectorPointsCalculator from "../helpers/elementsConnectorPointsCalculator";
 import { clearConnectorSelection } from "./connectorsResolver";
-import { drop } from "../actions/drawing";
-import { removeFromArray } from "../helpers/arrayManipulation";
-import { getPositionBoardRelative } from "../helpers/getPositionBoardRelative";
-import * as drawTypes from "../types/drawTypes";
+import { removeFromArray } from "../../helpers/arrayManipulation";
+import { getPositionBoardRelative } from "../../helpers/getPositionBoardRelative";
 import {
   autoResize,
   manualResize,

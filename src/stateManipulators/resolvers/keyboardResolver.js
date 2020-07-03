@@ -1,5 +1,4 @@
-import { removeFromArray } from "../helpers/arrayManipulation";
-import { connect } from "react-redux";
+import { removeFromArray } from "../../helpers/arrayManipulation";
 
 export const deleteSelecteds = (state) => {
   const selectedObjects = {
@@ -29,7 +28,6 @@ export const deleteSelecteds = (state) => {
 };
 
 const deleteDraw = (state, draw) => {
-
   //Constante para manter a listagem original de conectores
   const drawConnectors = draw.connectors;
 
@@ -41,10 +39,9 @@ const deleteDraw = (state, draw) => {
     deleteConnector(state, connector);
   }
 
-  if(!draw.parent){
+  if (!draw.parent) {
     state.boardDrawZOrder = removeFromArray(state.boardDrawZOrder, draw.id);
-  }
-  else{
+  } else {
     const parent = state.draws[draw.parent];
     parent.childrens = removeFromArray(parent.childrens, draw.id);
   }
@@ -63,32 +60,32 @@ const deleteDraw = (state, draw) => {
   const draws = { ...state.draws };
   delete draws[draw.id];
   state.draws = draws;
-}
+};
 
 const deleteConnector = (state, connector) => {
-  if(connector){
-  //remover as referencias nos draws
+  if (connector) {
+    //remover as referencias nos draws
 
-  const fromDrawId = connector.endPoints[0].id;
-  const toDrawId = connector.endPoints[1].id;
+    const fromDrawId = connector.endPoints[0].id;
+    const toDrawId = connector.endPoints[1].id;
 
-  const fromDraw = state.draws[fromDrawId];
-  const toDraw = state.draws[toDrawId];
+    const fromDraw = state.draws[fromDrawId];
+    const toDraw = state.draws[toDrawId];
 
-  if (fromDraw != undefined) {
-    fromDraw.connectors = removeFromArray(fromDraw.connectors, (obj) => {
-      return obj.id == connector.id;
-    });
+    if (fromDraw != undefined) {
+      fromDraw.connectors = removeFromArray(fromDraw.connectors, (obj) => {
+        return obj.id == connector.id;
+      });
+    }
+    if (toDraw != undefined) {
+      toDraw.connectors = removeFromArray(toDraw.connectors, (obj) => {
+        return obj.id == connector.id;
+      });
+    }
+
+    //remover de connectors
+    const connectors = { ...state.connectors };
+    delete connectors[connector.id];
+    state.connectors = connectors;
   }
-  if (toDraw != undefined) {
-    toDraw.connectors = removeFromArray(toDraw.connectors, (obj) => {
-      return obj.id == connector.id;
-    });
-  }
-
-  //remover de connectors
-  const connectors = { ...state.connectors };
-  delete connectors[connector.id];
-  state.connectors = connectors;
-}
 };

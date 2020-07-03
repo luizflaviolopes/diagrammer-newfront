@@ -1,10 +1,10 @@
-import * as elementTypes from "../types/drawTypes";
-import * as actionTypes from "../types/actionTypes";
-import * as drawResolver from "../resolvers/drawResolver";
-import * as connectorResolvers from "../resolvers/connectorsResolver";
-import * as keyboardResolver from "../resolvers/keyboardResolver";
-import * as drawListBoxResolver from "../resolvers/drawListBoxResolver";
-import elementsConnectorPointsCalculator from "../helpers/elementsConnectorPointsCalculator";
+import * as elementTypes from "../../types/drawTypes";
+import * as actionTypes from "../../types/actionTypes";
+import * as drawResolver from "../../stateManipulators/resolvers/drawResolver";
+import * as connectorResolvers from "../../stateManipulators/resolvers/connectorsResolver";
+import * as keyboardResolver from "../../stateManipulators/resolvers/keyboardResolver";
+import * as drawListBoxResolver from "../../stateManipulators/resolvers/drawListBoxResolver";
+import elementsConnectorPointsCalculator from "../../helpers/elementsConnectorPointsCalculator";
 
 const setState = () => ({
   boardView: {
@@ -93,6 +93,8 @@ export default (state = setState(), action = {}) => {
         action.payload
       );
 
+    //Dev (test) actions
+
     case "CHANGE_CIRCLE_RADIUS":
       let newstateChangeCircle = { ...state };
       let element = { ...newstateChangeCircle.draws[action.payload.el] };
@@ -107,8 +109,6 @@ export default (state = setState(), action = {}) => {
       element.y = center.y - element.height / 2;
       newstateChangeCircle.draws[action.payload.el] = element;
       return newstateChangeCircle;
-
-    //Dev (test) actions
 
     case "TEST_REPOSITION_DRAW":
       let newstateChangereposition = { ...state };

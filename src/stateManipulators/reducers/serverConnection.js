@@ -1,4 +1,4 @@
-import * as types from "../types/actionTypes";
+import * as types from "../../types/actionTypes";
 // 0 iddle
 // 1 ready
 // 2 busy

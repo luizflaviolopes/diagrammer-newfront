@@ -1,6 +1,5 @@
-import * as drawTypes from "../../types/drawTypes";
-import { startDragDrawListBoxDraw } from "../drawListBoxResolver";
-import { updateConnectors, getSiblings } from "../drawResolver";
+import * as drawTypes from "../../../types/drawTypes";
+import { getSiblings } from "../drawResolver";
 
 export const autoResize = (state, parent, positionBoardRelative, padding) => {
   autoResizeFromDropChildren(state, parent, positionBoardRelative, padding);
