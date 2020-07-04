@@ -1,10 +1,10 @@
-import * as elementTypes from "../../types/drawTypes";
-import * as actionTypes from "../../types/actionTypes";
-import * as drawResolver from "../../stateManipulators/resolvers/drawResolver";
-import * as connectorResolvers from "../../stateManipulators/resolvers/connectorsResolver";
-import * as keyboardResolver from "../../stateManipulators/resolvers/keyboardResolver";
-import * as drawListBoxResolver from "../../stateManipulators/resolvers/drawListBoxResolver";
-import elementsConnectorPointsCalculator from "../../helpers/elementsConnectorPointsCalculator";
+import * as elementTypes from "../types/drawTypes";
+import * as actionTypes from "../types/actionTypes";
+import * as drawResolver from "../resolvers/drawResolver";
+import * as connectorResolvers from "../resolvers/connectorsResolver";
+import * as keyboardResolver from "../resolvers/keyboardResolver";
+import * as drawListBoxResolver from "../resolvers/drawListBoxResolver";
+import elementsConnectorPointsCalculator from "../helpers/elementsConnectorPointsCalculator";
 
 const setState = () => ({
   boardView: {
