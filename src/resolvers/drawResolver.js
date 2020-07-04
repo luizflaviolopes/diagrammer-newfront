@@ -1,6 +1,6 @@
 import { clearConnectorSelection } from "./connectorsResolver";
-import { removeFromArray } from "../../helpers/arrayManipulation";
-import { getPositionBoardRelative } from "../../helpers/getPositionBoardRelative";
+import { removeFromArray } from "../helpers/arrayManipulation";
+import { getPositionBoardRelative } from "../helpers/getPositionBoardRelative";
 import {
   autoResize,
   manualResize,

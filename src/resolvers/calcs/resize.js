@@ -1,4 +1,4 @@
-import * as drawTypes from "../../../types/drawTypes";
+import * as drawTypes from "../../types/drawTypes";
 import { getSiblings } from "../drawResolver";
 
 export const autoResize = (state, parent, positionBoardRelative, padding) => {

@@ -1,4 +1,4 @@
-import { removeFromArray } from "../../helpers/arrayManipulation";
+import { removeFromArray } from "../helpers/arrayManipulation";
 
 export const deleteSelecteds = (state, actionPayload) => {
   if (!actionPayload.resolverData)
