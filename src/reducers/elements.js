@@ -52,6 +52,8 @@ export default (state = setState(), action = {}) => {
       return drawResolver.startResizeDraw({ ...state }, action.payload);
     case actionTypes.BOARD_DRAW_RESIZE:
       return drawResolver.resizeDraw({ ...state }, action.payload);
+    case actionTypes.BOARD_DRAW_STOP_RESIZE:
+      return drawResolver.resizeDraw({ ...state }, action.payload);
 
     //connector actions
 

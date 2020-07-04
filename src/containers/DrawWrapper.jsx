@@ -79,7 +79,6 @@ class DrawWrapper extends Component {
 }
 
 const mapDispatchToProps = {
-  clearHighlightDrawDragging: drawActions.clearHighlightDrawDragging,
   mouseDown: drawActions.mouseDown,
   dragging: drawActions.dragging,
   drop: drawActions.drop,

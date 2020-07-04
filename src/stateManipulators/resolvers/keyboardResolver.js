@@ -1,20 +1,32 @@
 import { removeFromArray } from "../../helpers/arrayManipulation";
 
-export const deleteSelecteds = (state) => {
-  const selectedObjects = {
-    connectors: state.sessionState.connectorsSelected,
-    draws: state.sessionState.drawsSelected,
-  };
+export const deleteSelecteds = (state, actionPayload) => {
+  if (!actionPayload.resolverData)
+    actionPayload.resolverData = {
+      selectedObjects: {
+        connectors: state.sessionState.connectorsSelected,
+        draws: state.sessionState.drawsSelected,
+      },
+    };
 
-  for (let i = 0; i < selectedObjects.connectors.length; i++) {
-    const connectorId = selectedObjects.connectors[i];
+  for (
+    let i = 0;
+    i < actionPayload.resolverData.selectedObjects.connectors.length;
+    i++
+  ) {
+    const connectorId =
+      actionPayload.resolverData.selectedObjects.connectors[i];
     const connector = state.connectors[connectorId];
 
     deleteConnector(state, connector);
   }
 
-  for (let i = 0; i < selectedObjects.draws.length; i++) {
-    const drawId = selectedObjects.draws[i];
+  for (
+    let i = 0;
+    i < actionPayload.resolverData.selectedObjects.draws.length;
+    i++
+  ) {
+    const drawId = actionPayload.resolverData.selectedObjects.draws[i];
     const draw = state.draws[drawId];
 
     deleteDraw(state, draw);

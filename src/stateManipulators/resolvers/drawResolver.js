@@ -14,8 +14,10 @@ const padding = 10;
 
 export const selectDraw = (state, actionPayload) => {
   const drawId = actionPayload.id;
+  //draw clicked to selection
   const selectedDraw = state.draws[drawId];
 
+  //Shift Pressed?
   if (!actionPayload.shiftPressed) {
     clearDrawSelected(state);
   }
@@ -40,7 +42,10 @@ export const drawDragging = (state, actionPayload) => {
 };
 
 export const drawdrop = (state, actionPayload) => {
-  let selecteds = state.sessionState.drawsSelected;
+  if (!actionPayload.resolverData)
+    actionPayload.resolverData = {
+      selecteds: state.sessionState.drawsSelected,
+    };
 
   if (actionPayload.id) {
     const parent = state.draws[actionPayload.id];
@@ -54,8 +59,8 @@ export const drawdrop = (state, actionPayload) => {
 
     autoResize(state, parent, positionBoardRelative, padding);
 
-    for (let a = 0; a < selecteds.length; a++) {
-      let droppedDraw = state.draws[selecteds[a]];
+    for (let a = 0; a < actionPayload.resolverData.selecteds.length; a++) {
+      let droppedDraw = state.draws[actionPayload.resolverData.selecteds[a]];
 
       // board to parent
       if (!droppedDraw.parent) {
@@ -67,8 +72,8 @@ export const drawdrop = (state, actionPayload) => {
     }
   } else {
     //Remove parent from children when dropping draw on board
-    for (let a = 0; a < selecteds.length; a++) {
-      let selectedDraw = state.draws[selecteds[a]];
+    for (let a = 0; a < actionPayload.resolverData.selecteds.length; a++) {
+      let selectedDraw = state.draws[actionPayload.resolverData.selecteds[a]];
       if (selectedDraw.parent) {
         selectedDraw.parent = undefined;
         state.boardDrawZOrder = [...state.boardDrawZOrder, selectedDraw.id];

@@ -3,6 +3,7 @@ import serverConnector from "./serverConnector";
 
 const newAction = (action) => {
   queue.add(action);
+  serverConnector.startSending();
 };
 
 const startConnection = () => {
