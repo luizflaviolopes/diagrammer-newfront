@@ -1,5 +1,3 @@
-import { intermediatePointsCalculator } from "../helpers/connectorPointsCalculator";
-
 import { clearDrawSelected } from "./drawResolver";
 import { getPositionBoardRelative } from "../helpers/getPositionBoardRelative";
 

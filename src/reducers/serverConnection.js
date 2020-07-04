@@ -21,7 +21,6 @@ export default (state = setState(), action = {}) => {
     case types.SERVER_CONNECTION_DISCONNECTED:
       newstate.communicationStatus = 3;
       return newstate;
-      break;
     default:
       return state;
   }

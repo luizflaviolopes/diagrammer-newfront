@@ -12,12 +12,6 @@ export const dragging = (data) => {
     payload: data,
   };
 };
-export const clearHighlightDrawDragging = (data) => {
-  return {
-    type: types.BOARD_CLEAR_HIGHLIGHT_DRAW_DRAGGING,
-    payload: data,
-  };
-};
 export const drop = (data) => {
   return {
     type: types.BOARD_DROP_ELEMENTS,
@@ -77,6 +71,13 @@ export const startResizeDraw = (data) => {
 export const resizeDraw = (data) => {
   return {
     type: types.BOARD_DRAW_RESIZE,
+    payload: data,
+  };
+};
+
+export const stopResizeDraw = (data) => {
+  return {
+    type: types.BOARD_DRAW_STOP_RESIZE,
     payload: data,
   };
 };

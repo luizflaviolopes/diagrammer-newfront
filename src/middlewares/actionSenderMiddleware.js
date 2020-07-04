@@ -2,6 +2,8 @@ import * as types from "../types/actionTypes";
 import syncController from "../boardSync/syncController";
 
 const actionSenderMiddleware = (store) => (next) => (action) => {
+  const nextResult = next(action);
+
   switch (action.type) {
     case types.SERVER_CONNECTION_READY:
     case types.SERVER_CONNECTION_BUSY:
@@ -12,7 +14,7 @@ const actionSenderMiddleware = (store) => (next) => (action) => {
       break;
   }
 
-  return next(action);
+  return nextResult;
 };
 
 export default actionSenderMiddleware;

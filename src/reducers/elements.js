@@ -52,6 +52,8 @@ export default (state = setState(), action = {}) => {
       return drawResolver.startResizeDraw({ ...state }, action.payload);
     case actionTypes.BOARD_DRAW_RESIZE:
       return drawResolver.resizeDraw({ ...state }, action.payload);
+    case actionTypes.BOARD_DRAW_STOP_RESIZE:
+      return drawResolver.resizeDraw({ ...state }, action.payload);
 
     //connector actions
 
@@ -93,6 +95,8 @@ export default (state = setState(), action = {}) => {
         action.payload
       );
 
+    //Dev (test) actions
+
     case "CHANGE_CIRCLE_RADIUS":
       let newstateChangeCircle = { ...state };
       let element = { ...newstateChangeCircle.draws[action.payload.el] };
@@ -107,8 +111,6 @@ export default (state = setState(), action = {}) => {
       element.y = center.y - element.height / 2;
       newstateChangeCircle.draws[action.payload.el] = element;
       return newstateChangeCircle;
-
-    //Dev (test) actions
 
     case "TEST_REPOSITION_DRAW":
       let newstateChangereposition = { ...state };

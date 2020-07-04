@@ -7,17 +7,10 @@ import * as serverConnectionsActions from "../actions/serverConnectionActions";
 //https://javascript.info/websocket
 
 let socket;
+let sendingInterval;
 
 const connectionOpened = () => {
   notifier(serverConnectionsActions.connectionReady());
-
-  setInterval(function () {
-    if (socket.bufferedAmount == 0) {
-      console.time("sendNext");
-      sendNext();
-      console.timeEnd("sendNext");
-    }
-  }, 50);
 };
 
 const connectionError = (error) => {
@@ -52,6 +45,24 @@ const connect = () => {
   console.timeEnd("getUserToken");
 };
 
+const startSending = () => {
+  if (!sendingInterval)
+    sendingInterval = setInterval(function () {
+      if (socket.bufferedAmount == 0) {
+        console.time("sendNext");
+        sendNext();
+        console.timeEnd("sendNext");
+      }
+    }, 50);
+};
+
+const stopSending = () => {
+  if (sendingInterval) {
+    clearInterval(sendingInterval);
+    sendingInterval = undefined;
+  }
+};
+
 const getUserToken = (callback) => {
   Auth.currentSession().then((userData) => {
     callback(userData.getIdToken().getJwtToken());
@@ -60,19 +71,27 @@ const getUserToken = (callback) => {
 
 const sendNext = () => {
   const nextAction = queue.getNext();
-  try {
-    socket.send(JSON.stringify({ message: "action", action: nextAction }));
-  } catch (exception) {
-    return;
-  }
-  queue.commit(nextAction);
+  if (nextAction) {
+    try {
+      socket.send(JSON.stringify({ message: "action", action: nextAction }));
+    } catch (exception) {
+      return;
+    }
+    queue.commit(nextAction);
+  } else stopSending();
 };
 
 const closeConnection = () => {
-  setTimeout(() => {
-    if (socket.bufferedAmount == 0) socket.close(1000, "Closed");
-    else closeConnection();
-  }, 100);
+  if (socket.bufferedAmount == 0) {
+    socket.close(1000, "Closed");
+  } else {
+    sleep(100);
+    closeConnection();
+  }
 };
 
-export default { connect };
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export default { connect, startSending, closeConnection };

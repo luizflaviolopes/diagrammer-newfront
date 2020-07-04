@@ -1,5 +1,9 @@
 import store from "../../store";
-import { resizeDraw, startResizeDraw } from "../../actions/drawing";
+import {
+  resizeDraw,
+  startResizeDraw,
+  stopResizeDraw,
+} from "../../actions/drawing";
 
 export const IsResizeAnchor = (element) => {
   console.log(element);
@@ -28,6 +32,12 @@ const onResizeMove = (evt) => {
 };
 
 const onResizeDrop = (evt) => {
+  let x = evt.clientX - window.dragging.startPosition.x;
+  let y = evt.clientY - window.dragging.startPosition.y;
+  let id = window.dragging.drawId;
+  let corner = window.dragging.corner;
+  store.dispatch(stopResizeDraw({ id: id, position: { x: x, y: y }, corner }));
+
   if (window.dragging) {
     window.dragging = undefined;
   }
