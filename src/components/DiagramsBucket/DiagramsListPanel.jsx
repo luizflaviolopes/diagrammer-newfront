@@ -9,6 +9,7 @@ import ButtonCreate from "./ButtonCreate.jsx";
 import { useEffect } from "react";
 import { useState } from "react";
 import ContentLoader from "react-content-loader";
+import DiagramCard from "./DiagramCard.jsx";
 
 const DiagramsListStyled = styled.div`
   display: flex;
@@ -38,7 +39,7 @@ const DiagramsListPanel = (props) => {
 
     let dummieSlots = [];
     for (let i = diagrams.length; i < 8; i++) {
-      dummieSlots.push(<Slot></Slot>);
+      dummieSlots.push(<Slot key={"dummie" + i}></Slot>);
     }
     return dummieSlots;
   };
@@ -48,7 +49,12 @@ const DiagramsListPanel = (props) => {
       <Slot>
         <ButtonCreate></ButtonCreate>
       </Slot>
-      {diagrams && diagrams.map((item) => <Slot>{item.id}</Slot>)}
+      {diagrams &&
+        diagrams.map((item) => (
+          <Slot key={item.id}>
+            <DiagramCard name={item.id}></DiagramCard>
+          </Slot>
+        ))}
       {getDummieSlots()}
     </DiagramsListStyled>
   );

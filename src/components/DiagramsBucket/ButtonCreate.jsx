@@ -156,7 +156,7 @@ const FormNewDiagram = (props) => {
             value={name}
             onChange={(evt) => setName(evt.target.value)}
           />
-          <label for="diagramName">Nome</label>
+          <label htmlFor="diagramName">Nome</label>
         </InputNameStyled>
         <IconButton
           icon={AiOutlineCheckCircle}

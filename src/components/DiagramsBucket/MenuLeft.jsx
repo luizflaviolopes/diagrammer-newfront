@@ -27,6 +27,9 @@ const MenuPanelStyled = styled.div`
     background-color: green;
     border-color: black white white white;
   }
+  div.buttons {
+    font-size: xx-large;
+  }
 `;
 
 const MeuLeft = (props) => {
@@ -34,8 +37,10 @@ const MeuLeft = (props) => {
     <MenuPanelStyled>
       <div className="title">Sistema de Diagramação</div>
       <hr></hr>
-      <IconButton icon={BsViewList}></IconButton>
-      <IconButton icon={FaUserCircle}></IconButton>
+      <div className="buttons">
+        <IconButton icon={BsViewList}></IconButton>
+        <IconButton icon={FaUserCircle}></IconButton>
+      </div>
       <div className="borderEnd"></div>
     </MenuPanelStyled>
   );
