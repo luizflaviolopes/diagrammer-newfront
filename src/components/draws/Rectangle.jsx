@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import ReactEditableSvgLabel from "react-editable-svg-label";
 
 export const Demo = (props) => {
   return <rect x="0" y="0" height={100} width={100}></rect>;
@@ -21,6 +22,12 @@ const ResizeHitbox = (props) => {
 };
 
 const Rectangle = (props) => {
+  const [text, setText] = useState(props.text);
+
+  const handleChangeText = (newText) => {
+    setText(newText);
+  };
+
   return (
     <React.Fragment>
       <rect
@@ -65,6 +72,15 @@ const Rectangle = (props) => {
         corner="sw"
         drawId={props.id}
       ></ResizeHitbox>
+      <ReactEditableSvgLabel
+        x={props.width / 2}
+        y="2"
+        alignment-baseline="hanging"
+        text-anchor="middle"
+        onChange={handleChangeText}
+      >
+        {text}
+      </ReactEditableSvgLabel>
     </React.Fragment>
   );
 };

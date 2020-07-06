@@ -98,7 +98,7 @@ export const drawAdd = (state, actionPayload) => {
 
   let newDraw = {
     type: actionPayload.type,
-    text: "",
+    text: "Element",
     ...positionBoardRelative,
     height: 100,
     width: 100,
