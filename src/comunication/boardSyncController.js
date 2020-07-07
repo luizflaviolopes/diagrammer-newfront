@@ -1,5 +1,5 @@
-import queue from "./queue";
-import serverConnector from "./serverConnector";
+import queue from "./components/queue";
+import serverConnector from "./connectors/socketServerConnector";
 
 const newAction = (action) => {
   queue.add(action);
@@ -11,7 +11,9 @@ const startConnection = () => {
 };
 
 const stopConnection = () => {
-  serverConnector.connect();
+  serverConnector.closeConnection();
 };
+
+const getBoardLastState = (boardId) => {};
 
 export default { newAction, startConnection, stopConnection };

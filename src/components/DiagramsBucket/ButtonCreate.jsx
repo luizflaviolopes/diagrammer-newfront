@@ -6,7 +6,7 @@ import { useState } from "react";
 import { CSSTransition } from "react-transition-group";
 import "../../css/animations.css";
 import IconButton from "./IconButton";
-import api from "../../tools/api";
+import { createDiagram } from "../../comunication/diagramsController";
 
 const ButtonCreateStyled = styled.div`
   width: 100%;
@@ -134,7 +134,7 @@ const FormNewDiagram = (props) => {
   const [name, setName] = useState();
 
   const handleCreateDiagram = async (evt) => {
-    api.post("diagrams/create", { name: name }).then();
+    createDiagram().then();
   };
 
   return (

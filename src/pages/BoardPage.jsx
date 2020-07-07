@@ -5,19 +5,14 @@ import testCreateSomeElements from "../TestScripts/createSomeElements";
 import { Provider } from "react-redux";
 import store from "../store";
 import ServerStatus from "../containers/ServerStatus";
-import syncController from "../boardSync/syncController";
+import syncController from "../comunication/boardSyncController";
 
 const BoardPage = (props) => {
-
   useEffect(() => {
     syncController.startConnection();
     testCreateSomeElements();
     return syncController.stopConnection;
-    
   });
-
-  
-
 
   return (
     <Provider store={store}>

@@ -1,6 +1,6 @@
 import axios from "axios";
-import { Auth } from "aws-amplify";
-import config from "../config.js";
+import userAPI from "../userAPI";
+import config from "../../config.js";
 
 const instance = axios.create({ baseURL: config.apiDomain });
 
@@ -8,8 +8,8 @@ const injectAuth = async (configs) => {
   let conf = configs || {};
   conf.headers = conf.headers || {};
 
-  const user = await Auth.currentSession();
-  conf.headers.Authorization = user.getIdToken().jwtToken;
+  const userToken = await userAPI.getUserToken();
+  conf.headers.Authorization = userToken;
 
   return conf;
 };

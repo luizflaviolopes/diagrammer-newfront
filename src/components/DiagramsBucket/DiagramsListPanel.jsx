@@ -1,8 +1,6 @@
 import React from "react";
-import { Auth } from "aws-amplify";
 import { Link, useNavigate } from "@reach/router";
-import conf from "../../config.js";
-import api from "../../tools/api.js";
+import { getUserDiagrams } from "../../comunication/diagramsController";
 import Slot from "./Slot.jsx";
 import styled from "styled-components";
 import ButtonCreate from "./ButtonCreate.jsx";
@@ -29,7 +27,7 @@ const DiagramsListPanel = (props) => {
   const [diagrams, setDiagrams] = useState([]);
 
   const fillDiagrams = () => {
-    api.get("diagrams").then((a) => {
+    getUserDiagrams().then((a) => {
       setDiagrams(a);
     });
   };
