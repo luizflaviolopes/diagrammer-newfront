@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ReactEditableSvgLabel from "react-editable-svg-label";
+import EditableText from "../EditableText";
 
 export const Demo = (props) => {
   return <rect x="0" y="0" height={100} width={100}></rect>;
@@ -72,15 +72,9 @@ const Rectangle = (props) => {
         corner="sw"
         drawId={props.id}
       ></ResizeHitbox>
-      <ReactEditableSvgLabel
-        x={props.width / 2}
-        y="2"
-        alignment-baseline="hanging"
-        text-anchor="middle"
-        onChange={handleChangeText}
-      >
-        {text}
-      </ReactEditableSvgLabel>
+      <EditableText elId={props.id} x={props.width / 2} y={2}>
+        {props.text}
+      </EditableText>
     </React.Fragment>
   );
 };

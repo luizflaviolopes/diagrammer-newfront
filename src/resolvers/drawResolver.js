@@ -361,3 +361,14 @@ export const getSiblings = (state, draw) => {
 
   return siblings;
 };
+
+export const changeText = (state, actionPayload) => {
+  const draw = state.draws[actionPayload.id];
+
+  const newDraw = { ...draw };
+  newDraw.text = actionPayload.text;
+
+  state.draws[actionPayload.id] = newDraw;
+
+  return state;
+};

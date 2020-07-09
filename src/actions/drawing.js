@@ -81,3 +81,10 @@ export const stopResizeDraw = (data) => {
     payload: data,
   };
 };
+
+export const changeDrawText = (data) => {
+  return {
+    type: types.BOARD_DRAW_CHANGE_TEXT,
+    payload: data,
+  };
+};
