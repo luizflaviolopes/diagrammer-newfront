@@ -21,9 +21,9 @@ const BoardWrapper = (props) => {
 
 const BoardAdapter = (props) => {
   useEffect(() => {
-    syncController.startConnection();
+    boardSyncController.startBoard(props.boardId);
     testCreateSomeElements();
-    return syncController.stopConnection;
+    return boardSyncController.stopConnection;
   });
 
   const [status, setStatus] = useState(false);

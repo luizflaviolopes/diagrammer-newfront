@@ -21,8 +21,9 @@ const DiagramsListStyled = styled.div`
 
 const DiagramsListPanel = (props) => {
   useEffect(() => {
+    console.log("recreating");
     fillDiagrams();
-  });
+  }, []);
 
   const [diagrams, setDiagrams] = useState([]);
 
@@ -33,10 +34,15 @@ const DiagramsListPanel = (props) => {
   };
 
   const getDummieSlots = () => {
-    if (diagrams.length >= 8) return null;
-
+    const dummiesCount =
+      diagrams.length >= 8
+        ? (diagrams.length + 1) % 3 === 0
+          ? 0
+          : 3 - ((diagrams.length + 1) % 3)
+        : 8 - diagrams.length;
     let dummieSlots = [];
-    for (let i = diagrams.length; i < 8; i++) {
+
+    for (let i = 0; i < dummiesCount; i++) {
       dummieSlots.push(<Slot key={"dummie" + i}></Slot>);
     }
     return dummieSlots;
@@ -45,14 +51,18 @@ const DiagramsListPanel = (props) => {
   return (
     <DiagramsListStyled>
       <Slot>
-        <ButtonCreate></ButtonCreate>
+        <ButtonCreate onCreate={fillDiagrams}></ButtonCreate>
       </Slot>
       {diagrams &&
-        diagrams.map((item) => (
-          <Slot key={item.id}>
-            <DiagramCard name={item.id}></DiagramCard>
-          </Slot>
-        ))}
+        diagrams
+          .sort((a, b) => {
+            return a.createdAt > b.createdAt ? 1 : -1;
+          })
+          .map((item) => (
+            <Slot key={item.id}>
+              <DiagramCard name={item.name} boardId={item.id}></DiagramCard>
+            </Slot>
+          ))}
       {getDummieSlots()}
     </DiagramsListStyled>
   );

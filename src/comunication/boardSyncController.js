@@ -7,8 +7,6 @@ const newAction = (action) => {
   serverConnector.startSending();
 };
 
-const startConnection = () => {};
-
 const stopConnection = () => {
   serverConnector.closeConnection();
 };
@@ -22,4 +20,4 @@ const startBoard = async (boardId) => {
   serverConnector.connect(boardId);
 };
 
-export default { newAction, startConnection, stopConnection };
+export default { newAction, startBoard, stopConnection };

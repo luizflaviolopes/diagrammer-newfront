@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { useNavigate } from "@reach/router";
 import IconButton from "./IconButton";
 import { FaTrashAlt } from "react-icons/fa";
 
@@ -56,8 +57,14 @@ const StyledCard = styled.div`
 `;
 
 const DiagramCard = (props) => {
+  const navigate = useNavigate();
+
+  const handleClick = (evt) => {
+    navigate(`/board/${props.boardId}`);
+  };
+
   return (
-    <StyledCard>
+    <StyledCard onClick={handleClick}>
       <div className="title">
         <div>{props.name}</div>
       </div>

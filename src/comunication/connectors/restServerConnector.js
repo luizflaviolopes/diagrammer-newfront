@@ -35,6 +35,6 @@ const request = async (path, data, config, type) => {
 };
 
 export default {
-  post: (path, data, config) => request(path, data, config, "post"),
-  get: (path, config) => request(path, null, config, "get"),
+  post: async (path, data, config) => await request(path, data, config, "post"),
+  get: async (path, config) => await request(path, null, config, "get"),
 };

@@ -7,6 +7,7 @@ import { CSSTransition } from "react-transition-group";
 import "../../css/animations.css";
 import IconButton from "./IconButton";
 import { createDiagram } from "../../comunication/diagramsController";
+import PropagateLoader from "react-spinners/PropagateLoader";
 
 const ButtonCreateStyled = styled.div`
   width: 100%;
@@ -32,7 +33,10 @@ const ButtonCreate = (props) => {
   const handleCloseForm = (evt) => {
     showForm(false);
   };
-
+  const handleCreate = (evt) => {
+    props.onCreate();
+    handleCloseForm();
+  };
   return (
     <div>
       <ButtonCreateStyled cover={cover} onClick={handleOpenForm}>
@@ -40,6 +44,7 @@ const ButtonCreate = (props) => {
         <FormNewDiagram
           in={form}
           onCancel={handleCloseForm}
+          onCreate={handleCreate}
           onExited={() => showCover(true)}
         ></FormNewDiagram>
       </ButtonCreateStyled>
@@ -132,9 +137,15 @@ const InputNameStyled = styled.div`
 
 const FormNewDiagram = (props) => {
   const [name, setName] = useState();
+  const [waiting, setWaiting] = useState(false);
 
   const handleCreateDiagram = async (evt) => {
-    createDiagram().then();
+    setWaiting(true);
+    createDiagram(name).then((data) => {
+      props.onCreate();
+    });
+    setWaiting(false);
+    setName("");
   };
 
   return (
@@ -158,18 +169,32 @@ const FormNewDiagram = (props) => {
           />
           <label htmlFor="diagramName">Nome</label>
         </InputNameStyled>
-        <IconButton
-          icon={AiOutlineCheckCircle}
-          size="larger"
-          style={{ display: "inline-block" }}
-          onClick={handleCreateDiagram}
-        ></IconButton>
-        <IconButton
-          icon={AiOutlineCloseCircle}
-          size="larger"
-          style={{ display: "inline-block" }}
-          onClick={props.onCancel}
-        ></IconButton>
+        {waiting ? (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <PropagateLoader size={14} color={"white"} loading={true} />
+          </div>
+        ) : (
+          <React.Fragment>
+            <IconButton
+              icon={AiOutlineCheckCircle}
+              size="larger"
+              style={{ display: "inline-block" }}
+              onClick={handleCreateDiagram}
+            ></IconButton>
+            <IconButton
+              icon={AiOutlineCloseCircle}
+              size="larger"
+              style={{ display: "inline-block" }}
+              onClick={props.onCancel}
+            ></IconButton>
+          </React.Fragment>
+        )}
       </div>
     </CSSTransition>
   );
