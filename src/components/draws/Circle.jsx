@@ -1,4 +1,5 @@
 import React from "react";
+import EditableText from "../EditableText";
 
 const ResizeHitbox = (props) => {
   return (
@@ -83,6 +84,14 @@ const Circle = (props) => {
             corner="sw"
             drawId={props.id}
           ></ResizeHitbox>
+          <EditableText
+            elId={props.id}
+            x={props.width / 2}
+            y={props.height / 2 - ((props.height / 2) * Math.sqrt(2)) / 2}
+            width={(props.width / 2) * Math.sqrt(2)}
+          >
+            {props.text}
+          </EditableText>
         </React.Fragment>
       ) : null}
     </React.Fragment>
