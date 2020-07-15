@@ -57,25 +57,34 @@ const Circle = (props) => {
         d={pathPoints}
         {...props.strokeProperties}
       ></path>
-      <ResizeHitbox x="0" y="0" corner="nw" drawId={props.id}></ResizeHitbox>
-      <ResizeHitbox
-        x={props.width - 10}
-        y="0"
-        corner="ne"
-        drawId={props.id}
-      ></ResizeHitbox>
-      <ResizeHitbox
-        x={props.width - 10}
-        y={props.height - 10}
-        corner="se"
-        drawId={props.id}
-      ></ResizeHitbox>
-      <ResizeHitbox
-        x="0"
-        y={props.height - 10}
-        corner="sw"
-        drawId={props.id}
-      ></ResizeHitbox>
+      {props.pointerEvents != "none" ? (
+        <React.Fragment>
+          <ResizeHitbox
+            x="0"
+            y="0"
+            corner="nw"
+            drawId={props.id}
+          ></ResizeHitbox>
+          <ResizeHitbox
+            x={props.width - 10}
+            y="0"
+            corner="ne"
+            drawId={props.id}
+          ></ResizeHitbox>
+          <ResizeHitbox
+            x={props.width - 10}
+            y={props.height - 10}
+            corner="se"
+            drawId={props.id}
+          ></ResizeHitbox>
+          <ResizeHitbox
+            x="0"
+            y={props.height - 10}
+            corner="sw"
+            drawId={props.id}
+          ></ResizeHitbox>
+        </React.Fragment>
+      ) : null}
     </React.Fragment>
   );
 };

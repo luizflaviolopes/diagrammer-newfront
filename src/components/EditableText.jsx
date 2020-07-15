@@ -5,10 +5,37 @@ import { useEffect } from "react";
 import { connect } from "react-redux";
 import { changeDrawText } from "../actions/drawing";
 
-const StyledInputText = styled.input`
+const StyledInputText = styled.textarea`
   position: absolute;
   left: ${(props) => props.position.x}px;
   top: ${(props) => props.position.y}px;
+  width: ${(props) => props.position.width}px;
+  resize: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  text-align: center;
+  font-size: 15px;
+
+  :hover {
+    border: none;
+    padding: 0;
+    margin: 0;
+    outline: 0;
+  }
+  :focus {
+    border: none;
+    padding: 0;
+    margin: 0;
+    outline: 0;
+  }
+  :active {
+    border: none;
+    padding: 0;
+    margin: 0;
+    outline: 0;
+  }
 `;
 
 const EditableText = (props) => {
@@ -16,6 +43,8 @@ const EditableText = (props) => {
 
   const handleClick = (evt) => {
     const position = evt.target.getBoundingClientRect();
+    position.x = position.x + position.width / 2 - props.width / 2;
+    position.width = props.width;
     setCoord(position);
   };
 
@@ -43,6 +72,7 @@ const EditableText = (props) => {
       alignment-baseline="hanging"
       x={props.x}
       y={props.y}
+      style={{ fontSize: "15px", fontFamily: "Arial" }}
     >
       {props.children}
     </text>
@@ -65,7 +95,7 @@ const InputText = (props) => {
     <StyledInputText
       ref={inputEl}
       position={props.position}
-      style={props.style}
+      style={{ fontFamily: "Arial", ...props.style }}
       value={props.children}
       onBlur={handleOnBlur}
       onChange={(evt) => {

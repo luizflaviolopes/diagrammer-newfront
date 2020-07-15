@@ -53,28 +53,42 @@ const Rectangle = (props) => {
         width={props.width}
         {...props.strokeProperties}
       ></rect>
-      <ResizeHitbox x="0" y="0" corner="nw" drawId={props.id}></ResizeHitbox>
-      <ResizeHitbox
-        x={props.width - 10}
-        y="0"
-        corner="ne"
-        drawId={props.id}
-      ></ResizeHitbox>
-      <ResizeHitbox
-        x={props.width - 10}
-        y={props.height - 10}
-        corner="se"
-        drawId={props.id}
-      ></ResizeHitbox>
-      <ResizeHitbox
-        x="0"
-        y={props.height - 10}
-        corner="sw"
-        drawId={props.id}
-      ></ResizeHitbox>
-      <EditableText elId={props.id} x={props.width / 2} y={2}>
-        {props.text}
-      </EditableText>
+      {props.pointerEvents != "none" ? (
+        <React.Fragment>
+          <ResizeHitbox
+            x="0"
+            y="0"
+            corner="nw"
+            drawId={props.id}
+          ></ResizeHitbox>
+          <ResizeHitbox
+            x={props.width - 10}
+            y="0"
+            corner="ne"
+            drawId={props.id}
+          ></ResizeHitbox>
+          <ResizeHitbox
+            x={props.width - 10}
+            y={props.height - 10}
+            corner="se"
+            drawId={props.id}
+          ></ResizeHitbox>
+          <ResizeHitbox
+            x="0"
+            y={props.height - 10}
+            corner="sw"
+            drawId={props.id}
+          ></ResizeHitbox>
+          <EditableText
+            elId={props.id}
+            x={props.width / 2}
+            y={5}
+            width={props.width}
+          >
+            {props.text}
+          </EditableText>
+        </React.Fragment>
+      ) : null}
     </React.Fragment>
   );
 };
