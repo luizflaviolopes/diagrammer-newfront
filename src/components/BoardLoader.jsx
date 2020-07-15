@@ -1,11 +1,20 @@
 import React from "react";
 import GridLoader from "react-spinners/GridLoader";
+import styled from "styled-components";
+
+const StyledDivLoadingAllView = styled.div`
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  align-items: center;
+  justify-content: center;
+`;
 
 const BoardLoader = (props) => {
   return (
-    <div>
-      <GridLoader size={14} color={"gold"} loading={true} />
-    </div>
+    <StyledDivLoadingAllView>
+      <GridLoader size={40} color={"rgb(183,180,77)"} loading={true} />
+    </StyledDivLoadingAllView>
   );
 };
 

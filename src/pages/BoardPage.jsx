@@ -21,10 +21,12 @@ const BoardWrapper = (props) => {
 
 const BoardAdapter = (props) => {
   useEffect(() => {
-    boardSyncController.startBoard(props.boardId);
+    boardSyncController.startBoard(props.boardId).then(() => {
+      setStatus(true);
+    });
     testCreateSomeElements();
     return boardSyncController.stopConnection;
-  });
+  }, []);
 
   const [status, setStatus] = useState(false);
 

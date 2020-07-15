@@ -16,8 +16,8 @@ const getBoardLastState = async (boardId) => {
 };
 
 const startBoard = async (boardId) => {
-  const boardState = getBoardLastState(boardId);
   serverConnector.connect(boardId);
+  const boardState = await getBoardLastState(boardId);
 };
 
 export default { newAction, startBoard, stopConnection };
