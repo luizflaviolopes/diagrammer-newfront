@@ -89,6 +89,7 @@ const Circle = (props) => {
             x={props.width / 2}
             y={props.height / 2 - ((props.height / 2) * Math.sqrt(2)) / 2}
             width={(props.width / 2) * Math.sqrt(2)}
+            height={(props.height / 2) * Math.sqrt(2)}
           >
             {props.text}
           </EditableText>

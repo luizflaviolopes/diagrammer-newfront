@@ -10,6 +10,8 @@ const StyledInputText = styled.textarea`
   left: ${(props) => props.position.x}px;
   top: ${(props) => props.position.y}px;
   width: ${(props) => props.position.width}px;
+  height: ${(props) => props.position.height}px;
+  overflow: hidden;
   resize: none;
   border: none;
   padding: 0;
@@ -45,6 +47,7 @@ const EditableText = (props) => {
     const position = evt.target.getBoundingClientRect();
     position.x = position.x + position.width / 2 - props.width / 2;
     position.width = props.width;
+    position.height = props.height;
     setCoord(position);
   };
 
@@ -66,16 +69,24 @@ const EditableText = (props) => {
   }
 
   return (
-    <text
-      onClick={handleClick}
-      text-anchor="middle"
-      alignment-baseline="hanging"
-      x={props.x}
-      y={props.y}
-      style={{ fontSize: "15px", fontFamily: "Arial" }}
-    >
-      {props.children}
-    </text>
+    <React.Fragment>
+      {props.children
+        .match(new RegExp(`[\\s\\S]{1,${Math.floor(props.width / 10)}}`, "g"))
+        .map((line, i) => {
+          return (
+            <text
+              onClick={handleClick}
+              text-anchor="middle"
+              alignment-baseline="hanging"
+              x={props.x}
+              y={props.y + i * 15}
+              style={{ fontSize: "15px", fontFamily: "Arial" }}
+            >
+              {line}
+            </text>
+          );
+        })}
+    </React.Fragment>
   );
 };
 

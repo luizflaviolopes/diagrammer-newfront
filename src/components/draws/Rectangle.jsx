@@ -84,6 +84,7 @@ const Rectangle = (props) => {
             x={props.width / 2}
             y={5}
             width={props.width}
+            height={props.height}
           >
             {props.text}
           </EditableText>
