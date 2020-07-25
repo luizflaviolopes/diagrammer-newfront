@@ -360,7 +360,7 @@ export const updateConnectorsFromResize = (draw, connectorsList, variants) => {
 
       case 90:
         varY = variants.varN;
-        varX = (variants.varW + variants.varE) / 2;
+        varX = variants.varW;
         conn.endPoints[connRef.endPoint].x += varX;
         conn.endPoints[connRef.endPoint].y += varY;
 

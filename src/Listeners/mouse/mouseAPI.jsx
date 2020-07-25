@@ -1,6 +1,7 @@
 import { onDrawDragStart, IsDraw } from "./draggingDraw";
 import { IsConnector, onDrawConnectorStart } from "./draggingConnector";
 import { IsResizeAnchor, onManualResizeStart } from "./draggingResizeAnchor";
+import { changeZoom } from "./zoom";
 
 const onMouseDownFunction = (evt) => {
   if (evt.button == 0) {
@@ -26,17 +27,23 @@ const onMouseMoveFunction = (evt) => {
   }
 };
 
-const draggingAPI = {
-  startDrag: () => {
+const onMouseWheelFunction = (evt) => {
+  changeZoom(evt);
+};
+
+const mouseAPI = {
+  startAPI: () => {
     window.onmousedown = onMouseDownFunction;
     window.onmouseup = onMouseUpFunction;
     window.onmousemove = onMouseMoveFunction;
+    window.onmousewheel = onMouseWheelFunction;
   },
-  endDrag: () => {
+  endAPI: () => {
     window.onmousedown = undefined;
     window.onmouseup = undefined;
     window.onmousemove = undefined;
+    window.onmousewheel = undefined;
   },
 };
 
-export default draggingAPI;
+export default mouseAPI;

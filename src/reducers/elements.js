@@ -4,14 +4,8 @@ import * as drawResolver from "../resolvers/drawResolver";
 import * as connectorResolvers from "../resolvers/connectorsResolver";
 import * as keyboardResolver from "../resolvers/keyboardResolver";
 import * as drawListBoxResolver from "../resolvers/drawListBoxResolver";
-import elementsConnectorPointsCalculator from "../helpers/elementsConnectorPointsCalculator";
 
 const setState = () => ({
-  boardView: {
-    x: 0,
-    y: 0,
-    zoom: 1,
-  },
   counters: {
     draws: 1,
     connectors: 1,
@@ -35,6 +29,7 @@ const setState = () => ({
 });
 
 export default (state = setState(), action = {}) => {
+  console.log(action);
   switch (action.type) {
     //draw actions
 
