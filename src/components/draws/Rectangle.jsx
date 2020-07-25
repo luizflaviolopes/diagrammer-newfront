@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import EditableText from "../EditableText";
 
 export const Demo = (props) => {
   return <rect x="0" y="0" height={100} width={100}></rect>;
@@ -21,6 +22,12 @@ const ResizeHitbox = (props) => {
 };
 
 const Rectangle = (props) => {
+  const [text, setText] = useState(props.text);
+
+  const handleChangeText = (newText) => {
+    setText(newText);
+  };
+
   return (
     <React.Fragment>
       <rect
@@ -46,25 +53,43 @@ const Rectangle = (props) => {
         width={props.width}
         {...props.strokeProperties}
       ></rect>
-      <ResizeHitbox x="0" y="0" corner="nw" drawId={props.id}></ResizeHitbox>
-      <ResizeHitbox
-        x={props.width - 10}
-        y="0"
-        corner="ne"
-        drawId={props.id}
-      ></ResizeHitbox>
-      <ResizeHitbox
-        x={props.width - 10}
-        y={props.height - 10}
-        corner="se"
-        drawId={props.id}
-      ></ResizeHitbox>
-      <ResizeHitbox
-        x="0"
-        y={props.height - 10}
-        corner="sw"
-        drawId={props.id}
-      ></ResizeHitbox>
+      {props.pointerEvents != "none" ? (
+        <React.Fragment>
+          <ResizeHitbox
+            x="0"
+            y="0"
+            corner="nw"
+            drawId={props.id}
+          ></ResizeHitbox>
+          <ResizeHitbox
+            x={props.width - 10}
+            y="0"
+            corner="ne"
+            drawId={props.id}
+          ></ResizeHitbox>
+          <ResizeHitbox
+            x={props.width - 10}
+            y={props.height - 10}
+            corner="se"
+            drawId={props.id}
+          ></ResizeHitbox>
+          <ResizeHitbox
+            x="0"
+            y={props.height - 10}
+            corner="sw"
+            drawId={props.id}
+          ></ResizeHitbox>
+        </React.Fragment>
+      ) : null}
+      <EditableText
+        elId={props.id}
+        x={props.width / 2}
+        y={5}
+        width={props.width}
+        height={props.height}
+      >
+        {props.text}
+      </EditableText>
     </React.Fragment>
   );
 };

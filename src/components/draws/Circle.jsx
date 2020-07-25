@@ -1,4 +1,5 @@
 import React from "react";
+import EditableText from "../EditableText";
 
 const ResizeHitbox = (props) => {
   return (
@@ -57,25 +58,43 @@ const Circle = (props) => {
         d={pathPoints}
         {...props.strokeProperties}
       ></path>
-      <ResizeHitbox x="0" y="0" corner="nw" drawId={props.id}></ResizeHitbox>
-      <ResizeHitbox
-        x={props.width - 10}
-        y="0"
-        corner="ne"
-        drawId={props.id}
-      ></ResizeHitbox>
-      <ResizeHitbox
-        x={props.width - 10}
-        y={props.height - 10}
-        corner="se"
-        drawId={props.id}
-      ></ResizeHitbox>
-      <ResizeHitbox
-        x="0"
-        y={props.height - 10}
-        corner="sw"
-        drawId={props.id}
-      ></ResizeHitbox>
+      {props.pointerEvents != "none" ? (
+        <React.Fragment>
+          <ResizeHitbox
+            x="0"
+            y="0"
+            corner="nw"
+            drawId={props.id}
+          ></ResizeHitbox>
+          <ResizeHitbox
+            x={props.width - 10}
+            y="0"
+            corner="ne"
+            drawId={props.id}
+          ></ResizeHitbox>
+          <ResizeHitbox
+            x={props.width - 10}
+            y={props.height - 10}
+            corner="se"
+            drawId={props.id}
+          ></ResizeHitbox>
+          <ResizeHitbox
+            x="0"
+            y={props.height - 10}
+            corner="sw"
+            drawId={props.id}
+          ></ResizeHitbox>
+          <EditableText
+            elId={props.id}
+            x={props.width / 2}
+            y={props.height / 2 - ((props.height / 2) * Math.sqrt(2)) / 2}
+            width={(props.width / 2) * Math.sqrt(2)}
+            height={(props.height / 2) * Math.sqrt(2)}
+          >
+            {props.text}
+          </EditableText>
+        </React.Fragment>
+      ) : null}
     </React.Fragment>
   );
 };

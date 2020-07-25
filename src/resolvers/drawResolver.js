@@ -98,7 +98,7 @@ export const drawAdd = (state, actionPayload) => {
 
   let newDraw = {
     type: actionPayload.type,
-    text: "",
+    text: "Element",
     ...positionBoardRelative,
     height: 100,
     width: 100,
@@ -360,4 +360,15 @@ export const getSiblings = (state, draw) => {
   }
 
   return siblings;
+};
+
+export const changeText = (state, actionPayload) => {
+  const draw = state.draws[actionPayload.id];
+
+  const newDraw = { ...draw };
+  newDraw.text = actionPayload.text;
+
+  state.draws[actionPayload.id] = newDraw;
+
+  return state;
 };

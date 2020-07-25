@@ -353,7 +353,7 @@ export const updateConnectorsFromResize = (draw, connectorsList, variants) => {
     switch (connRef.angle) {
       case 0: //se w variar em valor diferente de x || se y variar +/- que variação de H|| se h variar
         varY = (variants.varS + variants.varN) / 2;
-        varX = variants.varW;
+        varX = variants.varE;
         conn.endPoints[connRef.endPoint].x += varX;
         conn.endPoints[connRef.endPoint].y += varY;
         break;
