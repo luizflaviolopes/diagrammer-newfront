@@ -44,7 +44,7 @@ const EditableText = (props) => {
   const [coord, setCoord] = useState(null);
 
   const handleClick = (evt) => {
-    const position = evt.target.getBoundingClientRect();
+    const position = evt.currentTarget.getBoundingClientRect();
     position.x = position.x + position.width / 2 - props.width / 2;
     position.width = props.width;
     position.height = props.height;
@@ -69,24 +69,28 @@ const EditableText = (props) => {
   }
 
   return (
-    <React.Fragment>
+    <g onClick={handleClick}>
       {props.children
-        .match(new RegExp(`[\\s\\S]{1,${Math.floor(props.width / 10)}}`, "g"))
+        //.match(new RegExp(`[\\s\\S]{1,${Math.floor(props.width / 10)}}`, "g"))
+        .split("\n")
         .map((line, i) => {
           return (
             <text
-              onClick={handleClick}
               text-anchor="middle"
               alignment-baseline="hanging"
               x={props.x}
-              y={props.y + i * 15}
-              style={{ fontSize: "15px", fontFamily: "Arial" }}
+              y={props.y + i * 16}
+              style={{
+                fontSize: "15px",
+                fontFamily: "Arial",
+                userSelect: "none",
+              }}
             >
               {line}
             </text>
           );
         })}
-    </React.Fragment>
+    </g>
   );
 };
 

@@ -79,17 +79,17 @@ const Rectangle = (props) => {
             corner="sw"
             drawId={props.id}
           ></ResizeHitbox>
-          <EditableText
-            elId={props.id}
-            x={props.width / 2}
-            y={5}
-            width={props.width}
-            height={props.height}
-          >
-            {props.text}
-          </EditableText>
         </React.Fragment>
       ) : null}
+      <EditableText
+        elId={props.id}
+        x={props.width / 2}
+        y={5}
+        width={props.width}
+        height={props.height}
+      >
+        {props.text}
+      </EditableText>
     </React.Fragment>
   );
 };
