@@ -16,9 +16,10 @@ const StyledInputText = styled.textarea`
   border: none;
   padding: 0;
   margin: 0;
-  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0.1);
   text-align: center;
   font-size: 15px;
+  white-space: pre;
 
   :hover {
     border: none;
@@ -45,9 +46,9 @@ const EditableText = (props) => {
 
   const handleClick = (evt) => {
     const position = evt.currentTarget.getBoundingClientRect();
-    position.x = position.x + position.width / 2 - props.width / 2;
-    position.width = props.width;
-    position.height = props.height;
+    position.x = position.x;
+    position.width = position.width;
+    position.height = position.height;
     setCoord(position);
   };
 
@@ -97,10 +98,36 @@ const EditableText = (props) => {
 const InputText = (props) => {
   const inputEl = useRef(null);
 
+  const [position, setPosition] = useState(props.position);
+
   useEffect(() => {
     console.log(inputEl);
     inputEl.current.focus();
-  });
+    textSizing();
+  }, []);
+
+  const handleOnChange = (evt) => {
+    textSizing();
+    props.changeText({ id: props.elId, text: evt.target.value });
+  };
+
+  const textSizing = () => {
+    const txtArea = inputEl.current;
+
+    const newHeight = txtArea.scrollHeight;
+    const newWidth = txtArea.scrollWidth + 2;
+
+    let widthDiff = newWidth - props.position.width;
+
+    const newX = props.position.x - widthDiff / 2;
+
+    setPosition({
+      height: newHeight,
+      width: newWidth,
+      x: newX,
+      y: props.position.y,
+    });
+  };
 
   const handleOnBlur = (evt) => {
     props.onFinish();
@@ -109,13 +136,11 @@ const InputText = (props) => {
   return (
     <StyledInputText
       ref={inputEl}
-      position={props.position}
+      position={position}
       style={{ fontFamily: "Arial", ...props.style }}
       value={props.children}
       onBlur={handleOnBlur}
-      onChange={(evt) => {
-        props.changeText({ id: props.elId, text: evt.target.value });
-      }}
+      onChange={handleOnChange}
     ></StyledInputText>
   );
 };
