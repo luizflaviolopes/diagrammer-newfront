@@ -14,6 +14,8 @@ const boardStartReBuild = (data) => {
 const replayActionsInState = (state, actions) => {
   let newState = state;
 
+  if (!newState && actions.length == 0) return elementsReducer();
+
   for (let i = 0; i < actions.length; i++) {
     newState = elementsReducer(newState, actions[i].action);
   }
