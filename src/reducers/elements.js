@@ -55,6 +55,10 @@ export default (state = setState(), action = {}) => {
     case actionTypes.BOARD_DRAW_STOP_RESIZE:
       return drawResolver.resizeDraw({ ...state }, action.payload);
 
+    //ServerSyncActions
+    case actionTypes.BOARD_REBUILD:
+      return action.payload;
+
     //connector actions
 
     case actionTypes.BOARD_CONNECTOR_DRAWING:

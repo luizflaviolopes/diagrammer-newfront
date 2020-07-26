@@ -1,6 +1,7 @@
 import queue from "./components/queue";
 import serverConnector from "./connectors/socketServerConnector";
 import api from "./connectors/restServerConnector";
+import boardStartReBuild from "./components/boardStartReBuild";
 
 const newAction = (action) => {
   queue.add(action);
@@ -16,8 +17,9 @@ const getBoardLastState = async (boardId) => {
 };
 
 const startBoard = async (boardId) => {
-  serverConnector.connect(boardId);
   const boardState = await getBoardLastState(boardId);
+  boardStartReBuild(boardState);
+  serverConnector.connect(boardId);
 };
 
 export default { newAction, startBoard, stopConnection };
