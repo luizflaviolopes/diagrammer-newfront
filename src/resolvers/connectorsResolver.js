@@ -8,7 +8,7 @@ export const connectorDrawingStart = (state, actionPayload) => {
   const idFrom = +actionPayload.id;
 
   const positionBoardRelative = getPositionBoardRelative(
-    state,
+    actionPayload.boardView,
     actionPayload.variant.absolutePosition
   );
 
@@ -36,7 +36,10 @@ export const connectorDrawing = (state, actionPayload) => {
   const connector = state.connectors[state.counters.connectors];
   let newEndpoint = [...connector.endPoints];
 
-  const positionBoardRelative = getPositionBoardRelative(state, actionPayload);
+  const positionBoardRelative = getPositionBoardRelative(
+    actionPayload.boardView,
+    actionPayload
+  );
 
   newEndpoint[1] = {
     ...positionBoardRelative,

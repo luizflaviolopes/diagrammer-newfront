@@ -1,16 +1,16 @@
 export const getPositionBoardRelative = (
-  state,
+  boardView,
   absoluteposition,
   onlyZoom = false
 ) => {
   if (onlyZoom)
     return {
-      x: absoluteposition.x / state.boardView.zoom,
-      y: absoluteposition.y / state.boardView.zoom,
+      x: absoluteposition.x / boardView.zoom,
+      y: absoluteposition.y / boardView.zoom,
     };
   else
     return {
-      x: absoluteposition.x / state.boardView.zoom - state.boardView.x,
-      y: absoluteposition.y / state.boardView.zoom - state.boardView.y,
+      x: absoluteposition.x / boardView.zoom - boardView.x,
+      y: absoluteposition.y / boardView.zoom - boardView.y,
     };
 };

@@ -22,7 +22,7 @@ export const selectDraw = (state, actionPayload) => {
     clearDrawSelected(state);
   }
 
-  newSelectedDraw(state, selectedDraw, actionPayload.clientRectPosition);
+  newSelectedDraw(state, selectedDraw, actionPayload);
   state.sessionState.draggingElement = true;
 
   return state;
@@ -32,10 +32,15 @@ export const drawDragging = (state, actionPayload) => {
   let selecteds = state.sessionState.drawsSelected;
   let newPos = actionPayload.position;
 
+  const mouseMovementZoomRelative = getPositionBoardRelative(
+    actionPayload.boardView,
+    newPos,
+    true
+  );
+
   for (let i = 0; i < selecteds.length; i++) {
     const draw = state.draws[selecteds[i]];
-
-    updateDrawPosition(state, draw, newPos);
+    updateDrawPosition(state, draw, mouseMovementZoomRelative);
   }
 
   return state;
@@ -51,7 +56,7 @@ export const drawdrop = (state, actionPayload) => {
     const parent = state.draws[actionPayload.id];
 
     const positionBoardRelative = getPositionBoardRelative(
-      state,
+      actionPayload.boardView,
       actionPayload
     );
 
@@ -92,7 +97,7 @@ export const drawAdd = (state, actionPayload) => {
   const newID = state.counters.draws++;
 
   const positionBoardRelative = getPositionBoardRelative(
-    state,
+    actionPayload.boardView,
     actionPayload.position
   );
 
@@ -134,10 +139,10 @@ export const clearDrawSelected = (state) => {
   state.boardDrawShowOrder = [...state.boardDrawZOrder];
 };
 
-const newSelectedDraw = (state, drawSelected, clientRectPosition) => {
+const newSelectedDraw = (state, drawSelected, actionPayload) => {
   const positionBoardRelative = getPositionBoardRelative(
-    state,
-    clientRectPosition
+    actionPayload.boardView,
+    actionPayload.clientRectPosition
   );
 
   drawSelected.absolutePosition = {
@@ -177,14 +182,8 @@ const detachChildrenFromParentOnSelect = (parent, children_id) => {
   parent.childrens = removeFromArray(parent.childrens, children_id);
 };
 
-const updateDrawPosition = (state, draw, posVariation) => {
+const updateDrawPosition = (state, draw, mouseMovementZoomRelative) => {
   const newDraw = { ...draw };
-
-  const mouseMovementZoomRelative = getPositionBoardRelative(
-    state,
-    posVariation,
-    true
-  );
 
   newDraw.x = draw.absolutePosition.x + mouseMovementZoomRelative.x;
   newDraw.y = draw.absolutePosition.y + mouseMovementZoomRelative.y;
@@ -303,7 +302,7 @@ export const resizeDraw = (state, payload) => {
   const draw = state.draws[payload.id];
 
   const positionBoardRelative = getPositionBoardRelative(
-    state,
+    payload.boardView,
     payload.position
   );
 
