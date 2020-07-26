@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import Grid from "../components/Grid.jsx";
 import * as drawActions from "../actions/drawing";
 
-import draggingAPI from "../Listeners/mouse/draggingAPI";
+import mouseAPI from "../Listeners/mouse/mouseAPI";
 import keyboardAPI from "../Listeners/keyboard/keyboardAPI";
 
 import DrawWraper from "./DrawWrapper.jsx";
@@ -14,10 +14,10 @@ import SelectedDraws from "./SelectedDraws.jsx";
 
 const Board = (props) => {
   useEffect(() => {
-    draggingAPI.startDrag();
+    mouseAPI.startAPI();
     keyboardAPI.start();
     return () => {
-      draggingAPI.endDrag();
+      mouseAPI.endAPI();
       keyboardAPI.stop();
     };
   }, []);
@@ -74,7 +74,7 @@ const mapDispatchToProps = {
 };
 
 const mapStateToProps = (state) => ({
-  boardView: state.elements.boardView,
+  boardView: state.boardView,
   showSequence: state.elements.boardDrawShowOrder,
   selectedDraws: state.elements.sessionState.drawsSelected,
   selectedElement: state.elements.drawListBoxSelection,
