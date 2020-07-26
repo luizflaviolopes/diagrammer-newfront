@@ -1,5 +1,5 @@
 import notifier from "./connectionEventsNotifier";
-import * as serverConnectionsActions from "../actions/serverConnectionActions";
+import * as serverConnectionsActions from "../../actions/serverConnectionActions";
 
 let queue = [];
 let processing = false;

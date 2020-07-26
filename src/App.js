@@ -16,9 +16,9 @@ function App() {
   return (
     <div className="App">
       <Router>
-        <BoardPage default></BoardPage>
+        <BoardPage path="/board/:boardId"></BoardPage>
         <LoginPage path="/auth/*"></LoginPage>
-        <DiagramsBucket path="/diagrams"></DiagramsBucket>
+        <DiagramsBucket path="/diagrams" default></DiagramsBucket>
       </Router>
     </div>
   );

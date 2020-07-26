@@ -1,5 +1,5 @@
 import * as types from "../types/actionTypes";
-import syncController from "../boardSync/syncController";
+import syncController from "../comunication/boardSyncController";
 
 const actionSenderMiddleware = (store) => (next) => (action) => {
   const nextResult = next(action);

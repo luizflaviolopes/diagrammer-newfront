@@ -10,6 +10,7 @@ const SlotStyled = styled.div`
   display: flex;
   height: 30%;
   width: 30%;
+  overflow: hidden;
   > * {
     flex-grow: 1;
     flex-basis: 30%;

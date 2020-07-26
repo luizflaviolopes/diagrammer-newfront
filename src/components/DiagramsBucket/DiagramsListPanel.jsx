@@ -1,14 +1,13 @@
 import React from "react";
-import { Auth } from "aws-amplify";
 import { Link, useNavigate } from "@reach/router";
-import conf from "../../config.js";
-import api from "../../tools/api.js";
+import { getUserDiagrams } from "../../comunication/diagramsController";
 import Slot from "./Slot.jsx";
 import styled from "styled-components";
 import ButtonCreate from "./ButtonCreate.jsx";
 import { useEffect } from "react";
 import { useState } from "react";
 import ContentLoader from "react-content-loader";
+import DiagramCard from "./DiagramCard.jsx";
 
 const DiagramsListStyled = styled.div`
   display: flex;
@@ -22,23 +21,29 @@ const DiagramsListStyled = styled.div`
 
 const DiagramsListPanel = (props) => {
   useEffect(() => {
+    console.log("recreating");
     fillDiagrams();
-  });
+  }, []);
 
   const [diagrams, setDiagrams] = useState([]);
 
   const fillDiagrams = () => {
-    api.get("diagrams").then((a) => {
+    getUserDiagrams().then((a) => {
       setDiagrams(a);
     });
   };
 
   const getDummieSlots = () => {
-    if (diagrams.length >= 8) return null;
-
+    const dummiesCount =
+      diagrams.length >= 8
+        ? (diagrams.length + 1) % 3 === 0
+          ? 0
+          : 3 - ((diagrams.length + 1) % 3)
+        : 8 - diagrams.length;
     let dummieSlots = [];
-    for (let i = diagrams.length; i < 8; i++) {
-      dummieSlots.push(<Slot></Slot>);
+
+    for (let i = 0; i < dummiesCount; i++) {
+      dummieSlots.push(<Slot key={"dummie" + i}></Slot>);
     }
     return dummieSlots;
   };
@@ -46,9 +51,18 @@ const DiagramsListPanel = (props) => {
   return (
     <DiagramsListStyled>
       <Slot>
-        <ButtonCreate></ButtonCreate>
+        <ButtonCreate onCreate={fillDiagrams}></ButtonCreate>
       </Slot>
-      {diagrams && diagrams.map((item) => <Slot>{item.id}</Slot>)}
+      {diagrams &&
+        diagrams
+          .sort((a, b) => {
+            return a.createdAt > b.createdAt ? 1 : -1;
+          })
+          .map((item) => (
+            <Slot key={item.id}>
+              <DiagramCard name={item.name} boardId={item.id}></DiagramCard>
+            </Slot>
+          ))}
       {getDummieSlots()}
     </DiagramsListStyled>
   );

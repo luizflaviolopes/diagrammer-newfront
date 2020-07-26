@@ -1,8 +1,9 @@
-import configs from "../config";
-import { Auth } from "aws-amplify";
-import queue from "./queue";
-import notifier from "./connectionEventsNotifier";
-import * as serverConnectionsActions from "../actions/serverConnectionActions";
+import configs from "../../config";
+
+import queue from "../components/queue";
+import notifier from "../components/connectionEventsNotifier";
+import * as serverConnectionsActions from "../../actions/serverConnectionActions";
+import userAPI from "../userAPI";
 
 //https://javascript.info/websocket
 
@@ -31,18 +32,15 @@ const connectionClosed = (event) => {
   }
 };
 
-const connect = () => {
-  console.time("getUserToken");
-  getUserToken((userToken) => {
+const connect = (diagram) => {
+  userAPI.getUserToken().then((userToken) => {
     socket = new WebSocket(
-      `${configs.wsDomain}?token=${userToken}&diagram=teste`
+      `${configs.wsDomain}?token=${userToken}&diagram=${diagram}`
     );
     socket.onopen = connectionOpened;
     socket.onerror = connectionError;
     socket.onclose = connectionClosed;
   });
-
-  console.timeEnd("getUserToken");
 };
 
 const startSending = () => {
@@ -61,12 +59,6 @@ const stopSending = () => {
     clearInterval(sendingInterval);
     sendingInterval = undefined;
   }
-};
-
-const getUserToken = (callback) => {
-  Auth.currentSession().then((userData) => {
-    callback(userData.getIdToken().getJwtToken());
-  });
 };
 
 const sendNext = () => {
