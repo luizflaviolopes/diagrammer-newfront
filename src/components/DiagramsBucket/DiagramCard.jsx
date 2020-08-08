@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "@reach/router";
 import IconButton from "./IconButton";
 import { FaTrashAlt } from "react-icons/fa";
+import Modal, { Header, Footer } from "../shared/modalComponents";
+import { BasicInput } from "../shared/inputs";
+import { RedButton } from "../shared/buttons";
+import { deleteDiagram } from "../../comunication/diagramsController";
 
 const StyledCard = styled.div`
   position: relative;
@@ -56,16 +60,63 @@ const StyledCard = styled.div`
   }
 `;
 
+const DeleteModal = ({ name, closeAction, diagramId }) => {
+  const [checkName, setCheckName] = useState("");
+  const [alert, setAlert] = useState(null);
+  const [waiting, setWaiting] = useState(true);
+
+  const handleClick = (evt) => {
+    evt.preventDefault();
+    setWaiting(true);
+    if (checkName.toLowerCase() != name.toLowerCase()) {
+      setAlert("o nome do diagrama não confere");
+      setWaiting(false);
+      return;
+    }
+
+    deleteDiagram(diagramId).then(() => {
+      window.location.reload();
+    });
+  };
+
+  return (
+    <Modal closeAction={closeAction}>
+      <Header>Exclusão</Header>
+      <h1>Excluir o diagrama "{name}"?</h1>
+      <p>
+        Se você tem certeza da exclusão do diagrama "{name}", basta escrever o
+        nome do diagrama abaixo
+      </p>
+      <form onSubmit={handleClick}>
+        <BasicInput
+          onChange={(evt) => {
+            setCheckName(evt.target.value);
+          }}
+        />
+        <RedButton
+          disabled={checkName.toLowerCase() != name.toLowerCase()}
+          waiting={waiting}
+        >
+          Excluir
+        </RedButton>
+      </form>
+      <span style={{ color: "red" }}>{alert}</span>
+    </Modal>
+  );
+};
+
 const DiagramCard = (props) => {
   const navigate = useNavigate();
+
+  const [deleting, setDeleting] = useState(false);
 
   const handleClick = (evt) => {
     navigate(`/board/${props.boardId}`);
   };
 
   return (
-    <StyledCard onClick={handleClick}>
-      <div className="title">
+    <StyledCard>
+      <div className="title" onClick={handleClick}>
         <div>{props.name}</div>
       </div>
       <div className="options">
@@ -74,9 +125,20 @@ const DiagramCard = (props) => {
           <IconButton
             icon={FaTrashAlt}
             style={{ margin: "0.2em", padding: "0.2em" }}
+            onClick={() => {
+              setDeleting(true);
+            }}
           ></IconButton>
         </div>
       </div>
+
+      {deleting && (
+        <DeleteModal
+          name={props.name}
+          diagramId={props.boardId}
+          closeAction={() => setDeleting(false)}
+        />
+      )}
     </StyledCard>
   );
 };
