@@ -4,6 +4,7 @@ const bindFunction = () => {
   window.testCreateSomeElements = createSomeElements;
   window.changeCircleRadius = changeCircleRadius;
   window.repositionDraw = repositionDraw;
+  window.applyZoom = applyZoom;
 };
 
 const createSomeElements = (num) => {
@@ -43,6 +44,18 @@ const repositionDraw = (el, x, y) => {
       el,
       x,
       y,
+    },
+  };
+
+  store.dispatch(update);
+};
+
+const applyZoom = (zoomValue, mouseXPosition, mouseYPosition) => {
+  const update = {
+    type: "BOARDVIEW_ZOOM",
+    payload: {
+      mousePosition: { x: mouseXPosition, y: mouseYPosition },
+      value: zoomValue,
     },
   };
 

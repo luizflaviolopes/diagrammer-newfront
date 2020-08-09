@@ -4,7 +4,7 @@ import * as boardViewResolver from "../resolvers/boardViewResolver";
 const setState = () => ({
   x: 0,
   y: 0,
-  zoom: 1.5,
+  zoom: 1,
 });
 
 export default (state = setState(), action = {}) => {
@@ -13,6 +13,7 @@ export default (state = setState(), action = {}) => {
   switch (action.type) {
     case actionTypes.BOARDVIEW_ZOOM:
       return boardViewResolver.changeZoom({ ...state }, action.payload);
+
     default:
       return state;
   }
