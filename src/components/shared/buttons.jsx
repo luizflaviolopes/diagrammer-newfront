@@ -1,23 +1,26 @@
 import React from "react";
 import styled from "styled-components";
-import PropagateLoader from "react-spinners/PropagateLoader";
+import BeatLoader from "react-spinners/BeatLoader";
 
 const buttonWithAwaiter = (WrappedComponent) => {
   return (props) => {
     if (props.waiting)
       return (
         <WrappedComponent {...props}>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              minWidth: "3.3em",
-              opacity: "0.5",
-              cursor: "auto",
-            }}
-          >
-            <PropagateLoader size={14} color={"white"} loading={true} />
+          <div style={{ position: "relative" }}>
+            <div style={{ visibility: "hidden" }}>{props.children}</div>
+            <div
+              style={{
+                opacity: 0.8,
+                cursor: "auto",
+                position: "absolute",
+                top: 0,
+                margin: "auto",
+                width: "100%",
+              }}
+            >
+              <BeatLoader size={14} color={"white"} loading={true} />
+            </div>
           </div>
         </WrappedComponent>
       );
