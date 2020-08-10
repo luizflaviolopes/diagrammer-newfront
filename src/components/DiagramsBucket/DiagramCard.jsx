@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "@reach/router";
 import IconButton from "./IconButton";
 import { FaTrashAlt } from "react-icons/fa";
+
+import DeleteModal from "./DeleteModal";
 
 const StyledCard = styled.div`
   position: relative;
@@ -59,13 +61,15 @@ const StyledCard = styled.div`
 const DiagramCard = (props) => {
   const navigate = useNavigate();
 
+  const [deleting, setDeleting] = useState(false);
+
   const handleClick = (evt) => {
     navigate(`/board/${props.boardId}`);
   };
 
   return (
-    <StyledCard onClick={handleClick}>
-      <div className="title">
+    <StyledCard>
+      <div className="title" onClick={handleClick}>
         <div>{props.name}</div>
       </div>
       <div className="options">
@@ -74,9 +78,20 @@ const DiagramCard = (props) => {
           <IconButton
             icon={FaTrashAlt}
             style={{ margin: "0.2em", padding: "0.2em" }}
+            onClick={() => {
+              setDeleting(true);
+            }}
           ></IconButton>
         </div>
       </div>
+
+      {deleting && (
+        <DeleteModal
+          name={props.name}
+          diagramId={props.boardId}
+          closeAction={() => setDeleting(false)}
+        />
+      )}
     </StyledCard>
   );
 };
