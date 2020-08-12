@@ -18,25 +18,37 @@ export const onManualResizeStart = (evt) => {
     onDrop: onResizeDrop,
     drawId: evt.target.getAttribute("drawId"),
     corner: evt.target.getAttribute("corners"),
-    startPosition: { x: evt.clientX, y: evt.clientY },
   };
-  store.dispatch(startResizeDraw({ id: window.dragging.drawId }));
+  store.dispatch(
+    startResizeDraw({
+      id: window.dragging.drawId,
+      mousePosition: { x: evt.clientX, y: evt.clientY },
+    })
+  );
 };
 
 const onResizeMove = (evt) => {
-  let x = evt.clientX - window.dragging.startPosition.x;
-  let y = evt.clientY - window.dragging.startPosition.y;
   let id = window.dragging.drawId;
   let corner = window.dragging.corner;
-  store.dispatch(resizeDraw({ id: id, position: { x: x, y: y }, corner }));
+  store.dispatch(
+    resizeDraw({
+      id: id,
+      mousePosition: { x: evt.clientX, y: evt.clientY },
+      corner,
+    })
+  );
 };
 
 const onResizeDrop = (evt) => {
-  let x = evt.clientX - window.dragging.startPosition.x;
-  let y = evt.clientY - window.dragging.startPosition.y;
   let id = window.dragging.drawId;
   let corner = window.dragging.corner;
-  store.dispatch(stopResizeDraw({ id: id, position: { x: x, y: y }, corner }));
+  store.dispatch(
+    stopResizeDraw({
+      id: id,
+      mousePosition: { x: evt.clientX, y: evt.clientY },
+      corner,
+    })
+  );
 
   if (window.dragging) {
     window.dragging = undefined;

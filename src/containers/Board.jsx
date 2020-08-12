@@ -38,7 +38,7 @@ const Board = (props) => {
   const addDraw = (evt) => {
     props.addDraw({
       type: props.selectedElement,
-      position: { x: evt.pageX, y: evt.pageY },
+      mousePosition: { x: evt.pageX, y: evt.pageY },
     });
   };
 

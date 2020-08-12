@@ -10,7 +10,6 @@ export const onDrawDragStart = (evt) => {
   window.dragging = {
     mousePressedObject: evt.target,
     objectId: evt.target.id,
-    startPosition: { x: evt.clientX, y: evt.clientY },
     onMove: onDrawDragging,
     onDrop: onDrawDrop,
   };
@@ -19,15 +18,16 @@ export const onDrawDragStart = (evt) => {
       id: evt.target.id,
       shiftPressed: evt.shiftKey,
       clientRectPosition: evt.target.getBoundingClientRect(),
+      mousePosition: { x: evt.clientX, y: evt.clientY },
     })
   );
 };
 
 export const onDrawDragging = (evt) => {
-  let x = evt.clientX - window.dragging.startPosition.x;
-  let y = evt.clientY - window.dragging.startPosition.y;
   let id = window.dragging.objectId;
-  store.dispatch(dragging({ id: id, position: { x: x, y: y } }));
+  store.dispatch(
+    dragging({ id: id, mousePosition: { x: evt.clientX, y: evt.clientY } })
+  );
 };
 
 export const onDrawDrop = (evt) => {
@@ -38,8 +38,7 @@ export const onDrawDrop = (evt) => {
     store.dispatch(
       drop({
         id: evt.toElement.id,
-        x: evtMeasures.x,
-        y: evtMeasures.y,
+        mousePosition: { x: evtMeasures.x, y: evtMeasures.y },
       })
     );
   } else store.dispatch(drop({}));
