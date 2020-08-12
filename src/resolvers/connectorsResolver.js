@@ -1,5 +1,4 @@
 import { clearDrawSelected } from "./drawResolver";
-import { getPositionBoardRelative } from "../helpers/getPositionBoardRelative";
 
 export const connectorDrawingStart = (state, actionPayload) => {
   state.sessionState.connectorDrawing = true;
@@ -7,10 +6,7 @@ export const connectorDrawingStart = (state, actionPayload) => {
   const conId = state.counters.connectors;
   const idFrom = +actionPayload.id;
 
-  const positionBoardRelative = getPositionBoardRelative(
-    actionPayload.boardView,
-    actionPayload.variant.absolutePosition
-  );
+  const positionBoardRelative = actionPayload.position;
 
   let from = {
     id: idFrom,
@@ -36,10 +32,7 @@ export const connectorDrawing = (state, actionPayload) => {
   const connector = state.connectors[state.counters.connectors];
   let newEndpoint = [...connector.endPoints];
 
-  const positionBoardRelative = getPositionBoardRelative(
-    actionPayload.boardView,
-    actionPayload
-  );
+  const positionBoardRelative = actionPayload.position;
 
   newEndpoint[1] = {
     ...positionBoardRelative,
