@@ -42,12 +42,11 @@ export const drawDragging = (state, actionPayload) => {
   return state;
 };
 
-export const drawdrop = (state, actionPayload) => {
-  if (!actionPayload.resolverData)
-    actionPayload.resolverData = {
-      selecteds: state.sessionState.drawsSelected,
-    };
+const attachSelecteds = (state) => {
+  state.boardDrawShowOrder = [...state.boardDrawZOrder];
+};
 
+export const drawdrop = (state, actionPayload) => {
   if (actionPayload.id) {
     const parent = state.draws[actionPayload.id];
 
@@ -55,23 +54,33 @@ export const drawdrop = (state, actionPayload) => {
 
     parent.absolutePosition = positionBoardRelative;
 
-    autoResize(state, parent, positionBoardRelative, padding);
+    autoResize(
+      state,
+      parent,
+      positionBoardRelative,
+      padding,
+      actionPayload.stateData.elementsSelecteds
+    );
 
-    for (let a = 0; a < actionPayload.resolverData.selecteds.length; a++) {
-      let droppedDraw = state.draws[actionPayload.resolverData.selecteds[a]];
+    for (let a = 0; a < actionPayload.stateData.elementsSelecteds.length; a++) {
+      let droppedDraw =
+        state.draws[actionPayload.stateData.elementsSelecteds[a]];
 
       // board to parent
       if (!droppedDraw.parent) {
         addParentInChildren(droppedDraw, actionPayload.id);
         removeDrawFromBoard(state, droppedDraw.id);
+        addChildrenInParent(state, droppedDraw);
       } else {
         addParentInChildren(droppedDraw, actionPayload.id);
+        addChildrenInParent(state, droppedDraw);
       }
     }
   } else {
     //Remove parent from children when dropping draw on board
-    for (let a = 0; a < actionPayload.resolverData.selecteds.length; a++) {
-      let selectedDraw = state.draws[actionPayload.resolverData.selecteds[a]];
+    for (let a = 0; a < actionPayload.stateData.elementsSelecteds.length; a++) {
+      let selectedDraw =
+        state.draws[actionPayload.stateData.elementsSelecteds[a]];
       if (selectedDraw.parent) {
         selectedDraw.parent = undefined;
         state.boardDrawZOrder = [...state.boardDrawZOrder, selectedDraw.id];

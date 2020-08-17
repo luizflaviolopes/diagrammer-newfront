@@ -1,8 +1,20 @@
 import * as drawTypes from "../../types/drawTypes";
 import { getSiblings } from "../drawResolver";
 
-export const autoResize = (state, parent, positionBoardRelative, padding) => {
-  autoResizeFromDropChildren(state, parent, positionBoardRelative, padding);
+export const autoResize = (
+  state,
+  parent,
+  positionBoardRelative,
+  padding,
+  selectedIds
+) => {
+  autoResizeFromDropChildren(
+    state,
+    parent,
+    positionBoardRelative,
+    padding,
+    selectedIds
+  );
 };
 
 export const findLimitPointsFromDrawArray = (elementArray) => {
@@ -34,10 +46,9 @@ const autoResizeFromDropChildren = (
   state,
   parent,
   positionBoardRelative,
-  padding
+  padding,
+  selectedsIds
 ) => {
-  let selectedsIds = state.sessionState.drawsSelected;
-
   let selectedDraws = selectedsIds.map((id) => {
     return state.draws[id];
   });
