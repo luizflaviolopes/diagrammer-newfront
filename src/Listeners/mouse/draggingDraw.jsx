@@ -38,10 +38,12 @@ export const onDrawDrop = (evt) => {
     store.dispatch(
       drop({
         id: evt.toElement.id,
-        mousePosition: { x: evtMeasures.x, y: evtMeasures.y },
+        parentRect: { x: evtMeasures.x, y: evtMeasures.y },
+        mousePosition: { x: evt.clientX, y: evt.clientY },
       })
     );
-  } else store.dispatch(drop({}));
+  } else
+    store.dispatch(drop({ mousePosition: { x: evt.clientX, y: evt.clientY } }));
 
   window.dragging = undefined;
 };
