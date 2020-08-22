@@ -1,4 +1,5 @@
 import React, { Component, useState } from "react";
+import ReactDOM from "react-dom";
 import { connect } from "react-redux";
 
 import * as drawActions from "../actions/drawing";
@@ -14,15 +15,7 @@ class DrawWrapper extends Component {
     console.log("construindo", props.id);
     this.state = {
       showConnectors: false,
-      highlightConnector: false,
-      highlightDrawDragging: false,
-      pointerEvents:
-        props.sessionState.draggingElement && props.selected
-          ? "none"
-          : "painted",
     };
-
-    // this.centerCalc = elementCenterCalculator(props.type);
   }
 
   componentDidUpdate = () => {};
@@ -60,21 +53,33 @@ class DrawWrapper extends Component {
     let markers = [];
     if (this.props.resizePoints) markers = this.props.resizePoints;
 
-    return (
-      <g transform={`translate(${this.props.x}, ${this.props.y})`}>
+    const selected = this.props.selecteds.includes(this.props.id);
+
+    const DrawRender = (
+      <g
+        transform={`translate(${
+          selected ? this.props.absolutePosition.x : this.props.x
+        }, ${selected ? this.props.absolutePosition.y : this.props.y})`}
+      >
         <g
           onMouseEnter={(evt) => {
-            if (!this.props.sessionState.draggingElement)
-              this.setState({ showConnectors: true });
+            if (!this.props.onDragging) this.setState({ showConnectors: true });
           }}
           onMouseLeave={() => this.setState({ showConnectors: false })}
         >
-          <DrawAdapter {...this.props}></DrawAdapter>
+          <DrawAdapter {...this.props} selected={selected}></DrawAdapter>
           {connectionPoints}
         </g>
         {childrens}
       </g>
     );
+
+    if (this.props.selecteds.includes(this.props.id))
+      return ReactDOM.createPortal(
+        DrawRender,
+        document.getElementById("selectDraws")
+      );
+    return DrawRender;
   }
 }
 
@@ -86,8 +91,10 @@ const mapDispatchToProps = {
 };
 
 const mapStateToProps = (state, ownProps) => ({
-  sessionState: state.elements.sessionState,
   ...state.elements.draws[ownProps.id],
+  selecteds: state.context.selectedDraws,
+  onDragging: state.context.dragging,
+  connectorDrawing: state.context.connectorDrawing,
 });
 
 const DrawWrapperConnected = connect(

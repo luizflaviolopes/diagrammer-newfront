@@ -21,22 +21,30 @@ export const findLimitPointsFromDrawArray = (elementArray) => {
   const firstElement = elementArray[0];
 
   let childrenLimitPoints = {
-    left: firstElement.x,
-    top: firstElement.y,
-    right: firstElement.x + firstElement.width,
-    bottom: firstElement.y + firstElement.height,
+    left: firstElement.absolutePosition.x,
+    top: firstElement.absolutePosition.y,
+    right: firstElement.absolutePosition.x + firstElement.width,
+    bottom: firstElement.absolutePosition.y + firstElement.height,
   };
 
   for (let z = 1; z < elementArray.length; z++) {
     let elementSelected = elementArray[z];
-    if (elementSelected.x < childrenLimitPoints.left)
-      childrenLimitPoints.left = elementSelected.x;
-    if (elementSelected.y < childrenLimitPoints.top)
-      childrenLimitPoints.top = elementSelected.y;
-    if (elementSelected.x + elementSelected.width > childrenLimitPoints.right)
-      childrenLimitPoints.right = elementSelected.x + elementSelected.width;
-    if (elementSelected.y + elementSelected.height > childrenLimitPoints.bottom)
-      childrenLimitPoints.bottom = elementSelected.y + elementSelected.height;
+    if (elementSelected.absolutePosition.x < childrenLimitPoints.left)
+      childrenLimitPoints.left = elementSelected.absolutePosition.x;
+    if (elementSelected.absolutePosition.y < childrenLimitPoints.top)
+      childrenLimitPoints.top = elementSelected.absolutePosition.y;
+    if (
+      elementSelected.absolutePosition.x + elementSelected.width >
+      childrenLimitPoints.right
+    )
+      childrenLimitPoints.right =
+        elementSelected.absolutePosition.x + elementSelected.width;
+    if (
+      elementSelected.absolutePosition.y + elementSelected.height >
+      childrenLimitPoints.bottom
+    )
+      childrenLimitPoints.bottom =
+        elementSelected.absolutePosition.y + elementSelected.height;
   }
 
   return childrenLimitPoints;

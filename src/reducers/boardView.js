@@ -23,6 +23,7 @@ export default (state = setState(), action = {}) => {
     case actionTypes.BOARD_DRAGGING_ELEMENTS:
     case actionTypes.BOARD_DRAW_RESIZE:
     case actionTypes.BOARD_DRAW_STOP_RESIZE:
+    case actionTypes.BOARD_DROP_ELEMENTS:
       action.payload.displacement = {
         x: action.payload.position.x - state.dragStartPosition.x,
         y: action.payload.position.y - state.dragStartPosition.y,

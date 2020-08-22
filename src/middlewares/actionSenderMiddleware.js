@@ -10,7 +10,6 @@ const actionSenderMiddleware = (store) => (next) => (action) => {
     case types.SERVER_CONNECTION_DISCONNECTED:
     case types.BOARD_CONNECTOR_DRAWING:
     case types.BOARD_SELECTION_CLEAR:
-    case types.BOARD_SELECT_DRAW:
     case types.BOARD_DRAGGING_ELEMENTS:
     case types.BOARD_DRAW_RESIZE:
     case types.BOARD_REBUILD:
