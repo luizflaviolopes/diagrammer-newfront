@@ -134,7 +134,6 @@ export const reducer = (state = setState(), action = {}) => {
     case "teste":
       const newstate = { ...state };
       for (let i = 0; i < newstate.boardDrawZOrder.length; i++) {
-        console.log("teste");
         const drawId = newstate.boardDrawZOrder[i];
         const draw = newstate.draws[drawId];
 

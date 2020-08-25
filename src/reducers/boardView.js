@@ -21,7 +21,6 @@ export default (state = setState(), action = {}) => {
       return { ...state, dragStartPosition: action.payload.position };
 
     case actionTypes.BOARD_DRAGGING_ELEMENTS:
-    case actionTypes.BOARD_DRAW_RESIZE:
     case actionTypes.BOARD_DRAW_STOP_RESIZE:
     case actionTypes.BOARD_DROP_ELEMENTS:
       action.payload.displacement = {

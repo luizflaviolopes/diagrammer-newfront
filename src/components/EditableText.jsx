@@ -101,7 +101,6 @@ const InputText = (props) => {
   const [position, setPosition] = useState(props.position);
 
   useEffect(() => {
-    console.log(inputEl);
     inputEl.current.focus();
     textSizing();
   }, []);
