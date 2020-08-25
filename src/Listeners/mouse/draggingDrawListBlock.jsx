@@ -42,8 +42,6 @@ export const onDrawDragging = (evt) => {
 };
 
 export const onDrawDrop = (evt) => {
-  console.log(evt);
-
   if (IsDraw(evt.toElement)) {
     let evtMeasures = evt.toElement.getBoundingClientRect();
     store.dispatch(

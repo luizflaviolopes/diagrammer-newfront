@@ -1,5 +1,5 @@
 import store from "../../store";
-import elementsReducer from "../../reducers/elements";
+import { reducer as elementsReducer } from "../../reducers/elements";
 import { boardRebuildAction } from "../../actions/serverSyncActions";
 
 const boardStartReBuild = (data) => {

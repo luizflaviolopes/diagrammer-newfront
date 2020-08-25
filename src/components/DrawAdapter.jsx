@@ -14,12 +14,9 @@ class DrawAdapter extends React.Component {
   }
 
   onDragOver = (evt) => {
-    if (this.props.sessionState.connectorDrawing) {
+    if (this.props.connectorDrawing) {
       this.setState({ highlightConnectorDrawing: true });
-    } else if (
-      this.props.sessionState.draggingElement &&
-      !this.props.selected
-    ) {
+    } else if (this.props.onDragging && !this.props.selected) {
       this.setState({ highlightDrawDragging: true });
     }
   };
@@ -34,8 +31,7 @@ class DrawAdapter extends React.Component {
   };
 
   calcPointerEvents = () => {
-    if (this.props.sessionState.draggingElement && this.props.selected)
-      return "none";
+    if (this.props.onDragging && this.props.selected) return "none";
     else return "painted";
   };
 

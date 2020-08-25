@@ -28,8 +28,16 @@ const setState = () => ({
   },
 });
 
-export default (state = setState(), action = {}) => {
-  console.log(action);
+export default (state, action) => {
+  if (action.payload)
+    action.payload.stateData = {
+      elementsSelecteds: [...state.sessionState.drawsSelected],
+    };
+
+  return reducer(state, action);
+};
+
+export const reducer = (state = setState(), action = {}) => {
   switch (action.type) {
     //draw actions
 
@@ -126,7 +134,6 @@ export default (state = setState(), action = {}) => {
     case "teste":
       const newstate = { ...state };
       for (let i = 0; i < newstate.boardDrawZOrder.length; i++) {
-        console.log("teste");
         const drawId = newstate.boardDrawZOrder[i];
         const draw = newstate.draws[drawId];
 
