@@ -8,6 +8,7 @@ import ConnectionPoints from "../components/ConnectionPoints";
 
 import elementsConnectorPointsCalculator from "../helpers/elementsConnectorPointsCalculator";
 import DrawAdapter from "../components/DrawAdapter";
+import DrawFrame from "../components/DrawFrame";
 
 class DrawWrapper extends Component {
   constructor(props) {
@@ -23,12 +24,11 @@ class DrawWrapper extends Component {
     let connectionPoints = null;
     let childrens = null;
 
-    if (this.state.showConnectors) {
+    const getConnectors = () => {
       let points = elementsConnectorPointsCalculator(
         this.props.type,
         this.props.width,
-        this.props.height,
-        this.props.radius
+        this.props.height
       );
 
       connectionPoints = points.map((point) => (
@@ -38,7 +38,9 @@ class DrawWrapper extends Component {
           {...point}
         />
       ));
-    }
+
+      return connectionPoints;
+    };
 
     if (this.props.childrens) {
       childrens = this.props.childrens.map((element) => {
@@ -64,7 +66,15 @@ class DrawWrapper extends Component {
           onMouseLeave={() => this.setState({ showConnectors: false })}
         >
           <DrawAdapter {...this.props} selected={selected}></DrawAdapter>
-          {connectionPoints}
+          {this.state.showConnectors && getConnectors()}
+
+          {selected && (
+            <DrawFrame
+              height={this.props.height}
+              width={this.props.width}
+              drawId={this.props.id}
+            ></DrawFrame>
+          )}
         </g>
         {childrens}
       </g>

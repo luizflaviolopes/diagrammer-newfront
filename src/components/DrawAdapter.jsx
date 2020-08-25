@@ -1,7 +1,5 @@
 import React from "react";
 import elementTypeResolver from "../helpers/elementTypeResolver";
-import ConnectionPoints from "./ConnectionPoints";
-import elementsConnectorPointsCalculator from "../helpers/elementsConnectorPointsCalculator";
 
 //props.drawType -> tipo desenho a ser utilizado
 class DrawAdapter extends React.Component {
@@ -58,7 +56,7 @@ class DrawAdapter extends React.Component {
         opacity: "1",
         stroke: "black",
         strokeWidth: "3",
-        strokeDasharray: 6,
+        //strokeDasharray: 6,
       };
     }
 
