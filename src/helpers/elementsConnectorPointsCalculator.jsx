@@ -1,6 +1,6 @@
 import * as types from "../types/drawTypes";
 
-const elementsConnectorPointsCalculator = (type, w, h, r) => {
+const elementsConnectorPointsCalculator = (type, w, h) => {
   switch (type) {
     // case types.DRAW_CIRCLE:
     //   const big = w > h ? w : h;
