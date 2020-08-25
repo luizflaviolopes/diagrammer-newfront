@@ -11,7 +11,7 @@ const SelectedDraws = (props) => {
 const mapDispatchToProps = {};
 
 const mapStateToProps = (state) => ({
-  elements: state.elements.boardDrawSelected,
+  elements: state.elements.sessionState.drawsSelected,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SelectedDraws);

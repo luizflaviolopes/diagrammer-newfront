@@ -6,11 +6,13 @@ import {
 } from "../../actions/drawing";
 
 export const IsResizeAnchor = (element) => {
+  console.log(element);
   if (element.getAttribute("type") == "resizeAnchor") return true;
   else return false;
 };
 
 export const onManualResizeStart = (evt) => {
+  console.log(evt);
   window.dragging = {
     onMove: onResizeMove,
     onDrop: onResizeDrop,
@@ -31,7 +33,7 @@ const onResizeMove = (evt) => {
   store.dispatch(
     resizeDraw({
       id: id,
-      mousePosition: { x: evt.movementX, y: evt.movementY },
+      mousePosition: { x: evt.clientX, y: evt.clientY },
       corner,
     })
   );
@@ -40,14 +42,14 @@ const onResizeMove = (evt) => {
 const onResizeDrop = (evt) => {
   let id = window.dragging.drawId;
   let corner = window.dragging.corner;
-
   store.dispatch(
     stopResizeDraw({
       id: id,
-      mousePosition: { x: evt.movementX, y: evt.movementY },
+      mousePosition: { x: evt.clientX, y: evt.clientY },
       corner,
     })
   );
+
   if (window.dragging) {
     window.dragging = undefined;
   }
