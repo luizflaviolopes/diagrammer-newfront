@@ -1,75 +1,30 @@
 import * as drawTypes from "../../types/drawTypes";
 import { getSiblings } from "../drawResolver";
 
-export const autoResize = (
-  state,
-  parent,
-  positionBoardRelative,
-  padding,
-  selectedIds
-) => {
-  autoResizeFromDropChildren(
-    state,
-    parent,
-    positionBoardRelative,
-    padding,
-    selectedIds
-  );
+export const autoResize = (state, parent, positionBoardRelative, padding) => {
+  autoResizeFromDropChildren(state, parent, positionBoardRelative, padding);
 };
 
-export const findLimitPointsFromDrawArray = (elementArray, isAbsolute) => {
+export const findLimitPointsFromDrawArray = (elementArray) => {
   const firstElement = elementArray[0];
-  let childrenLimitPoints = {};
 
-  if (isAbsolute) {
-    childrenLimitPoints = {
-      left: firstElement.absolutePosition.x,
-      top: firstElement.absolutePosition.y,
-      right: firstElement.absolutePosition.x + firstElement.width,
-      bottom: firstElement.absolutePosition.y + firstElement.height,
-    };
+  let childrenLimitPoints = {
+    left: firstElement.x,
+    top: firstElement.y,
+    right: firstElement.x + firstElement.width,
+    bottom: firstElement.y + firstElement.height,
+  };
 
-    for (let z = 1; z < elementArray.length; z++) {
-      let elementSelected = elementArray[z];
-      if (elementSelected.absolutePosition.x < childrenLimitPoints.left)
-        childrenLimitPoints.left = elementSelected.absolutePosition.x;
-      if (elementSelected.absolutePosition.y < childrenLimitPoints.top)
-        childrenLimitPoints.top = elementSelected.absolutePosition.y;
-      if (
-        elementSelected.absolutePosition.x + elementSelected.width >
-        childrenLimitPoints.right
-      )
-        childrenLimitPoints.right =
-          elementSelected.absolutePosition.x + elementSelected.width;
-      if (
-        elementSelected.absolutePosition.y + elementSelected.height >
-        childrenLimitPoints.bottom
-      )
-        childrenLimitPoints.bottom =
-          elementSelected.absolutePosition.y + elementSelected.height;
-    }
-  } else {
-    childrenLimitPoints = {
-      left: firstElement.x,
-      top: firstElement.y,
-      right: firstElement.x + firstElement.width,
-      bottom: firstElement.y + firstElement.height,
-    };
-
-    for (let z = 1; z < elementArray.length; z++) {
-      let elementSelected = elementArray[z];
-      if (elementSelected.x < childrenLimitPoints.left)
-        childrenLimitPoints.left = elementSelected.x;
-      if (elementSelected.y < childrenLimitPoints.top)
-        childrenLimitPoints.top = elementSelected.y;
-      if (elementSelected.x + elementSelected.width > childrenLimitPoints.right)
-        childrenLimitPoints.right = elementSelected.x + elementSelected.width;
-      if (
-        elementSelected.y + elementSelected.height >
-        childrenLimitPoints.bottom
-      )
-        childrenLimitPoints.bottom = elementSelected.y + elementSelected.height;
-    }
+  for (let z = 1; z < elementArray.length; z++) {
+    let elementSelected = elementArray[z];
+    if (elementSelected.x < childrenLimitPoints.left)
+      childrenLimitPoints.left = elementSelected.x;
+    if (elementSelected.y < childrenLimitPoints.top)
+      childrenLimitPoints.top = elementSelected.y;
+    if (elementSelected.x + elementSelected.width > childrenLimitPoints.right)
+      childrenLimitPoints.right = elementSelected.x + elementSelected.width;
+    if (elementSelected.y + elementSelected.height > childrenLimitPoints.bottom)
+      childrenLimitPoints.bottom = elementSelected.y + elementSelected.height;
   }
 
   return childrenLimitPoints;
@@ -79,14 +34,15 @@ const autoResizeFromDropChildren = (
   state,
   parent,
   positionBoardRelative,
-  padding,
-  selectedsIds
+  padding
 ) => {
+  let selectedsIds = state.sessionState.drawsSelected;
+
   let selectedDraws = selectedsIds.map((id) => {
     return state.draws[id];
   });
 
-  let childrenLimitPoints = findLimitPointsFromDrawArray(selectedDraws, true);
+  let childrenLimitPoints = findLimitPointsFromDrawArray(selectedDraws);
 
   let drawLimitPoints = {
     left: positionBoardRelative.x,
@@ -249,6 +205,7 @@ const repositionChildrens = (state, drawUpdated, variationsXY) => {
 //   const padding = paddingFull / 2;
 //   const radius = Math.max(parent.width, parent.height) / 2;
 
+//   console.log("atualizando tamanho");
 //   let variationX = 0;
 //   let variationY = 0;
 //   let variationH = 0;
@@ -627,49 +584,51 @@ export const manualResize = (state, draw, dragPosition, corner) => {
 
 const resizeN = (draw, position, limit) => {
   let variation = position.y;
-  // const lastY = draw.y;
+  const lastY = draw.y;
 
-  if (draw.absolutePosition.y + variation - draw.lastMeasures.absoluteY > limit)
-    return { y: 0, x: undefined, relative: 0 };
+  if (variation > limit) variation = limit;
 
-  draw.y += variation;
-  draw.absolutePosition.y += variation;
-  draw.height -= variation;
+  const lastVariation = draw.height - draw.absolutePosition.height;
+  const currentVariation = variation + lastVariation;
 
-  return { y: variation, x: undefined, relative: variation };
+  draw.y += currentVariation;
+  draw.height = draw.absolutePosition.height - variation;
+
+  return { y: variation, x: undefined, relative: draw.y - lastY };
 };
 const resizeE = (draw, position, limit) => {
   const variation = position.x;
-  // const lastWidth = draw.width;
-  let newWidth = draw.width + variation;
+  const lastWidth = draw.width;
+  let newWidth = draw.absolutePosition.width + variation;
 
   if (newWidth < limit) newWidth = limit;
   draw.width = newWidth;
 
-  return variation;
+  return draw.width - lastWidth;
 };
 const resizeS = (draw, position, limit) => {
   const variation = position.y;
-  // const lastHeight = draw.height;
-  let newheight = draw.height + variation;
+  const lastHeight = draw.height;
+  let newheight = draw.absolutePosition.height + variation;
 
   if (newheight < limit) newheight = limit;
   draw.height = newheight;
 
-  return variation;
+  return draw.height - lastHeight;
 };
 const resizeW = (draw, position, limit) => {
   let variation = position.x;
-  // const lastX = draw.x;
+  const lastX = draw.x;
 
-  if (draw.absolutePosition.x + variation - draw.lastMeasures.absoluteX > limit)
-    return { x: 0, y: undefined, relative: 0 };
+  if (variation > limit) variation = limit;
 
-  draw.x += variation;
-  draw.absolutePosition.x += variation;
-  draw.width -= variation;
+  const lastVariation = draw.width - draw.absolutePosition.width;
+  const currentVariation = variation + lastVariation;
 
-  return { x: variation, y: undefined, relative: variation };
+  draw.x += currentVariation;
+  draw.width = draw.absolutePosition.width - variation;
+
+  return { x: variation, y: undefined, relative: draw.x - lastX };
 };
 
 const repositionChildrensFromAbsolutePosition = (
@@ -682,13 +641,13 @@ const repositionChildrensFromAbsolutePosition = (
     for (let c = 0; c < drawUpdated.childrens.length; c++) {
       let children = state.draws[drawUpdated.childrens[c]];
 
-      children.x -= variation.x;
+      children.x = children.absolutePosition.x - variation.x;
     }
   if (variation.y != undefined) {
     for (let c = 0; c < drawUpdated.childrens.length; c++) {
       let children = state.draws[drawUpdated.childrens[c]];
 
-      children.y -= variation.y;
+      children.y = children.absolutePosition.y - variation.y;
     }
   }
 };

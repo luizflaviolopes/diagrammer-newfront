@@ -27,6 +27,8 @@ export const connectorDrawingStart = (state, actionPayload) => {
 };
 
 export const connectorDrawing = (state, actionPayload) => {
+  console.log("connectorDragging", state.connectors, state.counters.connectors);
+
   const connector = state.connectors[state.counters.connectors];
   let newEndpoint = [...connector.endPoints];
 

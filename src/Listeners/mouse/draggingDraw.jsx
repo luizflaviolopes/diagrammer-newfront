@@ -31,17 +31,17 @@ export const onDrawDragging = (evt) => {
 };
 
 export const onDrawDrop = (evt) => {
+  console.log(evt);
+
   if (IsDraw(evt.toElement)) {
     let evtMeasures = evt.toElement.getBoundingClientRect();
     store.dispatch(
       drop({
         id: evt.toElement.id,
-        parentRect: { x: evtMeasures.x, y: evtMeasures.y },
-        mousePosition: { x: evt.clientX, y: evt.clientY },
+        mousePosition: { x: evtMeasures.x, y: evtMeasures.y },
       })
     );
-  } else
-    store.dispatch(drop({ mousePosition: { x: evt.clientX, y: evt.clientY } }));
+  } else store.dispatch(drop({}));
 
   window.dragging = undefined;
 };

@@ -71,6 +71,7 @@ const DrawListBlocks = connect(
 });
 
 const DrawListTab = (props) => {
+  console.log(Object.keys(Draws));
   return (
     <Tab name="Lista de desenhos" color="rgb(70, 70, 146)">
       <DrawListBlocks></DrawListBlocks>
