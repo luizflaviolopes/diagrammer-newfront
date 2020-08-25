@@ -17,6 +17,7 @@ const actionSenderMiddleware = (store) => (next) => (action) => {
     case types.DRAWLIST_CHANGE_SELECTED:
     case types.DRAWLIST_DRAG_BLOCK:
     case types.DRAWLIST_DROP_BLOCK_OUT_OF_BOARD:
+    case types.BOARDVIEW_ZOOM:
       break;
     default:
       syncController.newAction(action);

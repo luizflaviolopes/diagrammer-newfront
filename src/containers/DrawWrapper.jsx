@@ -12,7 +12,6 @@ import DrawAdapter from "../components/DrawAdapter";
 class DrawWrapper extends Component {
   constructor(props) {
     super(props);
-    console.log("construindo", props.id);
     this.state = {
       showConnectors: false,
     };
@@ -21,8 +20,6 @@ class DrawWrapper extends Component {
   componentDidUpdate = () => {};
 
   render() {
-    console.log("update", this.props.id);
-
     let connectionPoints = null;
     let childrens = null;
 
@@ -45,7 +42,6 @@ class DrawWrapper extends Component {
 
     if (this.props.childrens) {
       childrens = this.props.childrens.map((element) => {
-        console.log("renderizando filho");
         return <DrawWrapperConnected key={element} id={element} />;
       });
     }

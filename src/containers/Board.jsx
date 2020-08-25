@@ -30,7 +30,6 @@ const Board = (props) => {
 
   const drawDraws = (list) => {
     return list.map((itemId) => {
-      console.log("rendering", itemId);
       return <DrawWraper key={itemId} id={itemId} />;
     });
   };
@@ -45,7 +44,6 @@ const Board = (props) => {
   const clearSelection = () => {
     props.clearSelection();
   };
-  console.log("renderBoard");
   return (
     <div style={{ height: "100%" }}>
       <svg id="svg" width="100%" height="100%">

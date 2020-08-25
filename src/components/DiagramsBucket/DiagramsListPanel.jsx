@@ -21,7 +21,6 @@ const DiagramsListStyled = styled.div`
 
 const DiagramsListPanel = (props) => {
   useEffect(() => {
-    console.log("recreating");
     fillDiagrams();
   }, []);
 

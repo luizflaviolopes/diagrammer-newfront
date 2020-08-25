@@ -90,10 +90,10 @@ export const drawdrop = (state, actionPayload) => {
       let selectedDraw = state.draws[actionPayload.selectedDraws[a]];
 
       const newPosition = {
-        x: selectedDraw.lastPosition.x + actionPayload.displacement.x,
-        y: selectedDraw.lastPosition.y + actionPayload.displacement.y,
+        x: selectedDraw.lastMeasures.x + actionPayload.displacement.x,
+        y: selectedDraw.lastMeasures.y + actionPayload.displacement.y,
       };
-      selectDraw.lastPosition = undefined;
+      selectDraw.lastMeasures = undefined;
 
       selectedDraw.x = newPosition.x;
       selectedDraw.y = newPosition.y;
@@ -168,7 +168,7 @@ const newSelectedDraw = (state, drawSelected, actionPayload) => {
     x: positionBoardRelative.x,
     y: positionBoardRelative.y,
   };
-  drawSelected.lastPosition = {
+  drawSelected.lastMeasures = {
     x: positionBoardRelative.x,
     y: positionBoardRelative.y,
   };
@@ -212,8 +212,8 @@ const updateDrawPosition = (state, draw, mouseMovementZoomRelative) => {
   // newDraw.y = draw.absolutePosition.y + mouseMovementZoomRelative.y;
 
   newDraw.absolutePosition = {
-    x: draw.lastPosition.x + mouseMovementZoomRelative.x,
-    y: draw.lastPosition.y + mouseMovementZoomRelative.y,
+    x: draw.lastMeasures.x + mouseMovementZoomRelative.x,
+    y: draw.lastMeasures.y + mouseMovementZoomRelative.y,
   };
 
   let newPositionVariationForConnector = {
@@ -224,8 +224,6 @@ const updateDrawPosition = (state, draw, mouseMovementZoomRelative) => {
   };
 
   state.draws[draw.id] = newDraw;
-
-  console.log("updated position", draw.id);
 
   //updateChildrensPosition(state, draw, posVariation);
   updateConnectors(draw, state, newPositionVariationForConnector);
@@ -250,7 +248,6 @@ const updateChildrensLastPosition = (state, draw) => {
 export const updateConnectors = (draw, state, onMouseMovePositionVariant) => {
   const connectorsList = state.connectors;
   for (let i = 0; i < draw.connectors.length; i++) {
-    console.log("Atualizando conector.");
     const connRef = draw.connectors[i];
     const conn = connectorsList[connRef.id];
 
@@ -295,21 +292,25 @@ export const startResizeDraw = (state, payload) => {
 
   const draw = state.draws[payload.id];
 
-  draw.absolutePosition.x = draw.x;
-  draw.absolutePosition.y = draw.y;
-  draw.absolutePosition.height = draw.height;
-  draw.absolutePosition.width = draw.width;
+  draw.lastMeasures = {
+    x: draw.x,
+    y: draw.y,
+    height: draw.height,
+    width: draw.width,
+    absoluteX: draw.absolutePosition.x,
+    absoluteY: draw.absolutePosition.y,
+  };
 
   let childrensIds = draw.childrens;
   let childrenElements = childrensIds.map((id) => {
     return state.draws[id];
   });
 
-  for (let i = 0; i < childrenElements.length; i++) {
-    let children = childrenElements[i];
+  // for (let i = 0; i < childrenElements.length; i++) {
+  //   let children = childrenElements[i];
 
-    children.absolutePosition = { x: children.x, y: children.y };
-  }
+  //   children.absolutePosition = { x: children.x, y: children.y };
+  // }
 
   if (childrensIds.length > 0) {
     const limits = findLimitPointsFromDrawArray(childrenElements);
@@ -334,7 +335,7 @@ export const startResizeDraw = (state, payload) => {
 export const resizeDraw = (state, payload) => {
   const draw = state.draws[payload.id];
 
-  const positionBoardRelative = payload.displacement;
+  const displacementBoardRelative = payload.position;
 
   const drawLimitsBeforeResize = {
     top: draw.y,
@@ -346,7 +347,7 @@ export const resizeDraw = (state, payload) => {
   const variations = manualResize(
     state,
     draw,
-    positionBoardRelative,
+    displacementBoardRelative,
     payload.corner
   );
 
