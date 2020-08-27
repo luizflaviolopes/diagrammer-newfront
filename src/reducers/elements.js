@@ -54,8 +54,9 @@ export const reducer = (state = setState(), action = {}) => {
     case actionTypes.BOARD_DRAW_START_RESIZE:
       return drawResolver.startResizeDraw({ ...state }, action.payload);
     case actionTypes.BOARD_DRAW_RESIZE:
-    case actionTypes.BOARD_DRAW_STOP_RESIZE:
       return drawResolver.resizeDraw({ ...state }, action.payload);
+    case actionTypes.BOARD_DRAW_STOP_RESIZE:
+      return drawResolver.endResize({ ...state }, action.payload);
     case actionTypes.BOARD_DRAW_CHANGE_TEXT:
       return drawResolver.changeText({ ...state }, action.payload);
 

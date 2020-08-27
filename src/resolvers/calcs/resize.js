@@ -89,10 +89,10 @@ const autoResizeFromDropChildren = (
   let childrenLimitPoints = findLimitPointsFromDrawArray(selectedDraws, true);
 
   let drawLimitPoints = {
-    left: positionBoardRelative.x,
-    top: positionBoardRelative.y,
-    right: positionBoardRelative.x + parent.width,
-    bottom: positionBoardRelative.y + parent.height,
+    left: parent.absolutePosition.x,
+    top: parent.absolutePosition.y,
+    right: parent.absolutePosition.x + parent.width,
+    bottom: parent.absolutePosition.y + parent.height,
   };
 
   autoResizeParent(

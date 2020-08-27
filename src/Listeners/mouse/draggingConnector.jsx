@@ -62,11 +62,11 @@ const onConnectorDrop = (evt) => {
       store.dispatch(
         connectorDrawingEnd({
           id: evt.toElement.getAttribute("element"),
+          mousePosition: {
+            x: clientRect.x + clientRect.width / 2,
+            y: clientRect.y + clientRect.height / 2,
+          },
           variants: {
-            absolutePosition: {
-              x: clientRect.x + clientRect.width / 2,
-              y: clientRect.y + clientRect.height / 2,
-            },
             pointRef: evt.toElement.getAttribute("pointRef"),
             angle: +evt.toElement.getAttribute("angle"),
           },

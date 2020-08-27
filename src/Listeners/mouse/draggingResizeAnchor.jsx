@@ -31,7 +31,7 @@ const onResizeMove = (evt) => {
   store.dispatch(
     resizeDraw({
       id: id,
-      mousePosition: { x: evt.movementX, y: evt.movementY },
+      mousePosition: { x: evt.clientX, y: evt.clientY },
       corner,
     })
   );
@@ -44,7 +44,7 @@ const onResizeDrop = (evt) => {
   store.dispatch(
     stopResizeDraw({
       id: id,
-      mousePosition: { x: evt.movementX, y: evt.movementY },
+      mousePosition: { x: evt.clientX, y: evt.clientY },
       corner,
     })
   );

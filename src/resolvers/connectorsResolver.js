@@ -6,7 +6,7 @@ export const connectorDrawingStart = (state, actionPayload) => {
   const conId = state.counters.connectors;
   const idFrom = +actionPayload.id;
 
-  const positionBoardRelative = actionPayload.position;
+  const positionBoardRelative = actionPayload.positionRelative;
 
   let from = {
     id: idFrom,
@@ -30,7 +30,7 @@ export const connectorDrawing = (state, actionPayload) => {
   const connector = state.connectors[state.counters.connectors];
   let newEndpoint = [...connector.endPoints];
 
-  const positionBoardRelative = actionPayload.position;
+  const positionBoardRelative = actionPayload.positionRelative;
 
   newEndpoint[1] = {
     ...positionBoardRelative,
@@ -47,6 +47,8 @@ export const connectorDrawingEnd = (state, actionPayload) => {
     const connCounter = state.counters.connectors;
 
     const connObject = state.connectors[connCounter];
+
+    const positionBoardRelative = actionPayload.positionRelative;
 
     const drawA = state.draws[connObject.endPoints[0].id];
     drawA.connectors = [
@@ -69,7 +71,7 @@ export const connectorDrawingEnd = (state, actionPayload) => {
 
     let connEndpoints = [...connObject.endPoints];
     connEndpoints[1] = {
-      ...connEndpoints[1],
+      ...positionBoardRelative,
       id: +actionPayload.id,
       angle: +actionPayload.variants.angle,
     };

@@ -30,9 +30,8 @@ export const selectDraw = (state, actionPayload) => {
 
 export const drawDragging = (state, actionPayload) => {
   let selecteds = actionPayload.selectedDraws;
-  let newPos = actionPayload.position;
 
-  const mouseMovementZoomRelative = actionPayload.displacement;
+  const mouseMovementZoomRelative = actionPayload.displacementRelative;
 
   for (let i = 0; i < selecteds.length; i++) {
     const draw = state.draws[selecteds[i]];
@@ -42,37 +41,29 @@ export const drawDragging = (state, actionPayload) => {
   return state;
 };
 
-const attachSelecteds = (state) => {
-  state.boardDrawShowOrder = [...state.boardDrawZOrder];
-};
+// const attachSelecteds = (state) => {
+//   state.boardDrawShowOrder = [...state.boardDrawZOrder];
+// };
 
 export const drawdrop = (state, actionPayload) => {
   if (
-    Math.abs(actionPayload.displacement.x) < 5 &&
-    Math.abs(actionPayload.displacement.y) < 5
+    Math.abs(actionPayload.displacementRelative.x) < 5 &&
+    Math.abs(actionPayload.displacementRelative.y) < 5
   )
     return state;
 
   if (actionPayload.id) {
     const parent = state.draws[actionPayload.id];
 
-    const parentAbsolutePosition = {
-      x: actionPayload.parentRect.x,
-      y: actionPayload.parentRect.y,
-    };
-
-    parent.absolutePosition = parentAbsolutePosition;
-
-    autoResize(
-      state,
-      parent,
-      parentAbsolutePosition,
-      padding,
-      actionPayload.selectedDraws
-    );
-
     for (let a = 0; a < actionPayload.selectedDraws.length; a++) {
       let droppedDraw = state.draws[actionPayload.selectedDraws[a]];
+
+      let oldAbsolutePosition = { ...droppedDraw.absolutePosition };
+
+      droppedDraw.absolutePosition = {
+        x: droppedDraw.x + actionPayload.displacementRelative.x,
+        y: droppedDraw.y + actionPayload.displacementRelative.y,
+      };
 
       if (!droppedDraw.parent) {
         removeDrawFromBoard(state, droppedDraw.id);
@@ -83,22 +74,42 @@ export const drawdrop = (state, actionPayload) => {
 
       addParentInChildren(droppedDraw, actionPayload.id);
       addChildrenInParent(state, droppedDraw);
+
+      if (
+        oldAbsolutePosition.x.toFixed(2) !=
+          droppedDraw.absolutePosition.x.toFixed(2) ||
+        oldAbsolutePosition.y.toFixed(2) !=
+          droppedDraw.absolutePosition.y.toFixed(2)
+      )
+        updateConnectors(
+          droppedDraw,
+          state,
+          actionPayload.displacementRelative
+        );
     }
+    autoResize(state, parent, null, padding, actionPayload.selectedDraws);
   } else {
     //Remove parent from children when dropping draw on board
     for (let a = 0; a < actionPayload.selectedDraws.length; a++) {
       let selectedDraw = state.draws[actionPayload.selectedDraws[a]];
 
-      const newPosition = {
-        x: selectedDraw.lastMeasures.x + actionPayload.displacement.x,
-        y: selectedDraw.lastMeasures.y + actionPayload.displacement.y,
+      let oldAbsolutePosition = { ...selectedDraw.absolutePosition };
+
+      selectedDraw.absolutePosition = {
+        x: selectedDraw.x + actionPayload.displacementRelative.x,
+        y: selectedDraw.y + actionPayload.displacementRelative.y,
       };
-      selectDraw.lastMeasures = undefined;
 
-      selectedDraw.x = newPosition.x;
-      selectedDraw.y = newPosition.y;
+      // const newPosition = {
+      //   x: selectedDraw.lastMeasures.x + actionPayload.displacement.x,
+      //   y: selectedDraw.lastMeasures.y + actionPayload.displacement.y,
+      // };
+      // selectDraw.lastMeasures = undefined;
 
-      selectedDraw.absolutePosition = { ...newPosition };
+      selectedDraw.x = selectedDraw.absolutePosition.x;
+      selectedDraw.y = selectedDraw.absolutePosition.y;
+
+      //selectedDraw.absolutePosition = { ...newPosition };
 
       if (selectedDraw.parent) {
         const lastParent = state.draws[selectedDraw.parent];
@@ -109,6 +120,18 @@ export const drawdrop = (state, actionPayload) => {
           selectedDraw.id,
         ];
       }
+
+      if (
+        oldAbsolutePosition.x.toFixed(2) !=
+          selectedDraw.absolutePosition.x.toFixed(2) ||
+        oldAbsolutePosition.y.toFixed(2) !=
+          selectedDraw.absolutePosition.y.toFixed(2)
+      )
+        updateConnectors(
+          selectedDraw,
+          state,
+          actionPayload.displacementRelative
+        );
     }
   }
 
@@ -122,7 +145,7 @@ export const drawdrop = (state, actionPayload) => {
 export const drawAdd = (state, actionPayload) => {
   const newID = state.counters.draws++;
 
-  const positionBoardRelative = actionPayload.position;
+  const positionBoardRelative = actionPayload.positionRelative;
 
   let newDraw = {
     type: actionPayload.type,
@@ -162,13 +185,9 @@ export const clearDrawSelected = (state) => {
 };
 
 const newSelectedDraw = (state, drawSelected, actionPayload) => {
-  const positionBoardRelative = actionPayload.clientRectPosition;
+  const positionBoardRelative = actionPayload.clientRectPositionRelative;
 
   drawSelected.absolutePosition = {
-    x: positionBoardRelative.x,
-    y: positionBoardRelative.y,
-  };
-  drawSelected.lastMeasures = {
     x: positionBoardRelative.x,
     y: positionBoardRelative.y,
   };
@@ -201,49 +220,38 @@ const newSelectedDraw = (state, drawSelected, actionPayload) => {
   //}
 };
 
-const detachChildrenFromParentOnSelect = (parent, children_id) => {
-  parent.childrens = removeFromArray(parent.childrens, children_id);
-};
+// const detachChildrenFromParentOnSelect = (parent, children_id) => {
+//   parent.childrens = removeFromArray(parent.childrens, children_id);
+// };
 
 const updateDrawPosition = (state, draw, mouseMovementZoomRelative) => {
   const newDraw = { ...draw };
 
-  // newDraw.x = draw.absolutePosition.x + mouseMovementZoomRelative.x;
-  // newDraw.y = draw.absolutePosition.y + mouseMovementZoomRelative.y;
-
   newDraw.absolutePosition = {
-    x: draw.lastMeasures.x + mouseMovementZoomRelative.x,
-    y: draw.lastMeasures.y + mouseMovementZoomRelative.y,
-  };
-
-  let newPositionVariationForConnector = {
-    // x: newDraw.x - draw.x,
-    // y: newDraw.y - draw.y,
-    x: newDraw.absolutePosition.x - draw.absolutePosition.x,
-    y: newDraw.absolutePosition.y - draw.absolutePosition.y,
+    x: newDraw.absolutePosition.x + mouseMovementZoomRelative.x,
+    y: newDraw.absolutePosition.y + mouseMovementZoomRelative.y,
   };
 
   state.draws[draw.id] = newDraw;
 
-  //updateChildrensPosition(state, draw, posVariation);
-  updateConnectors(draw, state, newPositionVariationForConnector);
+  updateConnectors(draw, state, mouseMovementZoomRelative);
 };
 
-const updateDrawLastPosition = (state, draw) => {
-  draw.absolutePosition = {
-    y: draw.x,
-    y: draw.y,
-  };
-  updateChildrensLastPosition(state, draw);
-};
+// const updateDrawLastPosition = (state, draw) => {
+//   draw.absolutePosition = {
+//     y: draw.x,
+//     y: draw.y,
+//   };
+//   updateChildrensLastPosition(state, draw);
+// };
 
-const updateChildrensLastPosition = (state, draw) => {
-  for (let i = 0; i < draw.childrens.length; i++) {
-    const children = state.draws[draw.childrens[i]];
+// const updateChildrensLastPosition = (state, draw) => {
+//   for (let i = 0; i < draw.childrens.length; i++) {
+//     const children = state.draws[draw.childrens[i]];
 
-    updateDrawLastPosition(state, children);
-  }
-};
+//     updateDrawLastPosition(state, children);
+//   }
+// };
 
 export const updateConnectors = (draw, state, onMouseMovePositionVariant) => {
   const connectorsList = state.connectors;
@@ -335,7 +343,7 @@ export const startResizeDraw = (state, payload) => {
 export const resizeDraw = (state, payload) => {
   const draw = state.draws[payload.id];
 
-  const displacementBoardRelative = payload.position;
+  const displacementBoardRelative = payload.displacementRelative;
 
   const drawLimitsBeforeResize = {
     top: draw.y,
@@ -368,6 +376,17 @@ export const resizeDraw = (state, payload) => {
   }
 
   return state;
+};
+
+export const endResize = (state, payload) => {
+  const draw = state.draws[payload.id];
+
+  if (
+    draw.height == draw.lastMeasures.height &&
+    draw.width == draw.lastMeasures.width
+  )
+    return resizeDraw(state, payload);
+  else return state;
 };
 
 export const getSiblings = (state, draw) => {

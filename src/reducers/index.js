@@ -5,8 +5,8 @@ import serverConnection from "./serverConnection";
 import context from "./context";
 
 export default combineReducers({
-  boardView,
   context,
+  boardView,
   elements,
   serverConnection,
 });
