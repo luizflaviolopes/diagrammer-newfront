@@ -26,27 +26,27 @@ export default (state = setState(), action = {}) => {
     );
   };
 
+  if (action.payload && action.payload.mousePosition) injectPositionRelative();
+
   switch (action.type) {
     case actionTypes.BOARD_DRAW_ADD:
-      injectPositionRelative();
       return state;
     case actionTypes.BOARD_SELECT_DRAW:
       selectDraw(state, action.payload);
       return state;
-    case actionTypes.BOARD_DRAW_RESIZE:
-    case actionTypes.BOARD_DRAW_STOP_RESIZE:
-      injectDisplacementRelative();
-      return state;
-
     case actionTypes.BOARD_DRAGGING_ELEMENTS:
     case actionTypes.BOARD_DROP_ELEMENTS:
+      // injectDisplacementRelative();
+      return state;
+
+    case actionTypes.BOARD_DRAW_RESIZE:
+    case actionTypes.BOARD_DRAW_STOP_RESIZE:
       injectDisplacementRelative();
       return state;
 
     case actionTypes.BOARD_CONNECTOR_DRAWING_START:
     case actionTypes.BOARD_CONNECTOR_DRAWING:
     case actionTypes.BOARD_CONNECTOR_DRAWING_END:
-      injectPositionRelative();
       return state;
     case actionTypes.BOARDVIEW_ZOOM:
       return boardViewResolver.changeZoom({ ...state }, action.payload);

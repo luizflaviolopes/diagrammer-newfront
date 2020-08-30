@@ -82,7 +82,7 @@ const autoResizeFromDropChildren = (
   padding,
   selectedsIds
 ) => {
-  let selectedDraws = selectedsIds.map((id) => {
+  let selectedDraws = Object.keys(selectedsIds).map((id) => {
     return state.draws[id];
   });
 
