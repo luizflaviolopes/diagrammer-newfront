@@ -68,12 +68,6 @@ export const connectorDrawingEnd = (state, actionPayload) => {
 
     state.connectors[state.counters.connectors] = connObject;
 
-    // connObject.intermediatePoints = intermediatePointsCalculator(
-    //   connEndpoints[0],
-    //   connEndpoints[1],
-    //   20
-    // );
-
     state.counters.connectors = state.counters.connectors + 1;
   } else {
     let connectors = { ...state.connectors };

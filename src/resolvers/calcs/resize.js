@@ -403,7 +403,7 @@ export const updateConnectorsFromResize = (draw, connectorsList, variants) => {
 
       case 90:
         varY = variants.varN;
-        varX = variants.varW;
+        varX = (variants.varW + variants.varE) / 2;
         conn.endPoints[connRef.endPoint].x += varX;
         conn.endPoints[connRef.endPoint].y += varY;
 
@@ -629,7 +629,7 @@ const resizeN = (draw, position, limit) => {
   let variation = position.y;
   // const lastY = draw.y;
 
-  if (draw.absolutePosition.y + variation - draw.lastMeasures.absoluteY > limit)
+  if (draw.y + variation - draw.lastMeasures.y > limit)
     return { y: 0, x: undefined, relative: 0 };
 
   draw.y += variation;
@@ -662,7 +662,7 @@ const resizeW = (draw, position, limit) => {
   let variation = position.x;
   // const lastX = draw.x;
 
-  if (draw.absolutePosition.x + variation - draw.lastMeasures.absoluteX > limit)
+  if (draw.x + variation - draw.lastMeasures.x > limit)
     return { x: 0, y: undefined, relative: 0 };
 
   draw.x += variation;

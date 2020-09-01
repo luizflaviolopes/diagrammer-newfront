@@ -13,6 +13,7 @@ class Connector extends Component {
   }
 
   render() {
+    const selected = this.props.selcteds.includes(this.props.id);
     let pointerEvent = "stroke";
 
     if (this.props.drawing || this.props.onDrawDragging) {
@@ -27,7 +28,7 @@ class Connector extends Component {
 
     let midPoints = [];
 
-    if (this.props.selected) {
+    if (selected) {
       for (let i = 1; i < points.length - 1; i++) {
         midPoints.push(points[i]);
       }
@@ -50,7 +51,7 @@ class Connector extends Component {
               shiftPressed: evt.shiftKey,
             });
           }}
-          strokeDasharray={this.props.selected ? 2 : "none"}
+          strokeDasharray={selected ? 2 : "none"}
         />
         {midPoints.map((p) => {
           return <circle cx={p.x} cy={p.y} r="7" fill="green" />;
@@ -67,6 +68,7 @@ const mapDispatchToProps = {
 const mapStateToProps = (state, ownProps) => ({
   ...state.elements.connectors[ownProps.id],
   onDrawDragging: state.elements.sessionState.draggingElement,
+  selcteds: state.context.selectedConnectors,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Connector);

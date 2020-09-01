@@ -78,8 +78,8 @@ export const reducer = (state = setState(), action = {}) => {
         { ...state },
         action.payload
       );
-    case actionTypes.BOARD_SELECT_CONNECTOR:
-      return connectorResolvers.selectConector({ ...state }, action.payload);
+    // case actionTypes.BOARD_SELECT_CONNECTOR:
+    //   return connectorResolvers.selectConector({ ...state }, action.payload);
 
     //keyboard actions
 

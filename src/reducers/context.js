@@ -4,6 +4,7 @@ import { getPositionBoardRelative } from "../helpers/getPositionBoardRelative";
 
 const setState = () => ({
   selectedDraws: {},
+  selectedConnectors: [],
   dragging: false,
   connectorDrawing: false,
 });
@@ -17,9 +18,7 @@ export default (state = setState(), action = {}) => {
     case actionTypes.BOARD_DROP_ELEMENTS:
       return drop({ ...state }, action.payload);
     case actionTypes.BOARD_SELECTION_CLEAR:
-      const newState = { ...state };
-      newState.selectedDraws = {};
-      return newState;
+      return clearSelecteds({ ...state }, action.payload);
     case actionTypes.BOARD_DRAW_START_RESIZE:
       return startResize({ ...state }, action.payload);
     case actionTypes.BOARD_DRAW_RESIZE:
@@ -31,9 +30,20 @@ export default (state = setState(), action = {}) => {
       return startConnectorDrawing({ ...state }, action.payload);
     case actionTypes.BOARD_CONNECTOR_DRAWING_END:
       return endConnectorDrawing({ ...state }, action.payload);
+    case actionTypes.BOARD_SELECT_CONNECTOR:
+      return selectConnector({ ...state }, action.payload);
+
+    case actionTypes.BOARD_DELETE_PRESSED:
+      return selectConnector({ ...state }, action.payload);
     default:
       return state;
   }
+};
+
+const clearSelecteds = (state, actionpayload) => {
+  state.selectedDraws = {};
+  state.selectedConnectors = [];
+  return state;
 };
 
 const calculateDisplacementAndSetLastPosition = (state, actionPayload) => {
@@ -45,6 +55,7 @@ const calculateDisplacementAndSetLastPosition = (state, actionPayload) => {
 };
 
 const startResize = (state, actionPayload) => {
+  clearSelecteds(state);
   state.lastPosition = actionPayload.positionRelative;
   state.startPosition = actionPayload.positionRelative;
   return state;
@@ -60,6 +71,7 @@ const endResize = (state, actionPayload) => {
     x: actionPayload.positionRelative.x - state.startPosition.x,
     y: actionPayload.positionRelative.y - state.startPosition.y,
   };
+
   state.lastPosition = null;
   state.startPosition = null;
   return state;
@@ -77,6 +89,7 @@ const selectDraw = (state, actionPayload) => {
         absolutePosition: actionPayload.clientRectPositionRelative,
       },
     };
+    state.selectedConnectors = [];
   }
   state.lastPosition = actionPayload.positionRelative;
   state.startPosition = actionPayload.positionRelative;
@@ -140,4 +153,23 @@ const endConnectorDrawing = (state, actionPayload) => {
   }
 
   return { ...state, connectorDrawing: true };
+};
+
+const selectConnector = (state, actionPayload) => {
+  if (actionPayload.shiftPressed) {
+    if (!state.selectedConnectors.includes(actionPayload.id))
+      state.selectedConnectors = [...state.selectedConnectors, +actionPayload];
+  } else {
+    state.selectedConnectors = [+actionPayload.id];
+    state.selectedDraws = {};
+  }
+  return state;
+};
+
+const deleteSelecteds = (state, actionPayload) => {
+  actionPayload.selectedDraws = state.selectedDraws;
+  actionPayload.selectedConnectors = state.selectedConnectors;
+
+  state.selectedDraws = {};
+  state.selectedConnectors = [];
 };

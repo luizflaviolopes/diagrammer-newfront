@@ -299,7 +299,7 @@ const removeChildrenInParent = (parent, idChildrenToRemove) => {
 };
 
 export const startResizeDraw = (state, payload) => {
-  clearAllSelections(state);
+  // clearAllSelections(state);
 
   const draw = state.draws[payload.id];
 
@@ -312,41 +312,45 @@ export const startResizeDraw = (state, payload) => {
     absoluteY: draw.absolutePosition.y,
   };
 
-  let childrensIds = draw.childrens;
-  let childrenElements = childrensIds.map((id) => {
-    return state.draws[id];
-  });
-
   // for (let i = 0; i < childrenElements.length; i++) {
   //   let children = childrenElements[i];
 
   //   children.absolutePosition = { x: children.x, y: children.y };
   // }
 
+  draw.limitPoints = getResizeLimit(state, draw);
+
+  return state;
+};
+
+const getResizeLimit = (state, draw) => {
+  let childrensIds = draw.childrens;
+  let childrenElements = childrensIds.map((id) => {
+    return state.draws[id];
+  });
+
   if (childrensIds.length > 0) {
     const limits = findLimitPointsFromDrawArray(childrenElements);
 
-    draw.limitPoints = {
+    return {
       top: limits.top - padding,
       right: limits.right + padding,
       bottom: limits.bottom + padding,
       left: limits.left - padding,
     };
   } else
-    draw.limitPoints = {
+    return {
       top: draw.height - padding,
       right: padding,
       bottom: padding,
       left: draw.width - padding,
     };
-
-  return state;
 };
 
 export const resizeDraw = (state, payload) => {
   const draw = state.draws[payload.id];
 
-  const displacementBoardRelative = payload.displacementRelative;
+  const displacementBoardRelative = payload.displacement;
 
   const drawLimitsBeforeResize = {
     top: draw.y,
@@ -381,11 +385,30 @@ export const resizeDraw = (state, payload) => {
   return state;
 };
 
-export const endResize = (state, payload) => {
-  const draw = state.draws[payload.id];
+export const endResize = (state, actionPayload) => {
+  const draw = state.draws[actionPayload.id];
 
-  if (!isDragging()) return resizeDraw(state, payload);
-  else return state;
+  if (!draw.lastMeasures) {
+    draw.limitPoints = getResizeLimit(state, draw);
+    draw.lastMeasures = {
+      x: draw.x,
+      y: draw.y,
+      height: draw.height,
+      width: draw.width,
+      absoluteX: draw.absolutePosition.x,
+      absoluteY: draw.absolutePosition.y,
+    };
+
+    const resizeReturn = resizeDraw(state, actionPayload);
+    draw.limitPoints = undefined;
+    draw.lastMeasures = undefined;
+
+    return resizeReturn;
+  } else {
+    draw.limitPoints = undefined;
+    draw.lastMeasures = undefined;
+    return state;
+  }
 };
 
 export const getSiblings = (state, draw) => {
