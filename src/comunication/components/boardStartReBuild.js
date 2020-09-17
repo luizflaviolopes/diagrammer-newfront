@@ -11,13 +11,15 @@ const boardStartReBuild = (data) => {
   store.dispatch(boardRebuildAction(stateReBuilded));
 };
 
-const replayActionsInState = (state, actions) => {
+const replayActionsInState = (state, actionsPackages) => {
   let newState = state;
 
-  if (!newState && actions.length == 0) return elementsReducer();
+  if (!newState && actionsPackages.length == 0) return elementsReducer();
 
-  for (let i = 0; i < actions.length; i++) {
-    newState = elementsReducer(newState, actions[i].action);
+  for (let i = 0; i < actionsPackages.length; i++) {
+    for (let a = 0; a < actionsPackages[i].action.length; a++) {
+      newState = elementsReducer(newState, actionsPackages[i].action[a]);
+    }
   }
 
   return newState;

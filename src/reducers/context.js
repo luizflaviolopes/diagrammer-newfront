@@ -34,7 +34,7 @@ export default (state = setState(), action = {}) => {
       return selectConnector({ ...state }, action.payload);
 
     case actionTypes.BOARD_DELETE_PRESSED:
-      return selectConnector({ ...state }, action.payload);
+      return deleteSelecteds({ ...state }, action.payload);
     default:
       return state;
   }
@@ -172,4 +172,6 @@ const deleteSelecteds = (state, actionPayload) => {
 
   state.selectedDraws = {};
   state.selectedConnectors = [];
+
+  return state;
 };

@@ -43,15 +43,18 @@ const connect = (diagram) => {
   });
 };
 
+const send = () => {
+  if (!sendingInterval) startSending();
+};
+
 const startSending = () => {
-  if (!sendingInterval)
-    sendingInterval = setInterval(function () {
-      if (socket.bufferedAmount == 0) {
-        console.time("sendNext");
-        sendNext();
-        console.timeEnd("sendNext");
-      }
-    }, 50);
+  sendingInterval = setInterval(function () {
+    if (socket.bufferedAmount == 0) {
+      console.time("sendNext");
+      sendNext();
+      console.timeEnd("sendNext");
+    }
+  }, 50);
 };
 
 const stopSending = () => {
@@ -73,17 +76,17 @@ const sendNext = () => {
   } else stopSending();
 };
 
-const closeConnection = () => {
-  if (socket.bufferedAmount == 0) {
-    socket.close(1000, "Closed");
-  } else {
-    sleep(100);
-    closeConnection();
-  }
-};
+// const closeConnection = () => {
+//   if (socket.bufferedAmount == 0) {
+//     socket.close(1000, "Closed");
+//   } else {
+//     sleep(100);
+//     closeConnection();
+//   }
+// };
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export default { connect, startSending, closeConnection };
+export default { connect, send };
