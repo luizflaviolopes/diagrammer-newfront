@@ -37,7 +37,10 @@ const deleteDraw = (state, draw) => {
   }
 
   if (!draw.parent) {
-    state.boardDrawZOrder = removeFromArray(state.boardDrawZOrder, draw.id);
+    state.boardDrawShowOrder = removeFromArray(
+      state.boardDrawShowOrder,
+      draw.id
+    );
   } else {
     const parent = state.draws[draw.parent];
     parent.childrens = removeFromArray(parent.childrens, draw.id);

@@ -757,25 +757,25 @@ export const repositionSiblingsFromManualResize = (
 
     if (variations.varN < 0 && checkRepositionCaller("n")) {
       sibling.y += variations.varN;
-      varToConnectors.varN = variations.varN;
+      varToConnectors.varS = variations.varN;
       positionChanged = true;
     }
 
     if (variations.varE > 0 && checkRepositionCaller("e")) {
       sibling.x += variations.varE;
-      varToConnectors.varE = variations.varE;
+      varToConnectors.varW = variations.varE;
       positionChanged = true;
     }
 
     if (variations.varS > 0 && checkRepositionCaller("s")) {
       sibling.y += variations.varS;
-      varToConnectors.varS = variations.varS;
+      varToConnectors.varN = variations.varS;
       positionChanged = true;
     }
 
     if (variations.varW < 0 && checkRepositionCaller("w")) {
       sibling.x += variations.varW;
-      varToConnectors.varW = variations.varW;
+      varToConnectors.varE = variations.varW;
       positionChanged = true;
     }
 
