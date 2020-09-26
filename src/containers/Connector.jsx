@@ -22,9 +22,11 @@ class Connector extends Component {
     let from = this.props.endPoints[0];
     let to = this.props.endPoints[1];
 
-    const points = this.props.drawing
-      ? [from, to]
-      : intermediatePointsCalculator(from, to, 10);
+    // const points = this.props.drawing
+    //   ? [from, to]
+    //   : intermediatePointsCalculator(from, to, 10);
+
+    const points = intermediatePointsCalculator(from, to, 50);
 
     let midPoints = [];
 
@@ -36,12 +38,12 @@ class Connector extends Component {
 
     return (
       <g>
-        <polyline
+        <path
           style={{
             pointerEvents: pointerEvent,
             fill: "none",
           }}
-          points={polylinePointsTransformation(points)}
+          d={polylinePointsTransformation(points)}
           stroke="black"
           strokeWidth="3"
           markerEnd="url(#triangle)"
@@ -53,8 +55,18 @@ class Connector extends Component {
           }}
           strokeDasharray={selected ? 2 : "none"}
         />
-        {midPoints.map((p) => {
-          return <circle cx={p.x} cy={p.y} r="7" fill="green" />;
+        {points.map((p) => {
+          return (
+            <circle
+              cx={p.x + from.x}
+              cy={p.y + from.y}
+              r="7"
+              fill="green"
+              style={{
+                pointerEvents: "none",
+              }}
+            />
+          );
         })}
       </g>
     );

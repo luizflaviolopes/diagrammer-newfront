@@ -386,7 +386,12 @@ const repositionChildrens = (state, drawUpdated, variationsXY) => {
 //   return newPositions;
 // };
 
-export const updateConnectorsFromResize = (draw, connectorsList, variants) => {
+export const updateConnectorsFromResize = (
+  draw,
+  connectorsList,
+  variants,
+  isSibling
+) => {
   for (let i = 0; i < draw.connectors.length; i++) {
     const connRef = draw.connectors[i];
     const conn = connectorsList[connRef.id];
@@ -395,7 +400,8 @@ export const updateConnectorsFromResize = (draw, connectorsList, variants) => {
 
     switch (connRef.angle) {
       case 0: //se w variar em valor diferente de x || se y variar +/- que variação de H|| se h variar
-        varY = (variants.varS + variants.varN) / 2;
+        if (isSibling) varY = variants.varS + variants.varN;
+        else varY = (variants.varS + variants.varN) / 2;
         varX = variants.varE;
         conn.endPoints[connRef.endPoint].x += varX;
         conn.endPoints[connRef.endPoint].y += varY;
@@ -403,14 +409,16 @@ export const updateConnectorsFromResize = (draw, connectorsList, variants) => {
 
       case 90:
         varY = variants.varN;
-        varX = (variants.varW + variants.varE) / 2;
+        if (isSibling) varX = variants.varW + variants.varE;
+        else varX = (variants.varW + variants.varE) / 2;
         conn.endPoints[connRef.endPoint].x += varX;
         conn.endPoints[connRef.endPoint].y += varY;
 
         break;
 
       case 180:
-        varY = (variants.varS + variants.varN) / 2;
+        if (isSibling) varY = variants.varS + variants.varN;
+        else varY = (variants.varS + variants.varN) / 2;
         varX = variants.varW;
         conn.endPoints[connRef.endPoint].x += varX;
         conn.endPoints[connRef.endPoint].y += varY;
@@ -419,7 +427,8 @@ export const updateConnectorsFromResize = (draw, connectorsList, variants) => {
 
       case 270:
         varY = variants.varS;
-        varX = (variants.varW + variants.varE) / 2;
+        if (isSibling) varX = variants.varW + variants.varE;
+        else varX = (variants.varW + variants.varE) / 2;
         conn.endPoints[connRef.endPoint].x += varX;
         conn.endPoints[connRef.endPoint].y += varY;
 
@@ -782,7 +791,12 @@ export const repositionSiblingsFromManualResize = (
     if (positionChanged) {
       isRepositioned = true;
 
-      updateConnectorsFromResize(sibling, state.connectors, varToConnectors);
+      updateConnectorsFromResize(
+        sibling,
+        state.connectors,
+        varToConnectors,
+        true
+      );
 
       repositionSiblingsFromManualResize(
         state,

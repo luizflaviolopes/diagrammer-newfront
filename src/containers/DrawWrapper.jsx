@@ -70,7 +70,7 @@ class DrawWrapper extends Component {
             selected={selected ? true : false}
           ></DrawAdapter>
           {this.state.showConnectors && getConnectors()}
-
+          {/* {getConnectors()} */}
           {selected && (
             <DrawFrame
               height={this.props.height}
