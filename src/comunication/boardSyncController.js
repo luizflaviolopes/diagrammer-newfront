@@ -1,25 +1,26 @@
-import queue from "./components/queue";
-import serverConnector from "./connectors/socketServerConnector";
-import api from "./connectors/restServerConnector";
+// import queue from "./components/queue";
+// import serverConnector from "./connectors/socketServerConnector";
+// import api from "./connectors/restServerConnector";
 import boardStartReBuild from "./components/boardStartReBuild";
+import {
+  addAction as addToPackage,
+  flushPackage,
+} from "./components/actionsPackageManager";
+import { sendPackage, getBoardState } from "./serverController";
 
-const newAction = (action) => {
-  queue.add(action);
-  serverConnector.startSending();
+const addAction = (action) => {
+  addToPackage(action);
 };
 
-const stopConnection = () => {
-  serverConnector.closeConnection();
-};
-
-const getBoardLastState = async (boardId) => {
-  return await api.get("diagram?i=" + boardId);
+const sendActions = (action) => {
+  addToPackage(action);
+  const packageToSend = flushPackage();
+  sendPackage(packageToSend);
 };
 
 const startBoard = async (boardId) => {
-  // const boardState = await getBoardLastState(boardId);
-  // boardStartReBuild(boardState);
-  serverConnector.connect(boardId);
+  const boardState = await getBoardState(boardId);
+  boardStartReBuild(boardState);
 };
 
-export default { newAction, startBoard, stopConnection };
+export default { startBoard, addAction, sendActions };

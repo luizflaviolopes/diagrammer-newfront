@@ -51,7 +51,7 @@ class DrawWrapper extends Component {
     let markers = [];
     if (this.props.resizePoints) markers = this.props.resizePoints;
 
-    const selected = this.props.selecteds.includes(this.props.id);
+    const selected = this.props.selecteds[this.props.id];
 
     const DrawRender = (
       <g
@@ -65,9 +65,12 @@ class DrawWrapper extends Component {
           }}
           onMouseLeave={() => this.setState({ showConnectors: false })}
         >
-          <DrawAdapter {...this.props} selected={selected}></DrawAdapter>
+          <DrawAdapter
+            {...this.props}
+            selected={selected ? true : false}
+          ></DrawAdapter>
           {this.state.showConnectors && getConnectors()}
-
+          {/* {getConnectors()} */}
           {selected && (
             <DrawFrame
               height={this.props.height}
@@ -80,7 +83,7 @@ class DrawWrapper extends Component {
       </g>
     );
 
-    if (this.props.selecteds.includes(this.props.id))
+    if (this.props.selecteds[this.props.id])
       return ReactDOM.createPortal(
         DrawRender,
         document.getElementById("selectDraws")

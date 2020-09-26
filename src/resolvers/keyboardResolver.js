@@ -1,40 +1,25 @@
 import { removeFromArray } from "../helpers/arrayManipulation";
 
 export const deleteSelecteds = (state, actionPayload) => {
-  if (!actionPayload.resolverData)
-    actionPayload.resolverData = {
-      selectedObjects: {
-        connectors: state.sessionState.connectorsSelected,
-        draws: state.sessionState.drawsSelected,
-      },
-    };
+  const selectedDraws = actionPayload.selectedDraws;
 
-  for (
-    let i = 0;
-    i < actionPayload.resolverData.selectedObjects.connectors.length;
-    i++
-  ) {
-    const connectorId =
-      actionPayload.resolverData.selectedObjects.connectors[i];
+  const selectedConnectors = actionPayload.selectedConnectors;
+
+  for (let i = 0; i < selectedConnectors.length; i++) {
+    const connectorId = selectedConnectors[i];
     const connector = state.connectors[connectorId];
 
     deleteConnector(state, connector);
   }
 
-  for (
-    let i = 0;
-    i < actionPayload.resolverData.selectedObjects.draws.length;
-    i++
-  ) {
-    const drawId = actionPayload.resolverData.selectedObjects.draws[i];
+  const selectDrawsIds = Object.keys(selectedDraws);
+
+  for (let i = 0; i < selectDrawsIds.length; i++) {
+    const drawId = selectDrawsIds[i];
     const draw = state.draws[drawId];
 
     deleteDraw(state, draw);
   }
-
-  state.sessionState.connectorsSelected = [];
-
-  state.sessionState.drawsSelected = [];
 
   return state;
 };
@@ -52,7 +37,10 @@ const deleteDraw = (state, draw) => {
   }
 
   if (!draw.parent) {
-    state.boardDrawZOrder = removeFromArray(state.boardDrawZOrder, draw.id);
+    state.boardDrawShowOrder = removeFromArray(
+      state.boardDrawShowOrder,
+      draw.id
+    );
   } else {
     const parent = state.draws[draw.parent];
     parent.childrens = removeFromArray(parent.childrens, draw.id);

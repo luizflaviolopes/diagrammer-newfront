@@ -2,7 +2,7 @@ import React from "react";
 import * as drawActions from "../actions/drawing";
 import { connect } from "react-redux";
 
-const ConnectionPoints = props => {
+const ConnectionPoints = (props) => {
   // onDragStart = _this => {
   //   this.props.connectorDrawingStart({
   //     id: this.props.elementId,
@@ -44,27 +44,29 @@ const ConnectionPoints = props => {
 
   return (
     <React.Fragment>
-    <circle
-      id="anchorPointDummy"
-      cx={props.x}
-      cy={props.y}
-      pointRef={props.pointRef}
-      r="7"
-      fill="steelblue"
-      element={props.elementId}
-      angle={props.angle}
-    />
-    <circle
-      id="anchorPoint"
-      cx={props.x}
-      cy={props.y}
-      pointRef={props.pointRef}
-      r="20"
-      fill="white"
-      opacity="0"
-      element={props.elementId}
-      angle={props.angle}
-    />
+      <polyline
+        points={`${props.x + 5} ${props.y + 6} ${props.x + 10} ${props.y} ${
+          props.x + 5
+        } ${props.y - 6}`}
+        id="anchorPointDummy"
+        pointRef={props.pointRef}
+        fill="steelblue"
+        element={props.elementId}
+        angle={props.angle}
+        transform={`rotate(${-props.angle} ${props.x} ${props.y})`}
+      />
+      <polyline
+        points={`${props.x} ${props.y + 10} ${props.x + 12} ${props.y} ${
+          props.x
+        } ${props.y - 10}`}
+        id="anchorPoint"
+        pointRef={props.pointRef}
+        fill="white"
+        opacity="0"
+        element={props.elementId}
+        angle={props.angle}
+        transform={`rotate(${-props.angle} ${props.x} ${props.y})`}
+      />
     </React.Fragment>
   );
 };
@@ -72,7 +74,7 @@ const ConnectionPoints = props => {
 const mapDispatchToProps = {
   connectorDrawing: drawActions.connectorDrawing,
   connectorDrawingStart: drawActions.connectorDrawingStart,
-  connectorDrawingEnd: drawActions.connectorDrawingEnd
+  connectorDrawingEnd: drawActions.connectorDrawingEnd,
 };
 
 export default connect(null, mapDispatchToProps)(ConnectionPoints);

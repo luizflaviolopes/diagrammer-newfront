@@ -4,6 +4,7 @@ import * as drawResolver from "../resolvers/drawResolver";
 import * as connectorResolvers from "../resolvers/connectorsResolver";
 import * as keyboardResolver from "../resolvers/keyboardResolver";
 import * as drawListBoxResolver from "../resolvers/drawListBoxResolver";
+import { setStartDrag } from "../data/offContext";
 
 const setState = () => ({
   counters: {
@@ -29,10 +30,7 @@ const setState = () => ({
 });
 
 export default (state, action) => {
-  if (action.payload)
-    action.payload.stateData = {
-      elementsSelecteds: [...state.sessionState.drawsSelected],
-    };
+  // if (action.payload) action.payload.inContext = true;
 
   return reducer(state, action);
 };
@@ -42,6 +40,7 @@ export const reducer = (state = setState(), action = {}) => {
     //draw actions
 
     case actionTypes.BOARD_SELECT_DRAW:
+      setStartDrag(action.payload.clientRectPositionRelative);
       return drawResolver.selectDraw({ ...state }, action.payload);
     case actionTypes.BOARD_DRAGGING_ELEMENTS:
       return drawResolver.drawDragging({ ...state }, action.payload);
@@ -52,10 +51,12 @@ export const reducer = (state = setState(), action = {}) => {
     case actionTypes.BOARD_SELECTION_CLEAR:
       return drawResolver.clearAllSelections({ ...state }, action.payload);
     case actionTypes.BOARD_DRAW_START_RESIZE:
+      setStartDrag();
       return drawResolver.startResizeDraw({ ...state }, action.payload);
     case actionTypes.BOARD_DRAW_RESIZE:
-    case actionTypes.BOARD_DRAW_STOP_RESIZE:
       return drawResolver.resizeDraw({ ...state }, action.payload);
+    case actionTypes.BOARD_DRAW_STOP_RESIZE:
+      return drawResolver.endResize({ ...state }, action.payload);
     case actionTypes.BOARD_DRAW_CHANGE_TEXT:
       return drawResolver.changeText({ ...state }, action.payload);
 
@@ -77,8 +78,8 @@ export const reducer = (state = setState(), action = {}) => {
         { ...state },
         action.payload
       );
-    case actionTypes.BOARD_SELECT_CONNECTOR:
-      return connectorResolvers.selectConector({ ...state }, action.payload);
+    // case actionTypes.BOARD_SELECT_CONNECTOR:
+    //   return connectorResolvers.selectConector({ ...state }, action.payload);
 
     //keyboard actions
 
