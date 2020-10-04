@@ -55,7 +55,8 @@ class Connector extends Component {
           }}
           strokeDasharray={selected ? 2 : "none"}
         />
-        {points.map((p) => {
+        {/* {points.map((p, i) => {
+          if (i == 0 || i == 3) return null;
           return (
             <circle
               cx={p.x + from.x}
@@ -67,7 +68,7 @@ class Connector extends Component {
               }}
             />
           );
-        })}
+        })} */}
       </g>
     );
   }
