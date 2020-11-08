@@ -51,6 +51,7 @@ const Board = (props) => {
         <Grid
           offsetX={props.boardView.x}
           offsetY={props.boardView.y}
+          zoom={props.boardView.zoom}
           onDoubleClick={addDraw}
           onClick={clearSelection}
         />

@@ -1,7 +1,20 @@
-import React from "react";
+import { zoom } from "d3";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
+import { bindMouseFunctions } from "../Listeners/mouse/mouseFunctionsBinder";
 
 const Grid = (props) => {
+  const smGridSize = 10;
+  const bgGRidSize = 40;
+
+  const zoomCorrect = props.zoom
+
+  const gridEl = useRef(null);
+
+  useEffect(() => {
+    bindMouseFunctions
+  }, [])
+
   return (
     <React.Fragment>
       <defs>
@@ -15,8 +28,8 @@ const Grid = (props) => {
             width="10"
             height="10"
             fill="none"
-            stroke="gray"
-            strokeWidth="0.3"
+            stroke="#d6d6d6"
+            strokeWidth="0.2"
           />
         </pattern>
         <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -24,21 +37,23 @@ const Grid = (props) => {
             width="40"
             height="40"
             fill="url(#smallGrid)"
-            stroke="gray"
-            strokeWidth="0.5"
+            stroke="#d6d6d6"
+            strokeWidth="0.3"
           />
         </pattern>
       </defs>
       <rect
-        transform={`translate(${props.offsetX % 40},${props.offsetY % 40})`}
+        transform={`matrix(1,0,0,1, ${-10 +props.offsetX % 10},${-10 +props.offsetY % 10})`}
         id="surface"
         x="0"
         y="0"
-        width="100%"
-        height="100%"
-        fill="url(#grid)"
+        width="200%"
+        height="200%"
+        fill="url(#smallGrid)"
         onDoubleClick={props.onDoubleClick}
         onClick={props.onClick}
+        onDrag={evt => {console.log('dragstart')}}
+        draggable='true'
       />
     </React.Fragment>
   );
