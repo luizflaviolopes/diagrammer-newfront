@@ -1,5 +1,5 @@
 import { zoom } from "d3";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { connect } from "react-redux";
 import { bindMouseFunctions } from "../Listeners/mouse/mouseFunctionsBinder";
 
@@ -12,7 +12,11 @@ const Grid = (props) => {
   const gridEl = useRef(null);
 
   useEffect(() => {
-    bindMouseFunctions
+    bindMouseFunctions(gridEl.current,{
+      onClick: props.onClick,
+      onDbClick: props.onDoubleClick,
+      onDrag: props.onDrag
+    })
   }, [])
 
   return (
@@ -43,6 +47,7 @@ const Grid = (props) => {
         </pattern>
       </defs>
       <rect
+        ref={gridEl}
         transform={`matrix(1,0,0,1, ${-10 +props.offsetX % 10},${-10 +props.offsetY % 10})`}
         id="surface"
         x="0"
@@ -50,10 +55,10 @@ const Grid = (props) => {
         width="200%"
         height="200%"
         fill="url(#smallGrid)"
-        onDoubleClick={props.onDoubleClick}
-        onClick={props.onClick}
-        onDrag={evt => {console.log('dragstart')}}
-        draggable='true'
+        // onDoubleClick={props.onDoubleClick}
+        // onClick={props.onClick}
+        // onDrag={evt => {console.log('dragstart')}}
+        // draggable='true'
       />
     </React.Fragment>
   );

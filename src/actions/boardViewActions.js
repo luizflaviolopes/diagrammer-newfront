@@ -6,3 +6,10 @@ export const zoomAction = (data) => {
     payload: data,
   };
 };
+
+export const moveAction = (data) => {
+  return {
+    type: types.BOARDVIEW_MOVE,
+    payload: data,
+  };
+};
