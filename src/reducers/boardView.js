@@ -43,6 +43,9 @@ export default (state = setState(), action = {}) => {
     case actionTypes.BOARDVIEW_ZOOM:
       return boardViewResolver.changeZoom({ ...state }, action.payload);
 
+    case actionTypes.BOARDVIEW_MOVE:
+      return boardViewResolver.moveBoard({ ...state }, action.payload);
+
     default:
       return state;
   }

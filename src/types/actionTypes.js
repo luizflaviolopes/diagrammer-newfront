@@ -25,6 +25,7 @@ export const BOARD_SELECT_CONNECTOR = "BOARD_SELECT_CONNECTOR";
 
 //boardViewActions
 export const BOARDVIEW_ZOOM = "BOARDVIEW_ZOOM";
+export const BOARDVIEW_MOVE = "BOARDVIEW_MOVE";
 
 //KeyboardActions
 export const BOARD_DELETE_PRESSED = "BOARD_DELETE_PRESSED";

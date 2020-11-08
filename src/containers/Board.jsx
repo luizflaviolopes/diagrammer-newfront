@@ -11,6 +11,7 @@ import DrawWraper from "./DrawWrapper.jsx";
 import Connector from "./Connector.jsx";
 import Marker from "../components/Markers.jsx";
 import SelectedDraws from "./SelectedDraws.jsx";
+import { moveAction } from "../actions/boardViewActions.js";
 
 const Board = (props) => {
   useEffect(() => {
@@ -54,6 +55,7 @@ const Board = (props) => {
           zoom={props.boardView.zoom}
           onDoubleClick={addDraw}
           onClick={clearSelection}
+          onDrag={props.moveBoard}
         />
         <g
           transform={`matrix(${props.boardView.zoom},0,0,${props.boardView.zoom},${props.boardView.x},${props.boardView.y})`}
@@ -71,6 +73,7 @@ const Board = (props) => {
 const mapDispatchToProps = {
   addDraw: drawActions.addDraw,
   clearSelection: drawActions.clearSelection,
+  moveBoard: moveAction
 };
 
 const mapStateToProps = (state) => ({

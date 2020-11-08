@@ -17,3 +17,10 @@ export const changeZoom = (state, actionPayload) => {
 
   return state;
 };
+
+export const moveBoard = (state, actionPayload) => {
+  state.x += actionPayload.movementX;
+  state.y += actionPayload.movementY;
+
+  return state;
+};
