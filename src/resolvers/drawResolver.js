@@ -333,17 +333,17 @@ const getResizeLimit = (state, draw) => {
     const limits = findLimitPointsFromDrawArray(childrenElements);
 
     return {
-      top: limits.top - padding,
+      top: draw.height - (limits.top - padding),
       right: limits.right + padding,
       bottom: limits.bottom + padding,
-      left: limits.left - padding,
+      left: draw.width - (limits.left - padding),
     };
   } else
     return {
-      top: draw.height - padding,
+      top: padding,
       right: padding,
       bottom: padding,
-      left: draw.width - padding,
+      left: padding,
     };
 };
 
@@ -388,27 +388,27 @@ export const resizeDraw = (state, payload) => {
 export const endResize = (state, actionPayload) => {
   const draw = state.draws[actionPayload.id];
 
-  if (!draw.lastMeasures) {
-    draw.limitPoints = getResizeLimit(state, draw);
-    draw.lastMeasures = {
-      x: draw.x,
-      y: draw.y,
-      height: draw.height,
-      width: draw.width,
-      absoluteX: draw.absolutePosition.x,
-      absoluteY: draw.absolutePosition.y,
-    };
+  // if (!draw.lastMeasures) {
+  //   draw.limitPoints = getResizeLimit(state, draw);
+  //   draw.lastMeasures = {
+  //     x: draw.x,
+  //     y: draw.y,
+  //     height: draw.height,
+  //     width: draw.width,
+  //     absoluteX: draw.absolutePosition.x,
+  //     absoluteY: draw.absolutePosition.y,
+  //   };
 
-    const resizeReturn = resizeDraw(state, actionPayload);
-    draw.limitPoints = undefined;
-    draw.lastMeasures = undefined;
+  //   const resizeReturn = resizeDraw(state, actionPayload);
+  //   draw.limitPoints = undefined;
+  //   draw.lastMeasures = undefined;
 
-    return resizeReturn;
-  } else {
-    draw.limitPoints = undefined;
-    draw.lastMeasures = undefined;
-    return state;
-  }
+  //   return resizeReturn;
+  // } else {
+  draw.limitPoints = undefined;
+  draw.lastMeasures = undefined;
+  return state;
+  // }
 };
 
 export const getSiblings = (state, draw) => {

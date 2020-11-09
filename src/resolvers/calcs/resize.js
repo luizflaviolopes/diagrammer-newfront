@@ -613,7 +613,7 @@ const resizeCircle = (
 };
 
 export const manualResize = (state, draw, dragPosition, corner) => {
-  let limitpoints = draw.limitPoints;
+  const limitpoints = draw.limitPoints;
 
   const variations = {
     varN: 0,
@@ -654,7 +654,7 @@ const resizeN = (draw, position, limit) => {
   let variation = position.y;
   // const lastY = draw.y;
 
-  if (draw.y + variation - draw.lastMeasures.y > limit)
+  if (draw.height - variation < limit)
     return { y: 0, x: undefined, relative: 0 };
 
   draw.y += variation;
@@ -687,7 +687,7 @@ const resizeW = (draw, position, limit) => {
   let variation = position.x;
   // const lastX = draw.x;
 
-  if (draw.x + variation - draw.lastMeasures.x > limit)
+  if (draw.width - variation < limit)
     return { x: 0, y: undefined, relative: 0 };
 
   draw.x += variation;
