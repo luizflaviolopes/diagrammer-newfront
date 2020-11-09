@@ -400,8 +400,7 @@ export const updateConnectorsFromResize = (
 
     switch (connRef.angle) {
       case 0: //se w variar em valor diferente de x || se y variar +/- que variação de H|| se h variar
-        if (isSibling) varY = variants.varS + variants.varN;
-        else varY = (variants.varS + variants.varN) / 2;
+        varY = (variants.varS + variants.varN) / 2;
         varX = variants.varE;
         conn.endPoints[connRef.endPoint].x += varX;
         conn.endPoints[connRef.endPoint].y += varY;
@@ -409,16 +408,14 @@ export const updateConnectorsFromResize = (
 
       case 90:
         varY = variants.varN;
-        if (isSibling) varX = variants.varW + variants.varE;
-        else varX = (variants.varW + variants.varE) / 2;
+        varX = (variants.varW + variants.varE) / 2;
         conn.endPoints[connRef.endPoint].x += varX;
         conn.endPoints[connRef.endPoint].y += varY;
 
         break;
 
       case 180:
-        if (isSibling) varY = variants.varS + variants.varN;
-        else varY = (variants.varS + variants.varN) / 2;
+        varY = (variants.varS + variants.varN) / 2;
         varX = variants.varW;
         conn.endPoints[connRef.endPoint].x += varX;
         conn.endPoints[connRef.endPoint].y += varY;
@@ -427,13 +424,32 @@ export const updateConnectorsFromResize = (
 
       case 270:
         varY = variants.varS;
-        if (isSibling) varX = variants.varW + variants.varE;
-        else varX = (variants.varW + variants.varE) / 2;
+        varX = (variants.varW + variants.varE) / 2;
         conn.endPoints[connRef.endPoint].x += varX;
         conn.endPoints[connRef.endPoint].y += varY;
 
         break;
     }
+
+    conn.endPoints = [...conn.endPoints];
+  }
+};
+
+export const updateConnectorsFromRepositionSibling = (
+  draw,
+  connectorsList,
+  variants,
+  isSibling
+) => {
+  for (let i = 0; i < draw.connectors.length; i++) {
+    const connRef = draw.connectors[i];
+    const conn = connectorsList[connRef.id];
+
+    const varY = variants.varS + variants.varN;
+    const varX = variants.varW + variants.varE;
+
+    conn.endPoints[connRef.endPoint].x += varX;
+    conn.endPoints[connRef.endPoint].y += varY;
 
     conn.endPoints = [...conn.endPoints];
   }
@@ -712,10 +728,18 @@ export const repositionSiblingsFromManualResize = (
   const margin = 20;
 
   const drawLimits = {
-    top: () => draw.y,
-    right: () => draw.x + draw.width,
-    bottom: () => draw.y + draw.height,
-    left: () => draw.x,
+    get top() {
+      return draw.y;
+    },
+    get right() {
+      return draw.x + draw.width;
+    },
+    get bottom() {
+      return draw.y + draw.height;
+    },
+    get left() {
+      return draw.x;
+    },
   };
 
   let isRepositioned = false;
@@ -733,16 +757,16 @@ export const repositionSiblingsFromManualResize = (
     };
 
     const siblingLimits = {
-      top: () => {
+      get top() {
         return sibling.y;
       },
-      right: () => {
+      get right() {
         return sibling.x + sibling.width;
       },
-      bottom: () => {
+      get bottom() {
         return sibling.y + sibling.height;
       },
-      left: () => {
+      get left() {
         return sibling.x;
       },
     };
@@ -791,7 +815,7 @@ export const repositionSiblingsFromManualResize = (
     if (positionChanged) {
       isRepositioned = true;
 
-      updateConnectorsFromResize(
+      updateConnectorsFromRepositionSibling(
         sibling,
         state.connectors,
         varToConnectors,
@@ -824,68 +848,68 @@ const checkIfRepositionNeeded = (
     case "n":
       //verificar bottom
       if (
-        siblingLimits.bottom() < drawAbsoluteLimits.top &&
-        siblingLimits.bottom() > drawLimits.top() - margin
+        siblingLimits.bottom < drawAbsoluteLimits.top &&
+        siblingLimits.bottom > drawLimits.top - margin
       ) {
         if (
-          siblingLimits.right() > drawLimits.left() - margin &&
-          siblingLimits.right() < drawLimits.right() + margin
+          siblingLimits.right > drawLimits.left - margin &&
+          siblingLimits.right < drawLimits.right + margin
         )
           return true;
         if (
-          siblingLimits.left() < drawLimits.right() + margin &&
-          siblingLimits.left() > drawLimits.left() - margin
+          siblingLimits.left < drawLimits.right + margin &&
+          siblingLimits.left > drawLimits.left - margin
         )
           return true;
       }
       break;
     case "e":
       if (
-        siblingLimits.left() > drawAbsoluteLimits.right &&
-        siblingLimits.left() < drawLimits.right() + margin
+        siblingLimits.left > drawAbsoluteLimits.right &&
+        siblingLimits.left < drawLimits.right + margin
       ) {
         if (
-          siblingLimits.bottom() > drawLimits.top() - margin &&
-          siblingLimits.bottom() < drawLimits.bottom() + margin
+          siblingLimits.bottom > drawLimits.top - margin &&
+          siblingLimits.bottom < drawLimits.bottom + margin
         )
           return true;
         if (
-          siblingLimits.top() > drawLimits.top() - margin &&
-          siblingLimits.top() < drawLimits.bottom() + margin
+          siblingLimits.top > drawLimits.top - margin &&
+          siblingLimits.top < drawLimits.bottom + margin
         )
           return true;
       }
       break;
     case "s":
       if (
-        siblingLimits.top() > drawAbsoluteLimits.bottom &&
-        siblingLimits.top() < drawLimits.bottom() + margin
+        siblingLimits.top > drawAbsoluteLimits.bottom &&
+        siblingLimits.top < drawLimits.bottom + margin
       ) {
         if (
-          siblingLimits.left() < drawLimits.right() + margin &&
-          siblingLimits.left() > drawLimits.left() - margin
+          siblingLimits.left < drawLimits.right + margin &&
+          siblingLimits.left > drawLimits.left - margin
         )
           return true;
         if (
-          siblingLimits.right() > drawLimits.left() - margin &&
-          siblingLimits.right() < drawLimits.right() + margin
+          siblingLimits.right > drawLimits.left - margin &&
+          siblingLimits.right < drawLimits.right + margin
         )
           return true;
       }
       break;
     case "w":
       if (
-        siblingLimits.right() < drawAbsoluteLimits.left &&
-        siblingLimits.right() > drawLimits.left() - margin
+        siblingLimits.right < drawAbsoluteLimits.left &&
+        siblingLimits.right > drawLimits.left - margin
       ) {
         if (
-          siblingLimits.bottom() > drawLimits.top() - margin &&
-          siblingLimits.bottom() < drawLimits.bottom() + margin
+          siblingLimits.bottom > drawLimits.top - margin &&
+          siblingLimits.bottom < drawLimits.bottom + margin
         )
           return true;
         if (
-          siblingLimits.top() > drawLimits.top() - margin &&
-          siblingLimits.top() < drawLimits.bottom() + margin
+          siblingLimits.top > drawLimits.top - margin &&
+          siblingLimits.top < drawLimits.bottom + margin
         )
           return true;
       }
