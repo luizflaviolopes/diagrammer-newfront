@@ -18,7 +18,7 @@ export default {
     // Note: if the secure flag is set to true, then the cookie transmission requires a secure protocol
     cookieStorage: {
       // REQUIRED - Cookie domain (only required if cookieStorage is provided)
-      domain: "localhost",
+      domain: "diagrammer.auth.ca-central-1.amazoncognito.com",
       secure: false,
     },
 

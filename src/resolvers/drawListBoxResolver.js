@@ -16,11 +16,11 @@ export const startDragDrawListBoxDraw = (state, payload) => {
   if (lastCounter + 1 !== actualCounter)
     throw "Ocorreu um erro na inclusão do elemento";
 
-  newstate = drawResolver.selectDraw(newstate, {
-    id: lastCounter,
-    clientRectPosition: payload.position,
-    shiftPressed: false,
-  });
+  // newstate = drawResolver.selectDraw(newstate, {
+  //   id: lastCounter,
+  //   clientRectPosition: payload.position,
+  //   shiftPressed: false,
+  // });
 
   return newstate;
 };

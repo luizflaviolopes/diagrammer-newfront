@@ -10,6 +10,6 @@ export const sendPackage = (packageToSend) => {
 
 export const getBoardState = async (boardId) => {
   serverConnector.connect(boardId);
-  //return await api.get("diagram?i=" + boardId);
-  return { actions: [], state: null };
+  return await api.get("diagram?i=" + boardId);
+  //return { actions: [], state: null };
 };

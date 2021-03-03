@@ -14,7 +14,7 @@ const addAction = (action) => {
 
 const sendActions = (action) => {
   addToPackage(action);
-  const packageToSend = flushPackage();
+  const packageToSend = flushPackage(action.type);
   sendPackage(packageToSend);
 };
 
