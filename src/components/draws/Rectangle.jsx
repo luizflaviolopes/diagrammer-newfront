@@ -16,7 +16,7 @@ const ResizeHitbox = (props) => {
       y={props.y}
       height="10"
       width="10"
-      drawId={props.drawId}
+      drawid={props.drawId}
     ></rect>
   );
 };

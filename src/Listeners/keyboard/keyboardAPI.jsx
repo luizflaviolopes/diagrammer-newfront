@@ -1,5 +1,5 @@
 import store from "../../store";
-import { deletePressed } from "../../actions/keyboardActions.js";
+import { deletePressed, undo, redo } from "../../actions/keyboardActions.js";
 
 const keyboardAPI = {
   start: () => {
@@ -11,10 +11,20 @@ const keyboardAPI = {
 };
 
 const keyPressed = (evt) => {
-  switch (evt.key) {
+  switch (evt.code) {
     case "Backspace":
     case "Delete":
       store.dispatch(deletePressed({}));
+      break;
+    case 'KeyZ':
+      if(evt.ctrlKey)
+      store.dispatch(undo({}));
+      break;
+      case 'KeyY':
+        if(evt.ctrlKey)
+        store.dispatch(redo({}));
+        break;
+    default:
       break;
   }
 };

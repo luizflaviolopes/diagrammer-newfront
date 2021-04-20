@@ -20,7 +20,7 @@ const ResizeHitbox = (props) => {
       y={props.y - hitboxSize}
       height={hitboxSize}
       width={hitboxSize}
-      drawId={props.drawId}
+      drawid={props.drawid}
       fill="steelBlue"
     ></rect>
   );
@@ -42,13 +42,13 @@ const DrawFrame = (props) => {
         stroke="steelBlue"
         fill="none"
       ></rect>
-      //hitboxes
-      {hitboxes.map((box) => (
+      {hitboxes.map((box, i) => (
         <ResizeHitbox
+          key={i}
           x={width * box.x}
           y={height * box.y}
           corner={box.corner}
-          drawId={props.drawId}
+          drawid={props.drawid}
         ></ResizeHitbox>
       ))}
     </React.Fragment>

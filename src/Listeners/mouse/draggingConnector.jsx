@@ -11,36 +11,37 @@ export const IsConnector = (element) => {
 };
 
 export const onDrawConnectorStart = (evt) => {
-  window.dragging = {
-    onMove: onConnectorDragging,
-    onDrop: onConnectorDrop,
-  };
-  let clientRect = evt.target.getBoundingClientRect();
+  const elementStart = evt.target;
+  const elementStartId = elementStart.getAttribute("element");
+  const startClientRect = elementStart.getBoundingClientRect();
+
   store.dispatch(
     connectorDrawingStart({
-      id: evt.target.getAttribute("element"),
+      id: elementStartId,
       mousePosition: {
-        x: clientRect.x + clientRect.width / 2,
-        y: clientRect.y + clientRect.height / 2,
+        x: startClientRect.x + startClientRect.width / 2,
+        y: startClientRect.y + startClientRect.height / 2,
       },
       variant: {
-        pointRef: evt.target.getAttribute("pointRef"),
+        pointref: evt.target.getAttribute("pointref"),
         angle: +evt.target.getAttribute("angle"),
       },
     })
   );
-};
 
-const onConnectorDragging = (evt) => {
-  if (evt.toElement.id === "anchorPoint") {
-    let rectPos = evt.toElement.getBoundingClientRect();
+  return {
+    dragging: (evt) => {
+    if (evt.toElement.id === "anchorPoint") {
+      const destinationElement = evt.toElement;
+      const  rectPos = destinationElement.getBoundingClientRect();
+
     store.dispatch(
       connectorDrawing({
         mousePosition: {
           x: rectPos.left + (rectPos.right - rectPos.left) / 2,
           y: rectPos.top + (rectPos.bottom - rectPos.top) / 2,
         },
-        angle: +evt.toElement.getAttribute("angle"),
+        angle: +destinationElement.getAttribute("angle"),
       })
     );
   } else
@@ -52,26 +53,29 @@ const onConnectorDragging = (evt) => {
         },
       })
     );
+  },
+
+    drop:(evt) => {
+        if (evt.toElement.id === "anchorPoint") {
+          const destinationElement = evt.toElement;
+          const clientRect = destinationElement.getBoundingClientRect();
+          const destinationElementId = destinationElement.getAttribute("element");
+
+          store.dispatch(
+            connectorDrawingEnd({
+              id: destinationElementId,
+              mousePosition: {
+                x: clientRect.x + clientRect.width / 2,
+                y: clientRect.y + clientRect.height / 2,
+              },
+              variants: {
+                pointref: destinationElement.getAttribute("pointref"),
+                angle: +destinationElement.getAttribute("angle"),
+              },
+            })
+          );
+        } else store.dispatch(connectorDrawingEnd(undefined));
+      }
+    }
 };
 
-const onConnectorDrop = (evt) => {
-  if (window.dragging) {
-    window.dragging = undefined;
-    if (evt.toElement.id === "anchorPoint") {
-      let clientRect = evt.toElement.getBoundingClientRect();
-      store.dispatch(
-        connectorDrawingEnd({
-          id: evt.toElement.getAttribute("element"),
-          mousePosition: {
-            x: clientRect.x + clientRect.width / 2,
-            y: clientRect.y + clientRect.height / 2,
-          },
-          variants: {
-            pointRef: evt.toElement.getAttribute("pointRef"),
-            angle: +evt.toElement.getAttribute("angle"),
-          },
-        })
-      );
-    } else store.dispatch(connectorDrawingEnd(undefined));
-  }
-};

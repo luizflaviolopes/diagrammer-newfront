@@ -10,6 +10,10 @@ import {
   updateConnectorsFromResize,
 } from "./calcs/resize";
 import { isDragging } from "../data/offContext";
+import {
+  elementChange,
+  connectorChange,
+} from "../dataControllers/changeDataControl";
 
 const padding = 10;
 
@@ -41,16 +45,9 @@ export const drawDragging = (state, actionPayload) => {
   return state;
 };
 
-// const attachSelecteds = (state) => {
-//   state.boardDrawShowOrder = [...state.boardDrawZOrder];
-// };
-
 export const drawdrop = (state, actionPayload) => {
-  if (
-    Math.abs(actionPayload.completeDisplacement.x) < 5 &&
-    Math.abs(actionPayload.completeDisplacement.y) < 5
-  )
-    return state;
+  //discard drops in same place
+  if (!actionPayload) return state;
 
   if (actionPayload.id) {
     const parent = state.draws[actionPayload.id];
@@ -58,6 +55,8 @@ export const drawdrop = (state, actionPayload) => {
 
     for (let a = 0; a < selectedsIds.length; a++) {
       let droppedDraw = state.draws[selectedsIds[a]];
+
+      elementChange(droppedDraw);
 
       const oldAbsolute = { ...droppedDraw.absolutePosition };
 
@@ -163,6 +162,8 @@ export const drawAdd = (state, actionPayload) => {
     absolutePosition: { ...positionBoardRelative },
   };
 
+  elementChange({ id: newID });
+
   state.draws[newID] = newDraw;
   // state.boardDrawZOrder = [...state.boardDrawZOrder, newID];
   state.boardDrawShowOrder = [...state.boardDrawShowOrder, newID];
@@ -230,6 +231,8 @@ const newSelectedDraw = (state, drawSelected, actionPayload) => {
 const updateDrawPosition = (state, draw, mouseMovementZoomRelative) => {
   const newDraw = { ...draw };
 
+  elementChange(newDraw);
+
   newDraw.absolutePosition = {
     x: newDraw.absolutePosition.x + mouseMovementZoomRelative.x,
     y: newDraw.absolutePosition.y + mouseMovementZoomRelative.y,
@@ -268,6 +271,8 @@ export const updateConnectors = (draw, state, onMouseMovePositionVariant) => {
     newPositions[connRef.endPoint].y =
       conn.endPoints[connRef.endPoint].y + onMouseMovePositionVariant.y;
 
+    connectorChange(conn);
+
     conn.endPoints = newPositions;
   }
   for (let c = 0; c < draw.childrens.length; c++) {
@@ -279,6 +284,7 @@ export const updateConnectors = (draw, state, onMouseMovePositionVariant) => {
 const addChildrenInParent = (state, children) => {
   let parent = state.draws[children.parent];
 
+  elementChange(parent);
   let newChildrens = [...parent.childrens, children.id];
 
   children.x = children.absolutePosition.x - parent.absolutePosition.x;
@@ -295,6 +301,7 @@ const removeDrawFromBoard = (state, drawId) => {
   state.boardDrawShowOrder = removeFromArray(state.boardDrawShowOrder, +drawId);
 };
 const removeChildrenInParent = (parent, idChildrenToRemove) => {
+  elementChange(parent);
   parent.childrens = removeFromArray(parent.childrens, +idChildrenToRemove);
 };
 
@@ -302,6 +309,7 @@ export const startResizeDraw = (state, payload) => {
   // clearAllSelections(state);
 
   const draw = state.draws[payload.id];
+  elementChange(draw);
 
   draw.lastMeasures = {
     x: draw.x,
@@ -435,6 +443,7 @@ export const getSiblings = (state, draw) => {
 
 export const changeText = (state, actionPayload) => {
   const draw = state.draws[actionPayload.id];
+  elementChange(draw);
 
   const newDraw = { ...draw };
   newDraw.text = actionPayload.text;

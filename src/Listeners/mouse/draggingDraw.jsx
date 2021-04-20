@@ -1,5 +1,5 @@
 import store from "../../store";
-import { mouseDown, dragging, drop } from "../../actions/drawing";
+import { mouseDown, dragging, drop, drawClick } from "../../actions/drawing";
 
 export const IsDraw = (element) => {
   if (element.getAttribute("draw")) return true;
@@ -7,41 +7,50 @@ export const IsDraw = (element) => {
 };
 
 export const onDrawDragStart = (evt) => {
-  window.dragging = {
-    mousePressedObject: evt.target,
-    objectId: evt.target.id,
-    onMove: onDrawDragging,
-    onDrop: onDrawDrop,
-  };
+  const mousePressedObject = evt.target;
+  const objectId = evt.target.id;
+  let moved = false;
+
   store.dispatch(
     mouseDown({
-      id: evt.target.id,
+      id: objectId,
       shiftPressed: evt.shiftKey,
-      clientRectPosition: evt.target.getBoundingClientRect(),
+      clientRectPosition: mousePressedObject.getBoundingClientRect(),
       mousePosition: { x: evt.clientX, y: evt.clientY },
     })
   );
-};
 
-export const onDrawDragging = (evt) => {
-  let id = window.dragging.objectId;
-  store.dispatch(
-    dragging({ id: id, mousePosition: { x: evt.clientX, y: evt.clientY } })
-  );
-};
+  return {
+    dragging: (evt) => {
+      if(!moved){
+        moved = true;
+      }
 
-export const onDrawDrop = (evt) => {
-  if (IsDraw(evt.toElement)) {
-    let evtMeasures = evt.toElement.getBoundingClientRect();
-    store.dispatch(
-      drop({
-        id: evt.toElement.id,
-        parentRect: { x: evtMeasures.x, y: evtMeasures.y },
-        mousePosition: { x: evt.clientX, y: evt.clientY },
-      })
-    );
-  } else
-    store.dispatch(drop({ mousePosition: { x: evt.clientX, y: evt.clientY } }));
+      store.dispatch(
+        dragging({ id: objectId, mousePosition: { x: evt.clientX, y: evt.clientY } })
+      );
+    },
 
-  window.dragging = undefined;
+    drop:(evt) => {
+      if(!moved)
+      {
+        store.dispatch(drawClick())
+        return;
+      }
+
+      if (IsDraw(evt.toElement)) {
+        const elementDestination = evt.toElement;
+        const evtMeasures = elementDestination.getBoundingClientRect();
+        store.dispatch(
+          drop({
+            id: elementDestination.id,
+            parentRect: { x: evtMeasures.x, y: evtMeasures.y },
+            mousePosition: { x: evt.clientX, y: evt.clientY },
+          })
+        );
+      } else
+        store.dispatch(drop({ mousePosition: { x: evt.clientX, y: evt.clientY } }));
+    }
+  }
+
 };

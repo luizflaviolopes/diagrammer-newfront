@@ -9,10 +9,7 @@
     "@testing-library/user-event": "^7.1.2",
     "aws-amplify": "^3.3.21",
     "axios": "^0.19.2",
-    "d3": "^5.16.0",
-    "d3-dispatch": "^1.0.6",
-    "d3-drag": "^1.2.5",
-    "d3-selection": "^1.4.2",
+    "lodash": "^4.17.21",
     "react": "^16.14.0",
     "react-content-loader": "^5.1.4",
     "react-dom": "^16.14.0",
@@ -22,7 +19,8 @@
     "react-spinners": "^0.8.3",
     "react-transition-group": "^4.4.1",
     "redux": "^4.0.5",
-    "styled-components": "^5.2.1"
+    "styled-components": "^5.2.1",
+    "uuid": "^8.3.2"
   },
   "scripts": {
     "start": "react-scripts start",

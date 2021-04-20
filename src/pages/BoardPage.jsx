@@ -8,12 +8,14 @@ import store from "../store";
 import ServerStatus from "../containers/ServerStatus";
 import boardSyncController from "../comunication/boardSyncController";
 import { useState } from "react";
+import ToolBox from "../containers/ToolBox";
 
 const BoardWrapper = (props) => {
   return (
-    <div class="full-vh">
+    <div className="full-vh">
       <Board></Board>
       <DrawListTab></DrawListTab>
+      <ToolBox></ToolBox>
       <ServerStatus></ServerStatus>
     </div>
   );

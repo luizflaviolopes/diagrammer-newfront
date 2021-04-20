@@ -1,3 +1,7 @@
+import {
+  connectorChange,
+  elementChange,
+} from "../../dataControllers/changeDataControl";
 import * as drawTypes from "../../types/drawTypes";
 import { getSiblings } from "../drawResolver";
 
@@ -191,21 +195,12 @@ const autoResizeDraws = (
 
   let variationsFromResize;
 
-  if (draw.type == drawTypes.DRAW_CIRCLE)
-    variationsFromResize = resizeCircle(
-      draw,
-      padding,
-      childrensLimitPoints,
-      drawLimitPoints
-    );
-  else if (draw.type == drawTypes.DRAW_RECTANGLE)
-    variationsFromResize = resizeRect(
-      draw,
-      padding,
-      childrensLimitPoints,
-      drawLimitPoints
-    );
-  else throw { error: "desenho inválido" };
+  variationsFromResize = resizeRect(
+    draw,
+    padding,
+    childrensLimitPoints,
+    drawLimitPoints
+  );
 
   repositionChildrens(state, draw, {
     x: variationsFromResize.varW,
@@ -235,6 +230,7 @@ const repositionChildrens = (state, drawUpdated, variationsXY) => {
   if (variationsXY.x < 0 || variationsXY.y < 0) {
     for (let c = 0; c < drawUpdated.childrens.length; c++) {
       const children = state.draws[drawUpdated.childrens[c]];
+      elementChange(children);
       updateChildrensPositionOnParentResize(children, variationsXY);
     }
   }
@@ -431,6 +427,7 @@ export const updateConnectorsFromResize = (
         break;
     }
 
+    connectorChange(conn);
     conn.endPoints = [...conn.endPoints];
   }
 };
@@ -451,6 +448,7 @@ export const updateConnectorsFromRepositionSibling = (
     conn.endPoints[connRef.endPoint].x += varX;
     conn.endPoints[connRef.endPoint].y += varY;
 
+    connectorChange(conn);
     conn.endPoints = [...conn.endPoints];
   }
 };
@@ -480,6 +478,8 @@ const resizeRect = (
     variations.varW =
       childrensLimitPoints.left - padding - drawLimitPoints.left;
 
+    elementChange(drawToResize);
+
     drawToResize.x += variations.varW;
     drawToResize.width -= variations.varW;
     isUpdated = true;
@@ -488,6 +488,8 @@ const resizeRect = (
   //comparando topo
   if (childrensLimitPoints.top - padding < drawLimitPoints.top) {
     variations.varN = childrensLimitPoints.top - padding - drawLimitPoints.top;
+
+    elementChange(drawToResize);
 
     drawToResize.y += variations.varN;
     drawToResize.height -= variations.varN;
@@ -500,6 +502,8 @@ const resizeRect = (
     variations.varE =
       childrensLimitPoints.right + padding - drawLimitPoints.right;
 
+    elementChange(drawToResize);
+
     //incluir variação em largura
     drawToResize.width += variations.varE;
     isUpdated = true;
@@ -510,6 +514,9 @@ const resizeRect = (
     //calcular nova altura
     variations.varS =
       childrensLimitPoints.bottom + padding - drawLimitPoints.bottom;
+
+    elementChange(drawToResize);
+
     //definir nova altura
     drawToResize.height += variations.varS;
     isUpdated = true;
@@ -789,24 +796,28 @@ export const repositionSiblingsFromManualResize = (
       );
 
     if (variations.varN < 0 && checkRepositionCaller("n")) {
+      elementChange(sibling);
       sibling.y += variations.varN;
       varToConnectors.varS = variations.varN;
       positionChanged = true;
     }
 
     if (variations.varE > 0 && checkRepositionCaller("e")) {
+      elementChange(sibling);
       sibling.x += variations.varE;
       varToConnectors.varW = variations.varE;
       positionChanged = true;
     }
 
     if (variations.varS > 0 && checkRepositionCaller("s")) {
+      elementChange(sibling);
       sibling.y += variations.varS;
       varToConnectors.varN = variations.varS;
       positionChanged = true;
     }
 
     if (variations.varW < 0 && checkRepositionCaller("w")) {
+      elementChange(sibling);
       sibling.x += variations.varW;
       varToConnectors.varE = variations.varW;
       positionChanged = true;
@@ -814,6 +825,7 @@ export const repositionSiblingsFromManualResize = (
 
     if (positionChanged) {
       isRepositioned = true;
+      elementChange(draw);
 
       updateConnectorsFromRepositionSibling(
         sibling,

@@ -6,36 +6,46 @@ import { changeZoom } from "./zoom";
 const onMouseDownFunction = (evt) => {
   if (evt.button == 0) {
     if (IsDraw(evt.target)) {
-      onDrawDragStart(evt);
+      const callbacks = onDrawDragStart(evt);
+      bindCallbacks(callbacks);
     } else if (IsConnector(evt.target)) {
-      onDrawConnectorStart(evt);
+      const callbacks = onDrawConnectorStart(evt);
+      bindCallbacks(callbacks);
     } else if (IsResizeAnchor(evt.target)) {
-      onManualResizeStart(evt);
+      const callbacks = onManualResizeStart(evt);
+      bindCallbacks(callbacks);
     }
   }
 };
 
-const onMouseUpFunction = (evt) => {
-  if (window.dragging) {
-    window.dragging.onDrop(evt);
-  }
+const bindCallbacks = (callbacks) => {
+  bindMouseMove(callbacks.dragging)
+  bindMouseUp(callbacks.drop)
+}
+
+const bindMouseUp = (callback) => {
+  window.onmouseup = (evt) => {
+    callback(evt);
+    unloadBinds();
+  };
 };
 
-const onMouseMoveFunction = (evt) => {
-  if (window.dragging) {
-    window.dragging.onMove(evt);
-  }
+const bindMouseMove = (callback) => {
+  window.onmousemove = callback;
 };
 
 const onMouseWheelFunction = (evt) => {
   changeZoom(evt);
 };
 
+const unloadBinds = () =>{
+  window.onmouseup = undefined;
+  window.onmousemove = undefined
+}
+
 const mouseAPI = {
   startAPI: () => {
     window.onmousedown = onMouseDownFunction;
-    window.onmouseup = onMouseUpFunction;
-    window.onmousemove = onMouseMoveFunction;
     window.onmousewheel = onMouseWheelFunction;
   },
   endAPI: () => {

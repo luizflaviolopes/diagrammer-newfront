@@ -11,18 +11,39 @@ export const IsResizeAnchor = (element) => {
 };
 
 export const onManualResizeStart = (evt) => {
-  window.dragging = {
-    onMove: onResizeMove,
-    onDrop: onResizeDrop,
-    drawId: evt.target.getAttribute("drawId"),
-    corner: evt.target.getAttribute("corners"),
-  };
+    const drawId = evt.target.getAttribute("drawid");
+    const corner = evt.target.getAttribute("corners");
+
   store.dispatch(
     startResizeDraw({
-      id: window.dragging.drawId,
+      id: drawId,
       mousePosition: { x: evt.clientX, y: evt.clientY },
     })
   );
+
+  return {
+    dragging: (evt) => {
+      store.dispatch(
+        resizeDraw({
+          id: drawId,
+          mousePosition: { x: evt.clientX, y: evt.clientY },
+          corner,
+        })
+      );
+    },
+
+    drop:(evt) => {    
+      store.dispatch(
+        stopResizeDraw({
+          id: drawId,
+          mousePosition: { x: evt.clientX, y: evt.clientY },
+          corner,
+        })
+      );
+    }
+  }
+
+
 };
 
 const onResizeMove = (evt) => {

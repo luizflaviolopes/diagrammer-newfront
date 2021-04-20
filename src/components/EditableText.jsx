@@ -77,8 +77,9 @@ const EditableText = (props) => {
         .map((line, i) => {
           return (
             <text
-              text-anchor="middle"
-              alignment-baseline="hanging"
+              key={i}
+              textAnchor="middle"
+              alignmentBaseline="hanging"
               x={props.x}
               y={props.y + i * 16}
               style={{

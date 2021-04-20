@@ -34,7 +34,7 @@ class DrawWrapper extends Component {
       connectionPoints = points.map((point) => (
         <ConnectionPoints
           elementId={this.props.id}
-          key={point.pointRef}
+          key={point.pointref}
           {...point}
         />
       ));
@@ -75,7 +75,7 @@ class DrawWrapper extends Component {
             <DrawFrame
               height={this.props.height}
               width={this.props.width}
-              drawId={this.props.id}
+              drawid={this.props.id}
             ></DrawFrame>
           )}
         </g>

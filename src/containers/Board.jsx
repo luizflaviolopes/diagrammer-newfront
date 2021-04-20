@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import ReactDOM from "react-dom";
 import { connect } from "react-redux";
 import Grid from "../components/Grid.jsx";
 import * as drawActions from "../actions/drawing";
@@ -10,7 +9,6 @@ import keyboardAPI from "../Listeners/keyboard/keyboardAPI";
 import DrawWraper from "./DrawWrapper.jsx";
 import Connector from "./Connector.jsx";
 import Marker from "../components/Markers.jsx";
-import SelectedDraws from "./SelectedDraws.jsx";
 import { moveAction } from "../actions/boardViewActions.js";
 
 const Board = (props) => {

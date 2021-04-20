@@ -5,6 +5,8 @@ import * as connectorResolvers from "../resolvers/connectorsResolver";
 import * as keyboardResolver from "../resolvers/keyboardResolver";
 import * as drawListBoxResolver from "../resolvers/drawListBoxResolver";
 import { setStartDrag } from "../data/offContext";
+import { undo } from "../resolvers/othersResolver";
+import { startPossibleBoardShowOrderChange } from "./../dataControllers/changeDataControl";
 
 const setState = () => ({
   counters: {
@@ -45,8 +47,10 @@ export const reducer = (state = setState(), action = {}) => {
     case actionTypes.BOARD_DRAGGING_ELEMENTS:
       return drawResolver.drawDragging({ ...state }, action.payload);
     case actionTypes.BOARD_DROP_ELEMENTS:
+      startPossibleBoardShowOrderChange(state.boardDrawShowOrder);
       return drawResolver.drawdrop({ ...state }, action.payload);
     case actionTypes.BOARD_DRAW_ADD:
+      startPossibleBoardShowOrderChange(state.boardDrawShowOrder);
       return drawResolver.drawAdd({ ...state }, action.payload);
     case actionTypes.BOARD_SELECTION_CLEAR:
       return drawResolver.clearAllSelections({ ...state }, action.payload);
@@ -103,6 +107,10 @@ export const reducer = (state = setState(), action = {}) => {
         { ...state },
         action.payload
       );
+
+    //Other actions
+    case actionTypes.BOARD_UNDO:
+      return undo({ ...state });
 
     //Dev (test) actions
 

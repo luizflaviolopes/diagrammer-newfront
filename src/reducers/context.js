@@ -13,6 +13,10 @@ export default (state = setState(), action = {}) => {
   switch (action.type) {
     case actionTypes.BOARD_SELECT_DRAW:
       return selectDraw({ ...state }, action.payload);
+
+    case actionTypes.BOARD_DRAW_CLICK:
+      return click({ ...state }, action.payload);
+
     case actionTypes.BOARD_DRAGGING_ELEMENTS:
       return dragging({ ...state }, action.payload);
     case actionTypes.BOARD_DROP_ELEMENTS:
@@ -103,14 +107,23 @@ const dragging = (state, actionPayload) => {
   return state;
 };
 
+const click = (state, actionPayload) => {
+  state.dragging = false;
+  state.lastPosition = null;
+  state.startPosition = null;
+
+  return state;
+};
 const drop = (state, actionPayload) => {
-  actionPayload.selectedDraws = state.selectedDraws;
   state.dragging = false;
 
-  actionPayload.completeDisplacement = {
-    x: actionPayload.positionRelative.x - state.startPosition.x,
-    y: actionPayload.positionRelative.y - state.startPosition.y,
-  };
+  if (actionPayload) {
+    actionPayload.selectedDraws = state.selectedDraws;
+    actionPayload.completeDisplacement = {
+      x: actionPayload.positionRelative.x - state.startPosition.x,
+      y: actionPayload.positionRelative.y - state.startPosition.y,
+    };
+  }
   state.lastPosition = null;
   state.startPosition = null;
 

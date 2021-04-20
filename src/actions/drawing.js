@@ -88,3 +88,9 @@ export const changeDrawText = (data) => {
     payload: data,
   };
 };
+export const drawClick = (data) => {
+  return {
+    type: types.BOARD_DRAW_CLICK,
+    payload: data,
+  };
+};

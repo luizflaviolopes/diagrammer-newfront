@@ -49,7 +49,7 @@ const ConnectionPoints = (props) => {
           props.x + 5
         } ${props.y - 6}`}
         id="anchorPointDummy"
-        pointRef={props.pointRef}
+        pointref={props.pointref}
         fill="steelblue"
         element={props.elementId}
         angle={props.angle}
@@ -60,7 +60,7 @@ const ConnectionPoints = (props) => {
           props.x
         } ${props.y - 10}`}
         id="anchorPoint"
-        pointRef={props.pointRef}
+        pointref={props.pointref}
         fill="white"
         opacity="0"
         element={props.elementId}

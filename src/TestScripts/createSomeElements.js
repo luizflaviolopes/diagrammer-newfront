@@ -5,6 +5,15 @@ const bindFunction = () => {
   window.changeCircleRadius = changeCircleRadius;
   window.repositionDraw = repositionDraw;
   window.applyZoom = applyZoom;
+  window.undo = undo;
+};
+
+const undo = () => {
+  const update = {
+    type: "BOARD_UNDO",
+  };
+
+  store.dispatch(update);
 };
 
 const createSomeElements = (num) => {
