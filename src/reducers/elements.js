@@ -88,6 +88,7 @@ export const reducer = (state = setState(), action = {}) => {
     //keyboard actions
 
     case actionTypes.BOARD_DELETE_PRESSED:
+      startPossibleBoardShowOrderChange(state.boardDrawShowOrder);
       return keyboardResolver.deleteSelecteds({ ...state }, action.payload);
 
     //drawListBox actions

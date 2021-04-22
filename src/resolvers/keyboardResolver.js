@@ -1,3 +1,4 @@
+import { elementChange } from "../dataControllers/changeDataControl";
 import { removeFromArray } from "../helpers/arrayManipulation";
 
 export const deleteSelecteds = (state, actionPayload) => {
@@ -27,6 +28,7 @@ export const deleteSelecteds = (state, actionPayload) => {
 const deleteDraw = (state, draw) => {
   //Constante para manter a listagem original de conectores
   const drawConnectors = draw.connectors;
+  elementChange(draw);
 
   for (let i = 0; i < drawConnectors.length; i++) {
     const connectorId = drawConnectors[i].id;

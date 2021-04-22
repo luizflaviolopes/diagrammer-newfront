@@ -70,7 +70,7 @@ const EditableText = (props) => {
   }
 
   return (
-    <g onClick={handleClick}>
+    <g onDoubleClick={handleClick}>
       {props.children
         //.match(new RegExp(`[\\s\\S]{1,${Math.floor(props.width / 10)}}`, "g"))
         .split("\n")
@@ -100,6 +100,7 @@ const InputText = (props) => {
   const inputEl = useRef(null);
 
   const [position, setPosition] = useState(props.position);
+  const [text, setText] = useState(props.children)
 
   useEffect(() => {
     inputEl.current.focus();
@@ -107,9 +108,14 @@ const InputText = (props) => {
   }, []);
 
   const handleOnChange = (evt) => {
+    setText(evt.target.value);
     textSizing();
-    props.changeText({ id: props.elId, text: evt.target.value });
   };
+  const handleKeyPress =(evt) => {
+    if(evt.key == "Backspace" || evt.key == "Delete")
+      evt.stopPropagation();
+
+  }
 
   const textSizing = () => {
     const txtArea = inputEl.current;
@@ -130,15 +136,17 @@ const InputText = (props) => {
   };
 
   const handleOnBlur = (evt) => {
+    props.changeText({ id: props.elId, text: text });
     props.onFinish();
   };
 
   return (
     <StyledInputText
+      onKeyUp={handleKeyPress}
       ref={inputEl}
       position={position}
       style={{ fontFamily: "Arial", ...props.style }}
-      value={props.children}
+      value={text}
       onBlur={handleOnBlur}
       onChange={handleOnChange}
     ></StyledInputText>

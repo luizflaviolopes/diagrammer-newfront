@@ -3,7 +3,7 @@ import { deletePressed, undo, redo } from "../../actions/keyboardActions.js";
 
 const keyboardAPI = {
   start: () => {
-    window.onkeydown = keyPressed;
+    window.onkeyup = keyPressed;
   },
   stop: () => {
     window.onkeydown = undefined;

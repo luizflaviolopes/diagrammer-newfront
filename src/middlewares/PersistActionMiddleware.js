@@ -10,6 +10,7 @@ const PersistActionMiddleware = (storeAPI) => (next) => (action) => {
     case actionTypes.BOARD_DRAW_ADD:
     case actionTypes.BOARD_DRAW_STOP_RESIZE:
     case actionTypes.BOARD_DRAW_CHANGE_TEXT:
+    case actionTypes.BOARD_DELETE_PRESSED:
       FinishAction(action.type);
       break;
     default:
