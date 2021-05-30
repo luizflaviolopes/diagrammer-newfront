@@ -112,7 +112,7 @@ const InputText = (props) => {
     textSizing();
   };
   const handleKeyPress =(evt) => {
-    if(evt.key == "Backspace" || evt.key == "Delete")
+    if(evt.key === "Backspace" || evt.key === "Delete")
       evt.stopPropagation();
 
   }

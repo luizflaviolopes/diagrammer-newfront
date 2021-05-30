@@ -391,6 +391,7 @@ export const updateConnectorsFromResize = (
   for (let i = 0; i < draw.connectors.length; i++) {
     const connRef = draw.connectors[i];
     const conn = connectorsList[connRef.id];
+    connectorChange(conn);
 
     let varY, varX;
 
@@ -427,7 +428,6 @@ export const updateConnectorsFromResize = (
         break;
     }
 
-    connectorChange(conn);
     conn.endPoints = [...conn.endPoints];
   }
 };
@@ -441,6 +441,7 @@ export const updateConnectorsFromRepositionSibling = (
   for (let i = 0; i < draw.connectors.length; i++) {
     const connRef = draw.connectors[i];
     const conn = connectorsList[connRef.id];
+    connectorChange(conn);
 
     const varY = variants.varS + variants.varN;
     const varX = variants.varW + variants.varE;
@@ -448,7 +449,6 @@ export const updateConnectorsFromRepositionSibling = (
     conn.endPoints[connRef.endPoint].x += varX;
     conn.endPoints[connRef.endPoint].y += varY;
 
-    connectorChange(conn);
     conn.endPoints = [...conn.endPoints];
   }
 };

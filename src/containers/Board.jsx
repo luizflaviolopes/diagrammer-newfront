@@ -22,6 +22,7 @@ const Board = (props) => {
   }, []);
 
   const drawconnectors = () => {
+    console.log('render connectors', props.connectors)
     return Object.keys(props.connectors).map((conn) => {
       return <Connector key={conn} id={conn} />;
     });

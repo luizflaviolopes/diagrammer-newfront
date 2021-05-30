@@ -13,6 +13,12 @@ class Connector extends Component {
   }
 
   render() {
+    if(!this.props.endPoints){
+      console.log('missed connector')
+      return null;
+    }
+
+    console.log('rendering connector')
     const selected = this.props.selcteds.includes(this.props.id);
     let pointerEvent = "stroke";
 

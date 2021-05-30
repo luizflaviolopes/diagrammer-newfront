@@ -32,12 +32,9 @@ const updateStateBackward = (state, element, action) => {
   let previous = action.previous;
 
   //Object was created and need to be removed from boardShowOrder
-  // if (Object.keys(previous).length === 1) {
-  //   elements[previous.id] = undefined;
-  //   let newShowOrder = removeFromArray(state.boardDrawShowOrder, previous.id);
-  //   state.boardDrawShowOrder = newShowOrder;
-  // } else if (!previous.parent) {
-  // } else {
-  element[previous.id] = previous;
-  // }
+  if (Object.keys(previous).length === 1) {
+    delete element[previous.id];
+  } else {
+    element[previous.id] = previous;
+  }
 };

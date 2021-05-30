@@ -264,14 +264,13 @@ export const updateConnectors = (draw, state, onMouseMovePositionVariant) => {
   for (let i = 0; i < draw.connectors.length; i++) {
     const connRef = draw.connectors[i];
     const conn = connectorsList[connRef.id];
+    connectorChange(conn);
 
     let newPositions = [...conn.endPoints];
     newPositions[connRef.endPoint].x =
       conn.endPoints[connRef.endPoint].x + onMouseMovePositionVariant.x;
     newPositions[connRef.endPoint].y =
       conn.endPoints[connRef.endPoint].y + onMouseMovePositionVariant.y;
-
-    connectorChange(conn);
 
     conn.endPoints = newPositions;
   }

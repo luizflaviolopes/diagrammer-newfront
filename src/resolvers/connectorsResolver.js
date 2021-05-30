@@ -1,4 +1,5 @@
 import { clearDrawSelected } from "./drawResolver";
+import { connectorChange } from "../dataControllers/changeDataControl";
 
 export const connectorDrawingStart = (state, actionPayload) => {
   const conId = state.counters.connectors;
@@ -62,13 +63,14 @@ export const connectorDrawingEnd = (state, actionPayload) => {
     let connEndpoints = [startEndPoint, endEndPoint];
 
     const connObject = {
-      id: state.counters.connectors,
+      id: connCounter,
       endPoints: connEndpoints,
     };
 
-    state.connectors[state.counters.connectors] = connObject;
+    connectorChange({ id: connObject.id });
+    state.connectors[connCounter] = connObject;
 
-    state.counters.connectors = state.counters.connectors + 1;
+    state.counters.connectors = connCounter + 1;
   } else {
     let connectors = { ...state.connectors };
     delete connectors[state.counters.connectors];

@@ -19,7 +19,7 @@ export const elementChange = (el) => {
 export const connectorChange = (conn) => {
   if (changedConnectors[conn.id]) return;
 
-  changedElements[conn.id] = _.cloneDeep(conn);
+  changedConnectors[conn.id] = _.cloneDeep(conn);
 };
 
 export const startPossibleBoardShowOrderChange = (boardShowOrder) => {
@@ -45,7 +45,7 @@ export const getAllChanges = () => {
   let changedConnectorsToSend = Object.keys(changedConnectors).map((id) => {
     return {
       previous: changedConnectors[id],
-      current: _.cloneDeep(state.elements.connectors[changedElements[id].id]),
+      current: _.cloneDeep(state.elements.connectors[changedConnectors[id].id]),
       type: CONNECTOR,
     };
   });
